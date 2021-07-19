@@ -8,7 +8,6 @@ type ListNode struct {
 	Next *ListNode
 }
 
-//删除链表的倒数第N个结点
 func main() {
 	ln5 := ListNode{Val: 5}
 	ln4 := ListNode{Val: 4, Next: &ln5}
@@ -21,6 +20,7 @@ func main() {
 	}
 }
 
+//删除链表的倒数第n个结点
 func removeNthFromEnd(head *ListNode, n int) *ListNode {
 	if n < 1 {
 		return head
