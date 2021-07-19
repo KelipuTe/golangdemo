@@ -1,4 +1,4 @@
-package leetcode19
+package main
 
 import "fmt"
 
