@@ -20,11 +20,12 @@ func threeSum(nums []int) [][]int {
 	iTarget := 0
 	iarr2sliRes := make([][]int, 0)
 	iArrLen := len(nums)
+
 	if iArrLen < 3 {
 		return [][]int{}
 	}
-	sort.Ints(nums) //排序
-
+	//排序
+	sort.Ints(nums)
 	//固定一个基数，然后使用双指针遍历剩余的数组
 	for iIndex1 := 0; iIndex1 < iArrLen-2; iIndex1++ {
 		//跳过一样的数

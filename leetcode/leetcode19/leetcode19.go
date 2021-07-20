@@ -22,13 +22,15 @@ func main() {
 
 //删除链表的倒数第n个结点
 func removeNthFromEnd(head *ListNode, n int) *ListNode {
-	if n < 1 {
-		return head
-	}
 	ii := 0 //链表长度
 	pLNTou2 := head
 	pLNWei3 := head
 	tpLN := head //要删的结点的前1个结点
+
+	if n < 1 {
+		return head
+	}
+
 	for pLNWei3 != nil {
 		pLNWei3 = pLNWei3.Next
 		ii++

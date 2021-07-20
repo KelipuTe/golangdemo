@@ -28,7 +28,6 @@ func letterCombinations(digits string) []string {
 	if len(digits) < 1 {
 		return []string{}
 	}
-
 	//初始化第一个
 	for ij := 0; ij < len(mapPhone[string(digits[0])]); ij++ {
 		sBtn := mapPhone[string(digits[0])]

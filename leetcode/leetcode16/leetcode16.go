@@ -19,11 +19,12 @@ func threeSumClosest(nums []int, target int) int {
 	iClosestSum := 65535                //最接近的三数之和，初始化一个临界值
 	iClosestLen := iClosestSum - target //最接近的三数之和和目标数的差值
 	iArrLen := len(nums)
+
 	if iArrLen < 3 {
 		return iClosestSum
 	}
-	sort.Ints(nums) //排序
-
+	//排序
+	sort.Ints(nums)
 	//固定一个基数，然后使用双指针遍历剩余的数组
 	for iIndex1 := 0; iIndex1 < iArrLen-2; iIndex1++ {
 		//跳过一样的数

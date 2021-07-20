@@ -25,5 +25,6 @@ func twoSum(nums []int, target int) []int {
 			return []int{iIndex1, mapNum[iNum2]}
 		}
 	}
+
 	return []int{-1, -1}
 }

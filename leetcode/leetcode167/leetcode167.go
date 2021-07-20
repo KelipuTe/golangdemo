@@ -14,6 +14,7 @@ func main() {
 func twoSum(numbers []int, target int) []int {
 	//用目标数依次和数组元素做减法，由于数组是有序的，所以可以用二分查找，查找减出来的数在哪里
 	iArrLen := len(numbers)
+
 	for ii := 0; ii < iArrLen; ii++ {
 		iLow := ii + 1
 		iHigh := iArrLen - 1
@@ -28,5 +29,6 @@ func twoSum(numbers []int, target int) []int {
 			}
 		}
 	}
+
 	return []int{-1, -1}
 }
