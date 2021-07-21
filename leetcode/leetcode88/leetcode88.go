@@ -2,12 +2,6 @@ package main
 
 import "fmt"
 
-//链表结点
-type ListNode struct {
-	Val  int
-	Next *ListNode
-}
-
 func main() {
 	//函数是引用传递，多出来的0是为了合并用的
 	isli11 := []int{1, 2, 3, 0, 0, 0}
@@ -15,9 +9,7 @@ func main() {
 
 	merge(isli11, 3, isli12, 3)
 
-	for ii := 0; ii < len(isli11); ii++ {
-		fmt.Printf("%d,", isli11[ii])
-	}
+	fmt.Println(isli11)
 }
 
 //解：

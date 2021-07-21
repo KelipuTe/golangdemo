@@ -3,10 +3,10 @@ package main
 import "fmt"
 
 func main() {
-	// iarrNums := []int{-1, 1, 2, -2, 1, 1, 0}
-	// iTarget := 2
-	iarrNums := []int{1, 2, 3, 4}
-	iTarget := 9
+	iarrNums := []int{-1, 1, 2, -2, 1, 1, 0}
+	iTarget := 2
+	// iarrNums := []int{1, 2, 3, 4}
+	// iTarget := 9
 	// iarrNums := []int{1, 1, 1}
 	// iTarget := 2
 	// iarrNums := []int{1, -1, 0}
