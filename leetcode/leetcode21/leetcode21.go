@@ -24,6 +24,11 @@ func main() {
 	}
 }
 
+//解：
+//使用两个指针标记两个链表中未处理的第一个结点
+//每次比较两个链表中未处理的第一个结点，把较小的结点连接到结果链表中
+//移动指针指向下一个未处理的结点
+
 //合并两个有序链表
 func mergeTwoLists(l1 *ListNode, l2 *ListNode) *ListNode {
 	var pLNTou2, pLNNow *ListNode

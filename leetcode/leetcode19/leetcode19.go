@@ -20,9 +20,13 @@ func main() {
 	}
 }
 
+//解：
+//两个指针p1和p2，先让p1从头开始，往前遍历n个结点，然后p2从头开始同步遍历
+//当p1遍历到链表尾部时，p2就指向倒数第n个结点处，需要错1位，让p2指向前一个结点才能进行删除
+
 //删除链表的倒数第n个结点
 func removeNthFromEnd(head *ListNode, n int) *ListNode {
-	ii := 0 //链表长度
+	iListLen := 0 //链表长度
 	pLNTou2 := head
 	pLNWei3 := head
 	tpLN := head //要删的结点的前1个结点
@@ -31,16 +35,16 @@ func removeNthFromEnd(head *ListNode, n int) *ListNode {
 		return head
 	}
 
+	//让pLNWei3指针领先tpLN指针n个结点
 	for pLNWei3 != nil {
 		pLNWei3 = pLNWei3.Next
-		ii++
-		//如果要删倒数第n个结点，需要让pLNWei3指针领先tpLN指针n个结点
-		if ii > n+1 {
+		iListLen++
+		if iListLen > n+1 {
 			tpLN = tpLN.Next
 		}
 	}
 
-	if ii > n {
+	if iListLen > n {
 		//n小于等于链表长度，删
 		if tpLN.Next == pLNWei3 {
 			//删的是尾节点
@@ -48,7 +52,7 @@ func removeNthFromEnd(head *ListNode, n int) *ListNode {
 		} else {
 			tpLN.Next = tpLN.Next.Next
 		}
-	} else if ii == n {
+	} else if iListLen == n {
 		//n等于链表长度，删第1个
 		pLNTou2 = pLNTou2.Next
 	}

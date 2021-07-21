@@ -8,9 +8,15 @@ func main() {
 	fmt.Println(sarrRes)
 }
 
-//电话号码的字母组合
+//例：
 //手机九宫格键盘，电话按键2-9分别对应几个字母
 //给定一个仅包含数字2-9的字符串，返回所有它能表示的字母组合
+
+//解：
+//初始化第一个按键的结果
+//上一次迭代的结果，依次附加下一个按键对应的所有字母
+
+//电话号码的字母组合
 func letterCombinations(digits string) []string {
 	mapPhone := map[string]string{
 		"2": "abc",
@@ -22,8 +28,8 @@ func letterCombinations(digits string) []string {
 		"8": "tuv",
 		"9": "wxyz",
 	} //键位和字母表
-	var sarr1sliRes []string  //返回结果
-	var tsarr1sliRes []string //保存上一次的结果
+	var ssli1Res []string  //返回结果
+	var tssli1Res []string //保存上一次的结果
 
 	if len(digits) < 1 {
 		return []string{}
@@ -33,25 +39,25 @@ func letterCombinations(digits string) []string {
 		sBtn := mapPhone[string(digits[0])]
 		cItem := sBtn[ij]
 		sRes := string(cItem)
-		sarr1sliRes = append(sarr1sliRes, sRes)
+		ssli1Res = append(ssli1Res, sRes)
 	}
-	//处理后面的
+
 	for ii := 1; ii < len(digits); ii++ {
 		sBtn := mapPhone[string(digits[ii])]
 		//复制上一次循环的结果
-		tsarr1sliRes = make([]string, len(sarr1sliRes))
-		copy(tsarr1sliRes, sarr1sliRes)
+		tssli1Res = make([]string, len(ssli1Res))
+		copy(tssli1Res, ssli1Res)
 		//清空返回结果
-		sarr1sliRes = make([]string, 0)
+		ssli1Res = make([]string, 0)
 		//把这个键位上的字符，依次附加到上一次循环的结果的尾部
 		for ij := 0; ij < len(sBtn); ij++ {
 			cItem := sBtn[ij]
-			for ik := 0; ik < len(tsarr1sliRes); ik++ {
-				sRes := tsarr1sliRes[ik] + string(cItem)
-				sarr1sliRes = append(sarr1sliRes, sRes)
+			for ik := 0; ik < len(tssli1Res); ik++ {
+				sRes := tssli1Res[ik] + string(cItem)
+				ssli1Res = append(ssli1Res, sRes)
 			}
 		}
 	}
 
-	return sarr1sliRes
+	return ssli1Res
 }
