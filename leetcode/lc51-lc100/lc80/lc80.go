@@ -5,10 +5,10 @@ import "fmt"
 func main() {
 	isli1 := []int{1, 1, 1, 2, 2, 3}
 
-	iLen := removeDuplicates(isli1)
+	iSli1Len := removeDuplicates(isli1)
 
 	fmt.Println(isli1)
-	fmt.Println(iLen)
+	fmt.Println(iSli1Len)
 }
 
 //例：
@@ -20,20 +20,20 @@ func main() {
 
 //删除有序数组中的重复项
 func removeDuplicates(nums []int) int {
-	iCheck := nums[0]
-	iCount := 1
+	iCheckNum := nums[0]
+	iNumCount := 1
 	ij := 1
 
 	for ii := 1; ii < len(nums); ii++ {
-		if iCheck == nums[ii] && iCount < 2 {
+		if iCheckNum == nums[ii] && iNumCount < 2 {
 			nums[ij] = nums[ii]
-			iCount++
+			iNumCount++
 			ij++
 		}
-		if iCheck != nums[ii] {
+		if iCheckNum != nums[ii] {
 			nums[ij] = nums[ii]
-			iCheck = nums[ii]
-			iCount = 1
+			iCheckNum = nums[ii]
+			iNumCount = 1
 			ij++
 		}
 	}
