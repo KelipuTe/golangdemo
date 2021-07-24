@@ -3,7 +3,7 @@ package main
 import "fmt"
 
 func main() {
-	isli1 := []int{2, 0, 2, 1, 1, 0}
+	isli1 := []int{2, 1}
 
 	sortColors(isli1)
 
@@ -29,7 +29,7 @@ func sortColors(nums []int) {
 			ii++
 		}
 	}
-	for ii, ij := iSliLen-1, iSliLen-1; ij > 0; ij-- {
+	for ii, ij := iSliLen-1, iSliLen-1; ij >= 0; ij-- {
 		if nums[ij] == 2 {
 			ti := nums[ii]
 			nums[ii] = nums[ij]
