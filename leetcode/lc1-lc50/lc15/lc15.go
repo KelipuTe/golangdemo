@@ -13,32 +13,29 @@ func main() {
 	fmt.Println(iarrRes)
 }
 
-//例：
-//从数组an中找出三个整数[a1,a2,a3]，使得它们的和等于给定目标数n，数组元素会重复
-
-//解：
-//先对原数组进行升序排序
-//从左往右，依次固定基数a1，在右侧的剩下的数组元素中找到两个整数a2和a3使得它们的和等于n-a1
-//使用双指针，a2从i1+1开始往右，a3从in-1开始往左
-//如果a2+a3>n-a1，则需要提供一个更小的和，所以a3左移，反之a2右移
-
 //三数之和
+//从数组an中找出三个整数[a1,a2,a3]，使得它们的和等于给定目标数n，数组元素会重复
 func threeSum(nums []int) [][]int {
 	iArrLen := len(nums)
 	iTarget := 0
-	isli2Res := make([][]int, 0)
+	var isli2Res [][]int = make([][]int, 0) //结果
 
 	if iArrLen < 3 {
 		return [][]int{}
 	}
-	sort.Ints(nums)
+
+	sort.Ints(nums) //先对原数组进行升序排序
+
+	//从左往右，依次固定基数a1，在右侧的剩下的数组元素中找到两个整数a2和a3使得它们的和等于n-a1
 	for iIndex1 := 0; iIndex1 < iArrLen-2; iIndex1++ {
 		//跳过一样的数
 		if iIndex1 > 0 && nums[iIndex1] == nums[iIndex1-1] {
 			continue
 		}
+		//使用双指针，a2从i1+1开始往右，a3从in-1开始往左
 		iIndex2 := iIndex1 + 1
 		iIndex3 := iArrLen - 1
+		//如果a2+a3>n-a1，则需要提供一个更小的和，所以a3左移，反之a2右移
 		for iIndex2 < iIndex3 {
 			if nums[iIndex1]+nums[iIndex2]+nums[iIndex3] > iTarget {
 				//三数之和小于目标数，左指针右移

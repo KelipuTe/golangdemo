@@ -9,19 +9,17 @@ func main() {
 	fmt.Println(iarrRes)
 }
 
-//例：
-//从数组an中找出两个整数[a1,a2]，使得它们的和等于给定目标数，数组元素不会重复
-
-//解：
-//构造键为an，值为in的map
-//遍历数组，得到遍历的值a1和a2=n-a1，去map中查找有没有a2这个键
-
 //两数之和
+//从数组an中找出两个整数[a1,a2]，使得它们的和等于给定目标数，数组元素不会重复
 func twoSum(nums []int, target int) []int {
-	mapNum := make(map[int]int, len(nums))
+	var mapNum map[int]int = make(map[int]int, len(nums))
+
+	//构造键为an，值为in的map
 	for iIndex1, iNum1 := range nums {
 		mapNum[iNum1] = iIndex1
 	}
+
+	//遍历数组，得到遍历的值a1和a2=n-a1，去map中查找有没有a2这个键
 	for iNum1, iIndex1 := range mapNum {
 		iNum2 := target - iNum1
 		_, bExist := mapNum[iNum2]

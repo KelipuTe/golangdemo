@@ -13,22 +13,20 @@ func main() {
 	fmt.Println(iarrRes)
 }
 
-//例：
-//从数组中找出三个整数，让它们的和最接近给定的目标数，返回最接近的那个和
-
-//解：
-//基本思路同三数之和（leetcode15）
-//区别在于每次遍历需要记录当前三数之和和目标数的差值并和目前最小的差值比较
-
 //最接近的三数之和
+//从数组中找出三个整数，让它们的和最接近给定的目标数，返回最接近的那个和
 func threeSumClosest(nums []int, target int) int {
+	//基本思路同三数之和（leetcode15）
+	//区别在于每次遍历需要记录当前三数之和和目标数的差值并和目前最小的差值比较
+
 	iArrLen := len(nums)
-	iClosestSum := 65535                //最接近的三数之和，初始化一个临界值
-	iClosestLen := iClosestSum - target //最接近的三数之和和目标数的差值
+	var iClosestSum int = 65535                //最接近的三数之和，初始化一个临界值
+	var iClosestLen int = iClosestSum - target //最接近的三数之和和目标数的差值
 
 	if iArrLen < 3 {
 		return iClosestSum
 	}
+
 	sort.Ints(nums)
 	for iIndex1 := 0; iIndex1 < iArrLen-2; iIndex1++ {
 		//跳过一样的数

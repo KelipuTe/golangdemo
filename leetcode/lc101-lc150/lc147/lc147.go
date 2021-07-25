@@ -22,14 +22,14 @@ func main() {
 
 //对链表进行插入排序
 func insertionSortList(head *ListNode) *ListNode {
-	//默认头结点有序
-	//把结点取出来，并把连接断开
-	tpLNHead := head
-	pLNHead := head.Next //原链表剩余部分
-	tpLNHead.Next = nil
+	var tpLNHead *ListNode = head     //默认头结点有序
+	var pLNHead *ListNode = head.Next //原链表剩余部分
+
+	tpLNHead.Next = nil //断开头结点后面的链表
 
 	//处理剩下的部分
 	for pLNHead != nil {
+		//把结点取出来，断开结点后面的链表
 		tpLN := pLNHead
 		pLNHead = pLNHead.Next
 		tpLN.Next = nil

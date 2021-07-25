@@ -24,52 +24,52 @@ func main() {
 	}
 }
 
-//解：
-//使用两个指针标记两个链表中未处理的第一个结点
-//每次比较两个链表中未处理的第一个结点，把较小的结点连接到结果链表中
-//移动指针指向下一个未处理的结点
-
 //合并两个有序链表
 func mergeTwoLists(l1 *ListNode, l2 *ListNode) *ListNode {
-	var pLNTou2, pLNNow *ListNode
-	tpl1 := l1
-	tpl2 := l2
-	if tpl1 == nil {
+	//使用两个指针标记两个链表中未处理的第一个结点
+	//每次比较两个链表中未处理的第一个结点，把较小的结点连接到结果链表中
+
+	var pLNTou2 *ListNode //头指针
+	var pLNNow *ListNode  //连接指针
+	var tpLNl1, tpLNl2 *ListNode = l1, l2
+
+	if tpLNl1 == nil {
 		return l2
 	}
-	if tpl2 == nil {
+	if tpLNl2 == nil {
 		return l1
 	}
-	//确定头
-	if tpl1.Val >= tpl2.Val {
-		pLNTou2 = tpl2
-		pLNNow = tpl2
-		tpl2 = tpl2.Next
+
+	//确定头结点
+	if tpLNl1.Val >= tpLNl2.Val {
+		pLNTou2 = tpLNl2
+		pLNNow = tpLNl2
+		tpLNl2 = tpLNl2.Next
 	} else {
-		pLNTou2 = tpl1
-		pLNNow = tpl1
-		tpl1 = tpl1.Next
+		pLNTou2 = tpLNl1
+		pLNNow = tpLNl1
+		tpLNl1 = tpLNl1.Next
 	}
 
 	for true {
 		//其中一条链表已经到尾部
-		if tpl1 == nil {
-			pLNNow.Next = tpl2
+		if tpLNl1 == nil {
+			pLNNow.Next = tpLNl2
 			break
 		}
-		if tpl2 == nil {
-			pLNNow.Next = tpl1
+		if tpLNl2 == nil {
+			pLNNow.Next = tpLNl1
 			break
 		}
 		//两条链表都没有到尾部
-		if tpl1.Val >= tpl2.Val {
-			pLNNow.Next = tpl2
-			pLNNow = tpl2
-			tpl2 = tpl2.Next
+		if tpLNl1.Val >= tpLNl2.Val {
+			pLNNow.Next = tpLNl2
+			pLNNow = tpLNl2
+			tpLNl2 = tpLNl2.Next
 		} else {
-			pLNNow.Next = tpl1
-			pLNNow = tpl1
-			tpl1 = tpl1.Next
+			pLNNow.Next = tpLNl1
+			pLNNow = tpLNl1
+			tpLNl1 = tpLNl1.Next
 		}
 	}
 

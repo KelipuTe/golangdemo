@@ -3,43 +3,40 @@ package main
 import "fmt"
 
 func main() {
-	//函数是引用传递，多出来的0是为了合并用的
+	//切片是引用传递，多出来的0是为了合并用的
 	isli11 := []int{1, 2, 3, 0, 0, 0}
 	isli12 := []int{2, 5, 6}
-
 	merge(isli11, 3, isli12, 3)
-
 	fmt.Println(isli11)
 }
 
-//解：
-//使用两个下标标记两个数组中未处理的第一个数
-//每次比较两个数组中未处理的第一个数，把较小的添加到结果数组中
-//下标指向下一个未处理的数
-
 //合并两个有序数组
 func merge(nums1 []int, m int, nums2 []int, n int) {
-	tiNums := make([]int, 0, m+n)
-	ii1, ii2 := 0, 0
+	//使用两个下标标记两个数组中未处理的第一个数
+	//每次比较两个数组中未处理的第一个数，把较小的添加到结果数组
+
+	var tiNums []int = make([]int, 0, m+n) //结果数组
+	var iIndex1, iIndex2 int = 0, 0        //下标标记
 
 	for true {
 		//其中一个数组已经到尾部
-		if ii1 == m {
-			tiNums = append(tiNums, nums2[ii2:]...)
+		if iIndex1 == m {
+			tiNums = append(tiNums, nums2[iIndex2:]...)
 			break
 		}
-		if ii2 == n {
-			tiNums = append(tiNums, nums1[ii1:]...)
+		if iIndex2 == n {
+			tiNums = append(tiNums, nums1[iIndex1:]...)
 			break
 		}
 		//两个数组都没有到尾部
-		if nums1[ii1] < nums2[ii2] {
-			tiNums = append(tiNums, nums1[ii1])
-			ii1++
+		if nums1[iIndex1] < nums2[iIndex2] {
+			tiNums = append(tiNums, nums1[iIndex1])
+			iIndex1++
 		} else {
-			tiNums = append(tiNums, nums2[ii2])
-			ii2++
+			tiNums = append(tiNums, nums2[iIndex2])
+			iIndex2++
 		}
 	}
-	copy(nums1, tiNums)
+
+	copy(nums1, tiNums) //把结果复制到nums1中
 }
