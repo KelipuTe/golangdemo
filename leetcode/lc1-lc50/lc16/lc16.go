@@ -6,10 +6,8 @@ import (
 )
 
 func main() {
-	// iarrNums := []int{-1, 2, 1, -4}
-	iarrNums := []int{1, 1, -1, -1, 3}
-	iTarget := 1
-	iarrRes := threeSumClosest(iarrNums, iTarget)
+	// iarrRes := threeSumClosest([]int{-1, 2, 1, -4}, 1)
+	iarrRes := threeSumClosest([]int{1, 1, -1, -1, 3}, 1)
 	fmt.Println(iarrRes)
 }
 

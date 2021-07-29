@@ -3,9 +3,7 @@ package main
 import "fmt"
 
 func main() {
-	sNum := "22"
-	sarrRes := letterCombinations(sNum)
-	fmt.Println(sarrRes)
+	fmt.Println(letterCombinations("22"))
 }
 
 //电话号码的字母组合

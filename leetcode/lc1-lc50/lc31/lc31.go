@@ -10,7 +10,6 @@ func main() {
 	// isli1Num := []int{3, 2, 1}
 	// isli1Num := []int{1, 2}
 	nextPermutation(isli1Num)
-
 	fmt.Println(isli1Num)
 }
 
@@ -35,7 +34,7 @@ func nextPermutation(nums []int) {
 		sort.Ints(nums)
 		return
 	}
-
+	//后往前找
 	iIndex2 := -1
 	for ii := iNumsLen - 1; ii > iIndex1; ii-- {
 		if nums[ii] > nums[iIndex1] {
@@ -43,18 +42,13 @@ func nextPermutation(nums []int) {
 			break
 		}
 	}
-
-	tiNum := nums[iIndex1]
-	nums[iIndex1] = nums[iIndex2]
-	nums[iIndex2] = tiNum
-
+	nums[iIndex1], nums[iIndex2] = nums[iIndex2], nums[iIndex1]
+	//反序
 	if iIndex1 < iNumsLen-2 {
 		ii := iIndex1 + 1
 		ij := iNumsLen - 1
 		for ii < ij {
-			tiNum := nums[ii]
-			nums[ii] = nums[ij]
-			nums[ij] = tiNum
+			nums[ii], nums[ij] = nums[ij], nums[ii]
 			ii++
 			ij--
 		}

@@ -2,11 +2,10 @@ package main
 
 import "fmt"
 
-//链表结点
 type ListNode struct {
 	Val  int
 	Next *ListNode
-}
+} //链表结点
 
 func main() {
 	ln13 := ListNode{Val: 4}

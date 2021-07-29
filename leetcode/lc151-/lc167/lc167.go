@@ -3,9 +3,7 @@ package main
 import "fmt"
 
 func main() {
-	iarrNums := []int{2, 7, 11, 15}
-	iTarget := 9
-	iarrRes := twoSum(iarrNums, iTarget)
+	iarrRes := twoSum([]int{2, 7, 11, 15}, 9)
 	fmt.Println(iarrRes)
 }
 

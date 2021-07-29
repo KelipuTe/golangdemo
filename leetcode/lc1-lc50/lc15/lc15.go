@@ -6,11 +6,9 @@ import (
 )
 
 func main() {
-	// iarrNums := []int{0, 0, 0}
-	// iarrNums := []int{-1, 0, 1, 2, -1, -4}
-	iarrNums := []int{-2, 0, 3, -1, 4, 0, 3, 4, 1, 1, 1, -3, -5, 4, 0}
-	iarrRes := threeSum(iarrNums)
-	fmt.Println(iarrRes)
+	// fmt.Println(threeSum([]int{0, 0, 0}))
+	// fmt.Println(threeSum([]int{-1, 0, 1, 2, -1, -4}))
+	fmt.Println(threeSum([]int{-2, 0, 3, -1, 4, 0, 3, 4, 1, 1, 1, -3, -5, 4, 0}))
 }
 
 //三数之和

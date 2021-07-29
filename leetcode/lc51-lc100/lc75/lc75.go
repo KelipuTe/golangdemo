@@ -3,7 +3,7 @@ package main
 import "fmt"
 
 func main() {
-	isli1 := []int{2, 1}
+	isli1 := []int{2, 1, 0, 0, 1, 2, 2, 1, 0, 2, 1}
 	sortColors(isli1)
 	fmt.Println(isli1)
 }
@@ -16,18 +16,14 @@ func sortColors(nums []int) {
 	//从前往后遍历，找到0就换到前面
 	for ii, ij := 0, 0; ij < iSliLen; ij++ {
 		if nums[ij] == 0 {
-			ti := nums[ii]
-			nums[ii] = nums[ij]
-			nums[ij] = ti
+			nums[ii], nums[ij] = nums[ij], nums[ii]
 			ii++
 		}
 	}
 	//从后往前遍历，找到2就换到后面
 	for ii, ij := iSliLen-1, iSliLen-1; ij >= 0; ij-- {
 		if nums[ij] == 2 {
-			ti := nums[ii]
-			nums[ii] = nums[ij]
-			nums[ij] = ti
+			nums[ii], nums[ij] = nums[ij], nums[ii]
 			ii--
 		}
 	}

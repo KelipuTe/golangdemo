@@ -3,10 +3,7 @@ package main
 import "fmt"
 
 func main() {
-	iarrNums := []int{2, 7, 11, 15}
-	iTarget := 9
-	iarrRes := twoSum(iarrNums, iTarget)
-	fmt.Println(iarrRes)
+	fmt.Println(twoSum([]int{2, 7, 11, 15}, 9))
 }
 
 //两数之和

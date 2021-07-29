@@ -3,8 +3,7 @@ package main
 import "fmt"
 
 func main() {
-	ssli1Res := generateParenthesis(3)
-	fmt.Println(ssli1Res)
+	fmt.Println(generateParenthesis(3))
 }
 
 //括号生成

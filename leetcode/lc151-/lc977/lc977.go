@@ -3,8 +3,7 @@ package main
 import "fmt"
 
 func main() {
-	isli1Nums := []int{-4, -1, 0, 3, 10}
-	isli1Res := sortedSquares(isli1Nums)
+	isli1Res := sortedSquares([]int{-4, -1, 0, 3, 10})
 	for iIndexZuo1 := 0; iIndexZuo1 < len(isli1Res); iIndexZuo1++ {
 		fmt.Printf("%d,", isli1Res[iIndexZuo1])
 	}
