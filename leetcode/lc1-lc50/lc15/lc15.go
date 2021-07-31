@@ -24,11 +24,11 @@ func threeSum(nums []int) [][]int {
 	//因为答案中不可以包含重复的三元组，所以遇到连续的数字可以跳过
 
 	iNumsLen := len(nums)
+	var isli2Res [][]int = make([][]int, 0) //结果
+
 	if iNumsLen < 3 {
 		return [][]int{}
 	}
-
-	var isli2Res [][]int = make([][]int, 0) //结果
 
 	sort.Ints(nums) //排序
 	for iIndex1 := 0; iIndex1 < iNumsLen-2; iIndex1++ {

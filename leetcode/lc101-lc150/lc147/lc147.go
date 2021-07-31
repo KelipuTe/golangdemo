@@ -20,7 +20,7 @@ func main() {
 	}
 }
 
-//对链表进行插入排序
+//148-对链表进行插入排序
 func insertionSortList(head *ListNode) *ListNode {
 	var tpLNHead *ListNode = head     //默认头结点有序
 	var pLNHead *ListNode = head.Next //原链表剩余部分

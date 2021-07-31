@@ -20,15 +20,14 @@ func main() {
 }
 
 //查找二叉搜索树中第k个最小元素（从1开始计数）
-
-//树中的节点数为n；1<=k<=n<=10^4；0<=Node.val<=10^4
-
-//二叉搜索树的中序遍历是升序序列，遍历二叉搜索树然后取第k个值
+//树中的节点数为n;1<=k<=n<=10^4;0<=Node.val<=10^4
 
 var isli1QueryRes []int //遍历结果
 
-//230、二叉搜索树中第K小的元素
+//230-二叉搜索树中第K小的元素(94,98,144,145)
 func kthSmallest(root *TreeNode, k int) int {
+	//二叉搜索树的中序遍历是升序序列，遍历二叉搜索树然后取第k个值
+
 	isli1QueryRes = []int{}
 	fZhongXuQuery(root)
 	return isli1QueryRes[k-1]

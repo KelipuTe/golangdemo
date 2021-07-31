@@ -21,12 +21,12 @@ func threeSumClosest(nums []int, target int) int {
 	//区别在于每次遍历需要记录当前三数之和和目标数的差值并和目前最小的差值比较
 
 	iNumsLen := len(nums)
+	iClosestSum := 65535                //最接近的三数之和，初始化一个极大临界值
+	iClosestLen := iClosestSum - target //最接近的三数之和和目标数的差值
+
 	if iNumsLen < 3 {
 		return 65535
 	}
-
-	iClosestSum := 65535                //最接近的三数之和，初始化一个极大临界值
-	iClosestLen := iClosestSum - target //最接近的三数之和和目标数的差值
 
 	sort.Ints(nums) //排序
 	for iIndex1 := 0; iIndex1 < iNumsLen-2; iIndex1++ {

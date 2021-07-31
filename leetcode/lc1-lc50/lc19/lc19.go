@@ -19,19 +19,20 @@ func main() {
 	}
 }
 
-//删除链表的倒数第n个结点
+//19-删除链表的倒数第n个结点
 func removeNthFromEnd(head *ListNode, n int) *ListNode {
-	var iListLen int = 0           //链表长度
-	var pLNTou2 *ListNode = head   //头指针
-	var pLNWei3 *ListNode = head   //尾指针
-	var tpLNQuery *ListNode = head //遍历指针
+	//双指针
+	//两个指针，先让第一个指针从头开始，往前遍历n个结点，然后第二个指针从头开始同步遍历
+	//当第一个指针遍历到链表尾部时，第二个指针就指向倒数第n个结点处
+
+	iListLen := 0                               //链表长度
+	var pLNTou2, pLNWei3 *ListNode = head, head //头指针，尾指针
+	var tpLNQuery *ListNode = head              //遍历指针
 
 	if n < 1 {
 		return head
 	}
 
-	//两个指针，先让pLNWei3从头开始，往前遍历n个结点，然后tpLNQuery从头开始同步遍历
-	//当pLNWei3遍历到链表尾部时，tpLNQuery就指向倒数第n个结点处
 	for pLNWei3 != nil {
 		pLNWei3 = pLNWei3.Next
 		iListLen++

@@ -25,16 +25,16 @@ func main() {
 //树中节点数目在范围[1, 25]内；1<=Node.val<=(2^31)-1
 //对于树中每个节点:root.val=min(root.left.val,root.right.val)
 
-//遍历一遍找到除了根结点最小的即可
-
-//671、二叉树中第二小的节点
+//671-二叉树中第二小的节点
 func findSecondMinimumValue(root *TreeNode) int {
-	if root == nil {
-		return -1
-	}
+	//遍历一遍找到除了根结点最小的即可
 
 	var iMinVal int = -1                        //设定一个临界值
 	var psli1TN []*TreeNode = []*TreeNode{root} //队列
+
+	if root == nil {
+		return -1
+	}
 
 	for len(psli1TN) > 0 {
 		tpTN := psli1TN[0]

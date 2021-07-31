@@ -8,11 +8,13 @@ func main() {
 
 //通过调用bool isBadVersion(version)接口来判断版本号version是否在单元测试中出错
 //假设你有n个版本[1, 2, ..., n]，实现一个函数来查找第一个错误的版本
+//1<=bad<=n<=(2^31)-1
 
-//278、第一个错误的版本
+//278-第一个错误的版本(34,278)
 func firstBadVersion(n int) int {
 	//二分查找
-	//下标，按题目的意思应该是从1开始到n，而不是一般二分查找的0到n-1
+	//按题目的意思，下标应该是从1开始到n，而不是一般二分查找的0到n-1
+
 	iLeft, iRight := 1, n
 	for iLeft < iRight {
 		iMid := iLeft + (iRight-iLeft)>>1

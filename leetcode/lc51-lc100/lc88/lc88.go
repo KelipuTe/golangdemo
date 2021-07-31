@@ -3,14 +3,14 @@ package main
 import "fmt"
 
 func main() {
-	//切片是引用传递，多出来的0是为了合并用的
-	isli11 := []int{1, 2, 3, 0, 0, 0}
+
+	isli11 := []int{1, 2, 3, 0, 0, 0} //切片是引用传递，多出来的0是为了合并用的
 	isli12 := []int{2, 5, 6}
 	merge(isli11, 3, isli12, 3)
 	fmt.Println(isli11)
 }
 
-//合并两个有序数组
+//88-合并两个有序数组(21,88)(88,977)
 func merge(nums1 []int, m int, nums2 []int, n int) {
 	//使用两个下标标记两个数组中未处理的第一个数
 	//每次比较两个数组中未处理的第一个数，把较小的添加到结果数组

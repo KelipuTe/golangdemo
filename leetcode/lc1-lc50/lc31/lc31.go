@@ -13,9 +13,11 @@ func main() {
 	fmt.Println(isli1Num)
 }
 
-//下一个排列
-//给定一个数组，数组中的元素组成一个数字，
-//将数组重新排列，找到可以排列出的，比这个数字大的第一个数字，如果没有就将数组升序排序
+//算法需要将给定数字序列重新排列成字典序中下一个更大的排列
+//如果不存在下一个更大的排列，则将数字重新排列成最小的排列（即升序排列）
+//必须原地修改，只允许使用额外常数空间
+
+//31-下一个排列
 func nextPermutation(nums []int) {
 	//从后往前找，找到第一个数n[a]，让n[a]比n[a+1]小，如果没找到，说明数组是降序的，已经是最大的数字了
 	//再从后往前找，找到第一个比n[a]大的数n[b]，交换n[a]和n[b]，再把交换后n[b]后面的序列反序
@@ -23,6 +25,7 @@ func nextPermutation(nums []int) {
 
 	iNumsLen := len(nums)
 
+	//后往前找n[a]
 	iIndex1 := -1
 	for ii := iNumsLen - 2; ii >= 0; ii-- {
 		if nums[ii] < nums[ii+1] {
@@ -34,7 +37,7 @@ func nextPermutation(nums []int) {
 		sort.Ints(nums)
 		return
 	}
-	//后往前找
+	//后往前找n[b]
 	iIndex2 := -1
 	for ii := iNumsLen - 1; ii > iIndex1; ii-- {
 		if nums[ii] > nums[iIndex1] {

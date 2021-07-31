@@ -21,18 +21,20 @@ func main() {
 	}
 }
 
-//删除排序链表中的重复元素，删除重复元素的所有结点
-func deleteDuplicates(head *ListNode) *ListNode {
-	if head == nil || head.Next == nil {
-		//链表为空或者只有一个结点
-		return head
-	}
+//存在一个按升序排列的链表，删除链表中所有存在数字重复情况的节点，只保留原始链表中没有重复出现的数字。
 
+//82-删除排序链表中的重复元素II(82,83)
+func deleteDuplicates(head *ListNode) *ListNode {
 	var tplnHead *ListNode = nil        //头指针
 	var tplnLink *ListNode = nil        //连接指针
 	var tplnCheck *ListNode = head      //校验指针
 	var iNumCount int = 1               //校验计数
 	var tplnQuery *ListNode = head.Next //遍历指针
+
+	//链表为空或者只有一个结点
+	if head == nil || head.Next == nil {
+		return head
+	}
 
 	for tplnQuery != nil {
 		if tplnQuery.Val == tplnCheck.Val {

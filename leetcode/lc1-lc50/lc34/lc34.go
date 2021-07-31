@@ -9,10 +9,16 @@ func main() {
 	// fmt.Println(searchRange([]int{1}, 1))
 }
 
-//34、在排序数组中查找元素的第一个和最后一个位置
+//给定升序排列的整数数组和一个目标值target，找出给定目标值在数组中的开始位置和结束位置
+//0<=nums.length<=10^5;-10^9<=nums[i]<=10^9;-10^9<=target<=10^9
+
+//34-在排序数组中查找元素的第一个和最后一个位置(34,278)
 func searchRange(nums []int, target int) []int {
 	//二分查找
+
 	iNumsLen := len(nums)
+	iLeft, iRight := 0, iNumsLen-1
+
 	if iNumsLen < 1 {
 		return []int{-1, -1}
 	}
@@ -22,7 +28,6 @@ func searchRange(nums []int, target int) []int {
 
 	//不等的时候，和二分查找一样处理
 	//等于的时候，右边界往左边压，找到最小index的target
-	iLeft, iRight := 0, iNumsLen-1
 	for iLeft < iRight {
 		iMid := iLeft + (iRight-iLeft)>>1
 		if nums[iMid] > target {

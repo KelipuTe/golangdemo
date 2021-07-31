@@ -21,12 +21,12 @@ func main() {
 
 //给定一个二叉树，判断其是否是一个有效的二叉搜索树
 
-//二叉搜索树的中序遍历是升序序列，遍历二叉搜索树然后判断是不是升序序列
-
 var isli1QueryRes []int //遍历结果
 
-//98、验证二叉搜索树
+//98-验证二叉搜索树(94,98,230)
 func isValidBST(root *TreeNode) bool {
+	//二叉搜索树的中序遍历是升序序列，遍历二叉搜索树然后判断是不是升序序列
+
 	isli1QueryRes = []int{}
 	fZhongXuQuery(root)
 	for iIndex := 1; iIndex < len(isli1QueryRes); iIndex++ {

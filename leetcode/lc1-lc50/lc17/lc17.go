@@ -6,13 +6,20 @@ func main() {
 	fmt.Println(letterCombinations("22"))
 }
 
-//电话号码的字母组合
 //手机九宫格键盘，电话按键2-9分别对应几个字母
+//             "2": "abc", "3": "def",
+//"4": "ghi",  "5": "jkl", "6": "mno",
+//"7": "pqrs", "8": "tuv", "9": "wxyz",
 //给定一个仅包含数字2-9的字符串，返回所有它能表示的字母组合
+
+//17-电话号码的字母组合(17,22)
 func letterCombinations(digits string) []string {
+	//动态规划
+
 	var mapPhone map[string]string = map[string]string{
-		"2": "abc", "3": "def", "4": "ghi", "5": "jkl",
-		"6": "mno", "7": "pqrs", "8": "tuv", "9": "wxyz",
+		"2": "abc", "3": "def",
+		"4": "ghi", "5": "jkl", "6": "mno",
+		"7": "pqrs", "8": "tuv", "9": "wxyz",
 	} //键位和字母表
 	var ssli1Res []string  //返回结果
 	var tssli1Res []string //保存上一次的结果

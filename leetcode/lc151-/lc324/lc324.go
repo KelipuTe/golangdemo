@@ -14,36 +14,39 @@ func main() {
 	fmt.Println(isli1)
 }
 
-//摆动排序
-//一个整数数组an，将它重新排列成 an[0] < an[1] > an[2] < an[3] ... 的顺序
+//一个整数数组an，将它重新排列成an[0]<an[1]>an[2]<an[3]...的顺序
+
+//324-摆动排序II(75,324)
 func wiggleSort(nums []int) {
-	iSliLen := len(nums)
-	var isli1 []int = make([]int, iSliLen)
+	//将原数组升序排序
+	//将升序排序后的数组的前半部分的元素放到奇数下标，后半部分的元素放到偶数下标
+	//注意，数组长度为奇数和为偶数时，下标处理方式略有差别
+
+	iNumsLen := len(nums)
+	var isli1 []int = make([]int, iNumsLen)
 
 	//将原数组拷贝一份，然后升序排序
 	copy(isli1, nums)
 	sort.Ints(isli1)
 
-	//将前半部分的元素放到奇数下标，后半部分的元素放到偶数下标
-	//注意，数组长度为奇数和为偶数时，下标处理方式略有差别
-	if iSliLen%2 == 0 {
-		for ii, ij := 0, iSliLen/2-1; ii < iSliLen; {
+	if iNumsLen%2 == 0 {
+		for ii, ij := 0, (iNumsLen>>1)-1; ii < iNumsLen; {
 			nums[ii] = isli1[ij]
 			ii += 2
 			ij--
 		}
-		for ii, ij := 1, iSliLen-1; ii < iSliLen; {
+		for ii, ij := 1, iNumsLen-1; ii < iNumsLen; {
 			nums[ii] = isli1[ij]
 			ii += 2
 			ij--
 		}
 	} else {
-		for ii, ij := 0, iSliLen/2; ii < iSliLen; {
+		for ii, ij := 0, iNumsLen>>1; ii < iNumsLen; {
 			nums[ii] = isli1[ij]
 			ii += 2
 			ij--
 		}
-		for ii, ij := 1, iSliLen-1; ii < iSliLen; {
+		for ii, ij := 1, iNumsLen-1; ii < iNumsLen; {
 			nums[ii] = isli1[ij]
 			ii += 2
 			ij--
