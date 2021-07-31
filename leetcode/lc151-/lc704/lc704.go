@@ -6,7 +6,7 @@ func main() {
 	fmt.Println(search([]int{-1, 0, 3, 5, 9, 12}, 6))
 }
 
-//704、二分查找
+//704-二分查找
 func search(nums []int, target int) int {
 	iNumsLen := len(nums)
 	iLeft, iRight := 0, iNumsLen-1

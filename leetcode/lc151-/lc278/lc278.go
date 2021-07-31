@@ -12,6 +12,7 @@ func main() {
 //278、第一个错误的版本
 func firstBadVersion(n int) int {
 	//二分查找
+	//下标，按题目的意思应该是从1开始到n，而不是一般二分查找的0到n-1
 	iLeft, iRight := 1, n
 	for iLeft < iRight {
 		iMid := iLeft + (iRight-iLeft)>>1

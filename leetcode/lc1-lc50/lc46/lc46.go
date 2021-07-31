@@ -10,7 +10,7 @@ func main() {
 	fmt.Println(isli2Res)
 }
 
-//全排列
+//46-全排列
 func permute(nums []int) [][]int {
 	//回溯算法
 
