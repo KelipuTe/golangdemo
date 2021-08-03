@@ -8,7 +8,7 @@ import (
 func main() {
 	// combinationSum([]int{2, 3, 6, 7}, 7)
 	combinationSum([]int{2, 3, 5}, 8)
-	combinationSum([]int{1}, 1)
+	// combinationSum([]int{1}, 1)
 	fmt.Println(isli2Res)
 }
 
@@ -25,7 +25,7 @@ func combinationSum(candidates []int, target int) [][]int {
 	//因为可以重复，所以每次回溯都有两种选择，要自己或者跳过自己
 	isli2Res = [][]int{}         //初始化结果集
 	var isli1Res []int = []int{} //每次回溯的结果
-	sort.Ints(candidates)        //排序有利于回溯时过滤掉超过target的元素
+	sort.Ints(candidates)        //排序，有利于回溯时直接过滤掉超过target的元素
 	hui2Su4(candidates, target, 0, isli1Res)
 	return isli2Res
 }
