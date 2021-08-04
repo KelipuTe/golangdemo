@@ -3,21 +3,19 @@ package main
 import "fmt"
 
 func main() {
-	// fmt.Println(searchRange([]int{4, 4, 5, 5, 7, 7, 8, 8, 8, 9, 9, 9, 10}, 7))
+	// fmt.Println(searchRange([]int{4, 4, 5, 5, 7, 7, 8, 8, 8, 9, 9, 9, 10}, 4))
 	// fmt.Println(searchRange([]int{5, 7, 7, 8, 8, 10}, 6))
-	fmt.Println(searchRange([]int{2, 2}, 1))
-	// fmt.Println(searchRange([]int{1}, 1))
+	// fmt.Println(searchRange([]int{2, 2}, 1))
+	fmt.Println(searchRange([]int{1}, 1))
 }
 
 //给定升序排列的整数数组和一个目标值target，找出给定目标值在数组中的开始位置和结束位置
-//0<=nums.length<=10^5;-10^9<=nums[i]<=10^9;-10^9<=target<=10^9
+//0<=nums.length<=10^5，-10^9<=nums[i]<=10^9，-10^9<=target<=10^9
 
 //34-在排序数组中查找元素的第一个和最后一个位置(34,278)
 func searchRange(nums []int, target int) []int {
 	//二分查找
-
 	iNumsLen := len(nums)
-	iLeft, iRight := 0, iNumsLen-1
 
 	if iNumsLen < 1 {
 		return []int{-1, -1}
@@ -26,66 +24,35 @@ func searchRange(nums []int, target int) []int {
 		return []int{-1, -1}
 	}
 
-	//不等的时候，和二分查找一样处理
-	//等于的时候，右边界往左边压，找到最小index的target
-	for iLeft < iRight {
-		iMid := iLeft + (iRight-iLeft)>>1
-		if nums[iMid] > target {
-			iRight = iMid - 1
-		} else if nums[iMid] == target {
-			//要让iMid不会卡死
-			if iMid > 0 {
-				if nums[iMid-1] == target {
-					iRight = iMid - 1
-				} else {
-					iRight = iMid
-					iLeft++
-				}
-			} else if iMid == 0 {
-				iRight = iMid
-			}
+	//二分查找，查找大于目标数的最小的元素的下标
+	iIndex1 := iNumsLen
+	il1, ir1 := 0, iNumsLen-1
+	for il1 <= ir1 {
+		im1 := il1 + (ir1-il1)>>1
+		if nums[im1] > target {
+			ir1 = im1 - 1
+			iIndex1 = im1
 		} else {
-			iLeft = iMid + 1
+			il1 = im1 + 1
 		}
 	}
-	iFirst := iRight
 
-	//不等的时候，和二分查找一样处理
-	//等于的时候，左边界往右边压，找到最大index的target
-	iLeft, iRight = 0, iNumsLen-1
-	for iLeft < iRight {
-		iMid := iLeft + (iRight-iLeft)>>1
-		if nums[iMid] < target {
-			iLeft = iMid + 1
-		} else if nums[iMid] == target {
-			//要让iMid不会卡死
-			if iMid < iNumsLen-1 {
-				if nums[iMid+1] == target {
-					iLeft = iMid + 1
-				} else {
-					iLeft = iMid
-					iRight--
-				}
-			} else if iMid == iNumsLen-1 {
-				iLeft = iMid
-			}
+	//二分查找，查找小于目标数的最大的元素的下标
+	iIndex2 := -1
+	il2, ir2 := 0, iNumsLen-1
+	for il2 <= ir2 {
+		im2 := il2 + (ir2-il2)>>1
+		if nums[im2] < target {
+			il2 = im2 + 1
+			iIndex2 = im2
 		} else {
-			iRight = iMid - 1
+			ir2 = im2 - 1
 		}
 	}
-	iLast := iLeft
 
-	//要判断没找到的情况
-	if iFirst < 0 || iLast > iNumsLen-1 {
-		return []int{-1, -1}
+	if iIndex1-1 >= iIndex2+1 && nums[iIndex1-1] == nums[iIndex2+1] {
+		return []int{iIndex2 + 1, iIndex1 - 1}
 	}
-	if iFirst > iLast {
-		return []int{-1, -1}
-	} else {
-		if nums[iFirst] == target && nums[iLast] == target {
-			return []int{iFirst, iLast}
-		} else {
-			return []int{-1, -1}
-		}
-	}
+
+	return []int{-1, -1}
 }

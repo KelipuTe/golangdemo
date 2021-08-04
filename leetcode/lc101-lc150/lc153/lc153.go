@@ -25,34 +25,32 @@ func findMin(nums []int) int {
 	iNumsLen := len(nums)
 
 	if iNumsLen == 1 {
-		return nums[0]
+		return nums[0] //数组只有一个
 	}
-
 	if nums[0] <= nums[iNumsLen-1] {
-		//数组升序直接返回第一个
-		return nums[0]
+		return nums[0] //数组升序
 	}
 
 	iMin := nums[0]
-	iLeft, iRight := 0, iNumsLen-1
-	for iLeft <= iRight {
-		iMid := iLeft + (iRight-iLeft)>>1
+	il, ir := 0, iNumsLen-1
+	for il <= ir {
+		im := il + (ir-il)>>1
 		//每次循环校验一下端点和中间点
-		if nums[iLeft] < iMin {
-			iMin = nums[iLeft]
+		if nums[il] < iMin {
+			iMin = nums[il]
 		}
-		if nums[iMid] < iMin {
-			iMin = nums[iMid]
+		if nums[im] < iMin {
+			iMin = nums[im]
 		}
-		if nums[iRight] < iMin {
-			iMin = nums[iRight]
+		if nums[ir] < iMin {
+			iMin = nums[ir]
 		}
-		if nums[iLeft] <= nums[iMid] {
+		if nums[il] <= nums[im] {
 			//左半部分升序，则左半部分可以跳过
-			iLeft = iMid + 1
+			il = im + 1
 		} else {
 			//右半部分升序，则右半部分可以跳过
-			iRight = iMid - 1
+			ir = im - 1
 		}
 	}
 	return iMin
