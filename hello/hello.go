@@ -1,7 +1,11 @@
-package hello
+package main
 
-import "fmt"
+import (
+	"go0yang4li4/hello/hello1"
+	"go0yang4li4/hello/hello2"
+)
 
-func FHelloWorld() {
-	fmt.Println("hello world")
+func main() {
+	hello1.FHelloWorld()
+	hello2.FHelloWorld()
 }
