@@ -19,7 +19,7 @@ func main() {
 
 //拓扑排序，深度优先搜索
 
-//210-课程表II
+//210-课程表II(207,210)
 func findOrder(numCourses int, prerequisites [][]int) []int {
   var sli2Matrix [][]int           //伪有向图邻接表
   var sli1Visited []int            //顶点访问情况

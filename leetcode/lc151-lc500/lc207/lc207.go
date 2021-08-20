@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+  "fmt"
 )
 
 func main() {
@@ -20,7 +20,7 @@ func main() {
 
 //拓扑排序，深度优先搜索
 
-//207-课程表
+//207-课程表(207,210)
 func canFinish(numCourses int, prerequisites [][]int) bool {
   var sli2Matrix [][]int           //伪有向图邻接表
   var sli1Visited []int            //顶点访问情况
