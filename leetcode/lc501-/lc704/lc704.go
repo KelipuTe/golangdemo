@@ -12,21 +12,15 @@ func main() {
 
 //704-二分查找
 func search(nums []int, target int) int {
-  numsLen := len(nums)
-
-  indexLeft, indexRight := 0, numsLen-1
+  indexLeft, indexRight := 0, len(nums)-1
   for indexLeft <= indexRight {
-    //这么写可以防止数值过大溢出
-    indexMid := indexLeft + (indexRight-indexLeft)>>1
+    indexMid := indexLeft + (indexRight-indexLeft)>>1 //这么写可以防止数值过大溢出
     if nums[indexMid] > target {
-      //中间数大于目标数，目标数在左半边，移动右边界
-      indexRight = indexMid - 1
+      indexRight = indexMid - 1 //中间数大于目标数，目标数在左半边，移动右边界
     } else if nums[indexMid] < target {
-      //中间数小于目标数，目标数在右半边，移动左边界
-      indexLeft = indexMid + 1
+      indexLeft = indexMid + 1 //中间数小于目标数，目标数在右半边，移动左边界
     } else {
-      //找到目标
-      return indexMid
+      return indexMid //找到目标
     }
   }
 
