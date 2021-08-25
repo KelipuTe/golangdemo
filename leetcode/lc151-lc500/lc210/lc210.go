@@ -21,13 +21,13 @@ func main() {
 
 //210-课程表II(207,210)
 func findOrder(numCourses int, prerequisites [][]int) []int {
-  var sli2Matrix [][]int           //伪有向图邻接表
+  var sli2Matrix [][]int           //有向图邻接表
   var sli1Visited []int            //顶点访问情况
   var sli1Res []int                //拓扑排序结果
   var you3huan2 bool = false       //是否有环
   var funcDFS func(indexVisit int) //深度优先搜索
 
-  //有向图矩阵初始化并填充数据
+  //有向图初始化并填充数据
   sli2Matrix = make([][]int, numCourses)
   for n := 0; n < len(prerequisites); n++ {
     sli2Matrix[prerequisites[n][1]] = append(sli2Matrix[prerequisites[n][1]], prerequisites[n][0])
