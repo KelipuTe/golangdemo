@@ -21,11 +21,11 @@ func main() {
 
 //210-课程表II(207,210)
 func findOrder(numCourses int, prerequisites [][]int) []int {
-  var sli2Matrix [][]int           //有向图邻接表
-  var sli1Visited []int            //顶点访问情况
-  var sli1Res []int                //拓扑排序结果
-  var you3huan2 bool = false       //是否有环
-  var funcDFS func(indexVisit int) //深度优先搜索
+  var sli2Matrix [][]int         //有向图邻接表
+  var sli1Visited []int          //顶点访问情况
+  var sli1Res []int              //拓扑排序结果
+  var you3huan2 bool = false     //是否有环
+  var f0dfs func(indexVisit int) //深度优先搜索
 
   //有向图初始化并填充数据
   sli2Matrix = make([][]int, numCourses)
@@ -35,11 +35,11 @@ func findOrder(numCourses int, prerequisites [][]int) []int {
 
   sli1Visited = make([]int, numCourses)
 
-  funcDFS = func(indexVisit int) {
+  f0dfs = func(indexVisit int) {
     sli1Visited[indexVisit] = 1 //标记这个顶点正在访问
     for index := 0; index < len(sli2Matrix[indexVisit]); index++ {
       if sli1Visited[sli2Matrix[indexVisit][index]] == 0 {
-        funcDFS(sli2Matrix[indexVisit][index])
+        f0dfs(sli2Matrix[indexVisit][index])
         if you3huan2 {
           return
         }
@@ -57,7 +57,7 @@ func findOrder(numCourses int, prerequisites [][]int) []int {
   //拓扑排序
   for index := 0; index < numCourses; index++ {
     if sli1Visited[index] == 0 {
-      funcDFS(index)
+      f0dfs(index)
     }
   }
 

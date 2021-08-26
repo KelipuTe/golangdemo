@@ -22,9 +22,9 @@ func allPathsSourceTarget(graph [][]int) [][]int {
   var graphLen int = len(graph)
   var sli1Res []int = []int{0} //深度优先搜索的每一条路径的结果
 
-  var funcDFS func(indexVisit int, sli1Res []int) //深度优先搜索
+  var f0dfs func(indexVisit int, sli1Res []int) //深度优先搜索
 
-  funcDFS = func(indexVisit int, sli1Res []int) {
+  f0dfs = func(indexVisit int, sli1Res []int) {
     //已经遍历到目标顶点
     if indexVisit == graphLen-1 {
       var sli1ResTemp []int = make([]int, len(sli1Res))
@@ -35,12 +35,12 @@ func allPathsSourceTarget(graph [][]int) [][]int {
     //如果没有遍历到目标顶点，就继续递归
     for index := 0; index < len(graph[indexVisit]); index++ {
       sli1Res = append(sli1Res, graph[indexVisit][index])
-      funcDFS(graph[indexVisit][index], sli1Res)
+      f0dfs(graph[indexVisit][index], sli1Res)
       sli1Res = sli1Res[:len(sli1Res)-1]
     }
   }
 
-  funcDFS(0, sli1Res)
+  f0dfs(0, sli1Res)
 
   return sli2Res
 }
