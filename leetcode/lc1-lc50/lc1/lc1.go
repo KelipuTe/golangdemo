@@ -3,30 +3,33 @@ package main
 import "fmt"
 
 func main() {
-	fmt.Println(twoSum([]int{2, 7, 11, 15}, 9))
+  fmt.Println(twoSum([]int{2, 7, 11, 15}, 9))
+  fmt.Println(twoSum([]int{3, 2, 4}, 6))
+  fmt.Println(twoSum([]int{3, 3}, 6))
 }
 
-//给定整数数组nums和整数目标值target，找出和为目标值target的那两个整数，并返回它们的数组下标
-//2<=nums.length<=10^4;-10^9<=nums[i]<=10^9;-10^9<=target<=10^9
-//假设每种输入只会对应一个答案，但是，数组中同一个元素不能重复出现
+//给定一个整数数组nums和一个整数目标值target，在该数组中找出和为目标值target的那两个整数，并返回它们的数组下标。
+//假设每种输入只会对应一个答案。但是，数组中同一个元素在答案里不能重复出现。可以按任意顺序返回答案。
+//2<=nums.length<=10^4;-10^9<=nums[i]<=10^9;-10^9<=target<=10^9;只会存在一个有效答案;
+//进阶：实现一个时间复杂度小于O(n^2)的算法。
 
-//1-两数之和(1,15,167)
+//数组，哈希表（或，排序，双指针）
+//构造一个map，键为原数组值，值为原数组下标。
+//遍历数组，得到遍历的值a1，计算另一个数a2=目标数-a1。
+//然后，去map中查找有没有键为a2的，注意元素不能重复使用。
+//如果先完整的构造map，会存在无法处理3+3=6这样，两个数字是一样的问题场景。
+//所以，可以一边遍历一边构造map，这样前一个3会被写入map，
+//这时遍历到后一个3时，直接就可以匹配出结果，不会有上面的问题。
+
+//1-两数之和
 func twoSum(nums []int, target int) []int {
-	//排序后双指针，或者构造map
+  var mapNums map[int]int = map[int]int{}
+  for index, num := range nums {
+    if index2, canFind := mapNums[target-num]; canFind {
+      return []int{index2, index}
+    }
+    mapNums[num] = index
+  }
 
-	var mapNum map[int]int = make(map[int]int, len(nums))
-	//构造，键为原数组值，值为原数组下标的map
-	for iIndex1, iNum1 := range nums {
-		mapNum[iNum1] = iIndex1
-	}
-
-	//遍历数组，得到遍历的值a1和a2=目标数减去a1，去map中查找有没有a2这个键
-	for iNum1, iIndex1 := range mapNum {
-		iNum2 := target - iNum1
-		_, bExist := mapNum[iNum2]
-		if bExist {
-			return []int{iIndex1, mapNum[iNum2]}
-		}
-	}
-	return []int{-1, -1}
+  return []int{-1, -1}
 }
