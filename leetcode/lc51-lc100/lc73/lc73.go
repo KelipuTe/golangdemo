@@ -33,6 +33,11 @@ func main() {
 //m==matrix.length;n==matrix[0].length;
 //1<=m,n<=200;-2^31<=matrix[i][j]<=2^31-1
 
+//数组
+//用两个数组分别存储哪一行哪一列有0
+//然后根据这两个数组，重新给矩阵赋值
+
+//73-矩阵置零
 func setZeroes(matrix [][]int) {
   var hang2 int = len(matrix)
   var lie4 int = len(matrix[0])
