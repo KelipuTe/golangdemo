@@ -45,60 +45,56 @@ func main() {
 //此外，你可以假设该网格的四条边均被水包围。
 //m==grid.length;n==grid[i].length;1<=m,n<=300;grid[i][j]的值为'0'或'1'
 
-//广度优先遍历，队列
-//类似广度优先遍历，首先遍历二维数组，
-//如果找到陆地，先标记为访问过，比如'2'，然后入队。
-//如果队列不为空，就持续出队，从访问过的位置，检查上右下左四个方向是不是陆地，
-//如果是陆地，先标记为访问过，然后入队。
-//直到访问不到陆地，本次队列结束，岛屿数量加1，
-//继续遍历二维数组，直到所有的位置都访问过一次
+//数组，广度优先搜索，队列
+//类似广度优先搜索，遍历二维数组，如果找到陆地，标记为访问过，然后入队。
+//如果队列不为空，就出队，在访问位置，检查上右下左四个方向。
+//如果是陆地，标记为访问过，然后入队。直到访问队列为空，本次搜索结束，岛屿数量加1。
+//继续遍历二维数组，直到所有的位置都访问过一次。
 
-//200-岛屿数量
+//200-岛屿数量(200,695,733)
 func numIslands(grid [][]byte) int {
-  var iHang2Len, iLie4Len int           //二维数组行列数
-  var queue [][2]int                    //队列
-  var iStartIndex, iEndIndex int = 0, 0 //队列下标
-  var iIslandNum int = 0
+  var hang2, lie4 int = len(grid), len(grid[0]) //二维数组行列数
+  var land, visited byte = '1', '2'             //陆地，访问过的陆地
+  var queue [][2]int                            //队列
+  var queueStart, queueEnd int = 0, 0           //队列下标
+  var islandNum int = 0
 
-  iHang2Len = len(grid)
-  iLie4Len = len(grid[0])
-
-  for iHang2Now := 0; iHang2Now < iHang2Len; iHang2Now++ {
-    for iLie4Now := 0; iLie4Now < iLie4Len; iLie4Now++ {
-      if grid[iHang2Now][iLie4Now] == '1' {
-        //类似广度优先遍历，找到和这个陆地连接的所有的陆地
-        grid[iHang2Now][iLie4Now] = '2' //标记陆地已访问
-        queue = append(queue, [2]int{iHang2Now, iLie4Now})
-        iEndIndex++
-        for iStartIndex < iEndIndex {
-          tHang2, tLie4 := queue[iStartIndex][0], queue[iStartIndex][1]
-          iStartIndex++
-          //检查上右下左四个方向是不是陆地，是陆地就入队
-          if tHang2-1 >= 0 && grid[tHang2-1][tLie4] == '1' {
-            grid[tHang2-1][tLie4] = '2'
-            queue = append(queue, [2]int{tHang2 - 1, tLie4})
-            iEndIndex++
+  for hang2Index := 0; hang2Index < hang2; hang2Index++ {
+    for lie4Index := 0; lie4Index < lie4; lie4Index++ {
+      if grid[hang2Index][lie4Index] == land {
+        //类似广度优先搜索
+        grid[hang2Index][lie4Index] = visited //标记陆地已访问
+        queue = append(queue, [2]int{hang2Index, lie4Index})
+        queueEnd++
+        for queueStart < queueEnd {
+          hang2Temp, lie4Temp := queue[queueStart][0], queue[queueStart][1]
+          queueStart++
+          //检查上右下左四个方向
+          if hang2Temp-1 >= 0 && grid[hang2Temp-1][lie4Temp] == land {
+            grid[hang2Temp-1][lie4Temp] = visited
+            queue = append(queue, [2]int{hang2Temp - 1, lie4Temp})
+            queueEnd++
           }
-          if tLie4+1 < iLie4Len && grid[tHang2][tLie4+1] == '1' {
-            grid[tHang2][tLie4+1] = '2'
-            queue = append(queue, [2]int{tHang2, tLie4 + 1})
-            iEndIndex++
+          if lie4Temp+1 < lie4 && grid[hang2Temp][lie4Temp+1] == land {
+            grid[hang2Temp][lie4Temp+1] = visited
+            queue = append(queue, [2]int{hang2Temp, lie4Temp + 1})
+            queueEnd++
           }
-          if tHang2+1 < iHang2Len && grid[tHang2+1][tLie4] == '1' {
-            grid[tHang2+1][tLie4] = '2'
-            queue = append(queue, [2]int{tHang2 + 1, tLie4})
-            iEndIndex++
+          if hang2Temp+1 < hang2 && grid[hang2Temp+1][lie4Temp] == land {
+            grid[hang2Temp+1][lie4Temp] = visited
+            queue = append(queue, [2]int{hang2Temp + 1, lie4Temp})
+            queueEnd++
           }
-          if tLie4-1 >= 0 && grid[tHang2][tLie4-1] == '1' {
-            grid[tHang2][tLie4-1] = '2'
-            queue = append(queue, [2]int{tHang2, tLie4 - 1})
-            iEndIndex++
+          if lie4Temp-1 >= 0 && grid[hang2Temp][lie4Temp-1] == land {
+            grid[hang2Temp][lie4Temp-1] = visited
+            queue = append(queue, [2]int{hang2Temp, lie4Temp - 1})
+            queueEnd++
           }
         }
-        iIslandNum++ //相连的陆地已经全部标记，岛屿数量加1
+        islandNum++ //相连的陆地已经全部标记，岛屿数量加1
       }
     }
   }
 
-  return iIslandNum
+  return islandNum
 }
