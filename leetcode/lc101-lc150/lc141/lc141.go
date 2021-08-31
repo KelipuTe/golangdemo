@@ -23,27 +23,27 @@ type ListNode struct {
 //链表中节点的数目范围是[0,10^4];-10^5<=Node.val<=10^5;pos为-1或者链表中的一个有效索引。
 //进阶：用O(1)内存解决此问题
 
-//双指针
+//链表，环形链表，双指针
 //使用一个步长为1的慢指针和一个步长为2的快指针，从头部开始同时向后遍历。
 //如果某个时刻，两个指针指向了相同的地址，则存在环形结构。
 //如果存在环形结构，快指针会绕1圈或者几圈之后，从后面追上慢指针。
 
-//141-环形链表(141,142)
+//141-环形链表
 func hasCycle(head *ListNode) bool {
+  var pslow, pfast *ListNode = head, head //慢指针，快指针
+
   if head == nil {
     return false
   }
 
-  tpln1, tpln2 := head, head //慢指针，快指针
-
   for true {
-    if tpln2 == nil || tpln2.Next == nil {
-      return false //快指针能走到头，说明没有环
+    if pfast == nil || pfast.Next == nil {
+      return false //快指针能走到头，则没有环
     }
-    tpln1 = tpln1.Next
-    tpln2 = tpln2.Next.Next
-    if tpln1 == tpln2 {
-      return true
+    pslow = pslow.Next
+    pfast = pfast.Next.Next
+    if pslow == pfast {
+      return true //相遇，则有环
     }
   }
 
