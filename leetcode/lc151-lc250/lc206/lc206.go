@@ -2,6 +2,11 @@ package main
 
 import "fmt"
 
+type ListNode struct {
+  Val  int
+  Next *ListNode
+}
+
 func main() {
   ln5 := ListNode{5, nil}
   ln4 := ListNode{4, &ln5}
@@ -9,17 +14,10 @@ func main() {
   ln2 := ListNode{2, &ln3}
   ln1 := ListNode{1, &ln2}
 
-  tpln := reverseList(&ln1)
-
-  for tpln != nil {
-    fmt.Println(tpln.Val)
-    tpln = tpln.Next
+  phead := reverseList(&ln1)
+  for ; phead != nil; phead = phead.Next {
+    fmt.Printf("%d,", phead.Val)
   }
-}
-
-type ListNode struct {
-  Val  int
-  Next *ListNode
 }
 
 //给你单链表的头节点head，请反转链表，并返回反转后的链表。
@@ -27,25 +25,15 @@ type ListNode struct {
 
 //206-反转链表
 func reverseList(head *ListNode) *ListNode {
-  var plnP, plnT, plnN, plnHeadNew *ListNode
+  var pprevious, pnow, pnext *ListNode = nil, nil, nil //前一个结点，当前结点，下一个结点
 
-  if head == nil || head.Next == nil {
-    return head //空链表或者只有一个结点
+  pnow = head
+  for pnow != nil {
+    pnext = pnow.Next     //原来的下一个结点
+    pnow.Next = pprevious //反转，第一次的时候是nil
+    pprevious = pnow      //当前结点变成前一个结点
+    pnow = pnext          //原来的下一个结点变成当前结点
   }
 
-  plnP, plnT, plnN = head, head.Next, head.Next.Next //前一个结点，当前结点，下一个结点
-  for plnT != nil {
-    if plnT.Next == nil {
-      plnHeadNew = plnT //尾结点的next为空，反转之前就要判断，并设置为新得头结点
-    }
-    plnT.Next = plnP //反转
-    plnP = plnT
-    plnT = plnN
-    if plnN != nil {
-      plnN = plnN.Next
-    }
-  }
-  head.Next = nil //处理原头结点
-
-  return plnHeadNew
+  return pprevious
 }
