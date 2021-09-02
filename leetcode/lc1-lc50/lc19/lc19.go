@@ -13,6 +13,7 @@ func main() {
   ln3 := ListNode{3, &ln4}
   ln2 := ListNode{2, &ln3}
   ln1 := ListNode{1, &ln2}
+
   lnRes := removeNthFromEnd(&ln1, 3)
   for ; lnRes != nil; lnRes = lnRes.Next {
     fmt.Printf("%d,", lnRes.Val)
@@ -35,22 +36,18 @@ func removeNthFromEnd(head *ListNode, n int) *ListNode {
   for ptail != nil {
     ptail = ptail.Next
     listLen++
-    if listLen > n+1 {
-      //需要错1位，让pquery指向前一个结点才能进行删除
+    if listLen > n+1 { //需要错1位，让pquery指向前一个结点才能进行删除
       pquery = pquery.Next
     }
   }
 
-  if listLen > n {
-    //链表长度大于等于n，删倒数第n个
-    if pquery.Next == ptail {
-      //删的是尾节点
+  if listLen > n { //链表长度大于等于n，删倒数第n个
+    if pquery.Next == ptail { //删的是尾节点
       pquery.Next = nil
     } else {
       pquery.Next = pquery.Next.Next
     }
-  } else if listLen <= n {
-    //链表长度小于等于n，删第1个
+  } else { //链表长度小于等于n，删第1个
     phead = phead.Next
   }
 
