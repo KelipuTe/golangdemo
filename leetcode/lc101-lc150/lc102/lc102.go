@@ -1,56 +1,61 @@
+//lc102-二叉树的层序遍历
+//[二叉树][层序遍历][队列]
+
+//给一个二叉树，请返回其按层序遍历得到的节点值（即逐层地，从左到右访问所有节点）
+
+//使用队列记录每一层需要遍历的结点
+
 package main
 
 import "fmt"
-
-func main() {
-  tn7 := TreeNode{3, nil, nil}
-  tn6 := TreeNode{4, nil, nil}
-  tn5 := TreeNode{4, nil, nil}
-  tn4 := TreeNode{3, nil, nil}
-  tn3 := TreeNode{2, &tn6, &tn7}
-  tn2 := TreeNode{2, &tn4, &tn5}
-  tn1 := TreeNode{1, &tn2, &tn3}
-
-  fmt.Println(levelOrder(&tn1))
-}
 
 type TreeNode struct {
   Val   int
   Left  *TreeNode
   Right *TreeNode
-} // 树结点
+}
 
-//给一个二叉树，请返回其按层序遍历得到的节点值（即逐层地，从左到右访问所有节点）
-
-//队列，广度优先遍历
-//可以使用两个指针数组模拟队列操作，一个数组用于保存当前层所有的结点，另一个用于保存下一层所有的结点
-//在遍历当前层的时候，记录下一层所有需要遍历的结点
-//当前层遍历结束之后，用下一层的数组覆盖当前层的数组，继续遍历，直到队列为空
-
-//102-二叉树的层序遍历
-func levelOrder(root *TreeNode) [][]int {
-  var isli2Res [][]int = [][]int{}             //结果集
-  var ptnSli1Queue []*TreeNode = []*TreeNode{} //当前层所有需要遍历的节点
-
-  if root == nil {
-    return isli2Res
-  }
-
-  ptnSli1Queue = append(ptnSli1Queue, root)
-  for ii := 0; len(ptnSli1Queue) > 0; ii++ {
-    isli2Res = append(isli2Res, []int{})          //结果集增加一行
-    var tptnSli1Queue []*TreeNode = []*TreeNode{} //下一层所有需要遍历的节点
-    for ij := 0; ij < len(ptnSli1Queue); ij++ {
-      isli2Res[ii] = append(isli2Res[ii], ptnSli1Queue[ij].Val)
-      if ptnSli1Queue[ij].Left != nil {
-        tptnSli1Queue = append(tptnSli1Queue, ptnSli1Queue[ij].Left)
-      }
-      if ptnSli1Queue[ij].Right != nil {
-        tptnSli1Queue = append(tptnSli1Queue, ptnSli1Queue[ij].Right)
-      }
+func main() {
+  phead :=
+    &TreeNode{1,
+      &TreeNode{2,
+        &TreeNode{4,
+          &TreeNode{8, nil, nil},
+          nil},
+        &TreeNode{5, nil, nil}},
+      &TreeNode{3, nil, nil},
     }
-    ptnSli1Queue = tptnSli1Queue
+
+  fmt.Println(levelOrder(phead))
+}
+
+func levelOrder(root *TreeNode) [][]int {
+  var sli2Res [][]int = [][]int{}
+  var queue []*TreeNode = []*TreeNode{}
+  var indexStart, indexEnd int = 0, 0
+
+  if root != nil {
+    queue = append(queue, root)
+    indexEnd++
+    ceng2Temp := -1
+    for indexStart < indexEnd {
+      sli2Res = append(sli2Res, []int{}) //结果集增加一行
+      indexEndTemp := indexEnd           //每层遍历的结束
+      ceng2Temp++
+      for index := indexStart; index < indexEndTemp; index++ {
+        sli2Res[ceng2Temp] = append(sli2Res[ceng2Temp], queue[index].Val)
+        if queue[index].Left != nil {
+          queue = append(queue, queue[index].Left)
+          indexEnd++
+        }
+        if queue[index].Right != nil {
+          queue = append(queue, queue[index].Right)
+          indexEnd++
+        }
+      }
+      indexStart = indexEndTemp //每层遍历的开始
+    }
   }
 
-  return isli2Res
+  return sli2Res
 }

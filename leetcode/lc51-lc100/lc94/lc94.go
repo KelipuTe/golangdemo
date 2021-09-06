@@ -1,4 +1,4 @@
-//94-二叉树的中序遍历
+//lc94-二叉树的中序遍历
 //[二叉树][中序遍历]
 
 //给你二叉树的根节点root，返回它节点值的中序遍历。
@@ -30,22 +30,22 @@ func main() {
 
 func inorderTraversal(root *TreeNode) []int {
   var sli1Res []int = []int{}
-  var f0hou4xu4 func(root *TreeNode)
+  var f0zhong1xu4 func(root *TreeNode)
 
-  f0hou4xu4 = func(root *TreeNode) {
+  f0zhong1xu4 = func(root *TreeNode) {
     if root == nil {
       return
     }
     if root.Left != nil {
-      f0hou4xu4(root.Left)
-    }
-    if root.Right != nil {
-      f0hou4xu4(root.Right)
+      f0zhong1xu4(root.Left)
     }
     sli1Res = append(sli1Res, root.Val)
+    if root.Right != nil {
+      f0zhong1xu4(root.Right)
+    }
   }
 
-  f0hou4xu4(root)
+  f0zhong1xu4(root)
 
   return sli1Res
 }
