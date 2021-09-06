@@ -1,45 +1,51 @@
+//144-二叉树的前序遍历
+//[二叉树][前序遍历]
+
+//给你二叉树的根节点root，返回它节点值的前序遍历。
+//树中节点数目在范围[0,100]内；-100<=Node.val<=100
+
 package main
 
 import "fmt"
 
 type TreeNode struct {
-	Val   int
-	Left  *TreeNode
-	Right *TreeNode
-} //树结点
+  Val   int
+  Left  *TreeNode
+  Right *TreeNode
+}
 
 func main() {
-	tn8 := TreeNode{1, nil, nil}
-	tn5 := TreeNode{4, nil, nil}
-	tn4 := TreeNode{2, &tn8, nil}
-	tn3 := TreeNode{6, nil, nil}
-	tn2 := TreeNode{3, &tn4, &tn5}
-	tn1 := TreeNode{5, &tn2, &tn3}
+  phead :=
+    &TreeNode{1,
+      &TreeNode{2,
+        &TreeNode{4,
+          &TreeNode{8, nil, nil},
+          nil},
+        &TreeNode{5, nil, nil}},
+      &TreeNode{3, nil, nil},
+    }
 
-	fmt.Println(preorderTraversal(&tn1))
+  fmt.Println(preorderTraversal(phead))
 }
 
-//树中节点数目在范围[0,100]内
-//-100<=Node.val<=100
-
-var isli1QueryRes []int //遍历结果
-
-//144-二叉树的前序遍历(94,144,145)
 func preorderTraversal(root *TreeNode) []int {
-	isli1QueryRes = []int{}
-	if root == nil {
-		return isli1QueryRes
-	}
-	fQianXuQuery(root)
-	return isli1QueryRes
-}
+  var sli1Res []int = []int{}
+  var f0qian2xu4 func(root *TreeNode)
 
-func fQianXuQuery(root *TreeNode) {
-	isli1QueryRes = append(isli1QueryRes, root.Val)
-	if root.Left != nil {
-		fQianXuQuery(root.Left)
-	}
-	if root.Right != nil {
-		fQianXuQuery(root.Right)
-	}
+  f0qian2xu4 = func(root *TreeNode) {
+    if root == nil {
+      return
+    }
+    sli1Res = append(sli1Res, root.Val)
+    if root.Left != nil {
+      f0qian2xu4(root.Left)
+    }
+    if root.Right != nil {
+      f0qian2xu4(root.Right)
+    }
+  }
+
+  f0qian2xu4(root)
+
+  return sli1Res
 }
