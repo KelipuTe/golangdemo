@@ -8,15 +8,10 @@ type ListNode struct {
 }
 
 func main() {
-  ln5 := ListNode{5, nil}
-  ln4 := ListNode{4, &ln5}
-  ln3 := ListNode{3, &ln4}
-  ln2 := ListNode{2, &ln3}
-  ln1 := ListNode{1, &ln2}
-
-  lnRes := getKthFromEnd(&ln1, 3)
-  for ; lnRes != nil; lnRes = lnRes.Next {
-    fmt.Printf("%d,", lnRes.Val)
+  phead := &ListNode{1, &ListNode{2, &ListNode{3, &ListNode{4, &ListNode{5, nil}}}}}
+  pres := getKthFromEnd(phead, 3)
+  for ; pres != nil; pres = pres.Next {
+    fmt.Printf("%d,", pres.Val)
   }
 }
 
