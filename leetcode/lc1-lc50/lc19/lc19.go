@@ -1,3 +1,11 @@
+//lc19-删除链表的倒数第n个结点
+//[单链表][双指针]
+
+//给一个链表，删除链表的倒数第n个结点，并且返回链表的头结点。
+//进阶：尝试使用一趟扫描实现。
+
+//详见/shu4ju4jie2gou4/lian4biao3/dan1lian4biao3.DelNthFromTail()
+
 package main
 
 import "fmt"
@@ -8,48 +16,35 @@ type ListNode struct {
 }
 
 func main() {
-  ln5 := ListNode{5, nil}
-  ln4 := ListNode{4, &ln5}
-  ln3 := ListNode{3, &ln4}
-  ln2 := ListNode{2, &ln3}
-  ln1 := ListNode{1, &ln2}
-
-  lnRes := removeNthFromEnd(&ln1, 3)
-  for ; lnRes != nil; lnRes = lnRes.Next {
-    fmt.Printf("%d,", lnRes.Val)
+  phead := &ListNode{1, &ListNode{2, &ListNode{3, &ListNode{4, &ListNode{5, nil}}}}}
+  phead = removeNthFromEnd(phead, 3)
+  for pquery := phead; pquery != nil; pquery = pquery.Next {
+    fmt.Printf("%d,", pquery.Val)
   }
 }
 
-//链表，双指针
-//两个指针，先让第一个指针从头开始，往前遍历n个结点，然后第二个指针从头开始同步遍历
-//当第一个指针遍历到链表尾部时，第二个指针就指向倒数第n个结点处
-
-//19-删除链表的倒数第n个结点
 func removeNthFromEnd(head *ListNode, n int) *ListNode {
-  var listLen int = 0                                   //链表长度
-  var phead, ptail, pquery *ListNode = head, head, head //头指针，尾指针，遍历指针
+  var pheadTemp *ListNode = &ListNode{0, head}           //临时头结点
+  var pquery, pprevious *ListNode = pheadTemp, pheadTemp //遍历指针，倒数第n+1个结点
 
-  if n < 1 {
-    return head
+  if pquery.Next == nil {
+    return pheadTemp.Next
   }
 
-  for ptail != nil {
-    ptail = ptail.Next
-    listLen++
-    if listLen > n+1 { //需要错1位，让pquery指向前一个结点才能进行删除
-      pquery = pquery.Next
+  for i := 1; i <= n+1; i++ { //要删除倒数第n个结点，需要倒数第n+1个结点
+    pquery = pquery.Next
+    if pquery == nil { //如果链表长度不够倒数，则删除第一个结点
+      pprevious.Next = pprevious.Next.Next
+
+      return pheadTemp.Next
     }
   }
-
-  if listLen > n { //链表长度大于等于n，删倒数第n个
-    if pquery.Next == ptail { //删的是尾节点
-      pquery.Next = nil
-    } else {
-      pquery.Next = pquery.Next.Next
-    }
-  } else { //链表长度小于等于n，删第1个
-    phead = phead.Next
+  for pquery != nil { //同步遍历
+    pquery = pquery.Next
+    pprevious = pprevious.Next
   }
 
-  return phead
+  pprevious.Next = pprevious.Next.Next //删除倒数第n个结点
+
+  return pheadTemp.Next
 }
