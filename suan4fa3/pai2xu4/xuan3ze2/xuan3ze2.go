@@ -30,8 +30,8 @@ func SelecionSort(arr1nums []int, isASC bool) {
   fmt.Println(arr1nums)
 
   var arr1numsLen int = len(arr1nums)
-  for indexi := 0; indexi < arr1numsLen; indexi++ { //第n次循环找到第n小(大)的元素
-    index, num := indexi, arr1nums[indexi] //本次要找的最小(大)元素的下标，最小(大)元素
+  for indexi := 0; indexi < arr1numsLen; indexi++ { //第n次循环找到第n小（大）的元素
+    index, num := indexi, arr1nums[indexi] //本次要找的最小（大）元素的下标，最小（大）元素
 
     if isASC { //升序排序
       for indexj := indexi + 1; indexj < arr1numsLen; indexj++ {
@@ -46,7 +46,7 @@ func SelecionSort(arr1nums []int, isASC bool) {
         }
       }
     }
-    arr1nums[index], arr1nums[indexi] = arr1nums[indexi], arr1nums[index] //把第n小(大)的元素和第n位置的元素交换
+    arr1nums[index], arr1nums[indexi] = arr1nums[indexi], arr1nums[index] //把第n小（大）的元素和第n位置的元素交换
   }
 
   fmt.Println(arr1nums)

@@ -16,28 +16,25 @@ func main() {
     arr1nums[i] = rand.Intn(999)
   }
 
-  MergeSort(arr1nums, true)
+  fmt.Println(arr1nums)
+  MergeSort(arr1nums, 0, len(arr1nums)-1, true)
+  fmt.Println(arr1nums)
 
   rand.Seed(time.Now().UnixNano())
   for i := 0; i < arr1numsLen; i++ {
     arr1nums[i] = rand.Intn(999)
   }
 
-  MergeSort(arr1nums, false)
-}
-
-func MergeSort(arr1nums []int, isASC bool) {
   fmt.Println(arr1nums)
-  fen1zu3(arr1nums, 0, len(arr1nums)-1, isASC)
+  MergeSort(arr1nums, 0, len(arr1nums)-1, false)
   fmt.Println(arr1nums)
 }
 
-//分组
-func fen1zu3(arr1nums []int, indexStart int, indexEnd int, isASC bool) {
+func MergeSort(arr1nums []int, indexStart int, indexEnd int, isASC bool) {
   if indexStart < indexEnd {
     var indexMid int = indexStart + (indexEnd-indexStart)>>1
-    fen1zu3(arr1nums, indexStart, indexMid, isASC)
-    fen1zu3(arr1nums, indexMid+1, indexEnd, isASC)
+    MergeSort(arr1nums, indexStart, indexMid, isASC)
+    MergeSort(arr1nums, indexMid+1, indexEnd, isASC)
     he2bing4(arr1nums, indexStart, indexEnd, isASC)
   }
 }
