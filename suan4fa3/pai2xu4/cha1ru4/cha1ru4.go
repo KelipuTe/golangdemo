@@ -1,4 +1,4 @@
-//插入排序
+//插入排序InsertionSort
 package main
 
 import (
@@ -16,17 +16,17 @@ func main() {
     arr1nums[i] = rand.Intn(999)
   }
 
-  InsertionSort(arr1nums, true)
+  cha1ru4(arr1nums, true)
 
   rand.Seed(time.Now().UnixNano())
   for i := 0; i < arr1numsLen; i++ {
     arr1nums[i] = rand.Intn(999)
   }
 
-  InsertionSort(arr1nums, false)
+  cha1ru4(arr1nums, false)
 }
 
-func InsertionSort(arr1nums []int, isASC bool) {
+func cha1ru4(arr1nums []int, isASC bool) {
   fmt.Println(arr1nums)
 
   var arr1numsLen int = len(arr1nums)
