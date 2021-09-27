@@ -29,10 +29,11 @@ func main() {
 func SelecionSort(arr1nums []int, isASC bool) {
   fmt.Println(arr1nums)
 
-  arr1numsLen := len(arr1nums)
+  var arr1numsLen int = len(arr1nums)
   for indexi := 0; indexi < arr1numsLen; indexi++ { //第n次循环找到第n小(大)的元素
-    index, num := indexi, arr1nums[indexi] //本次要找的，最小(大)元素的下标，最小(大)元素
-    if isASC {                             //升序排序
+    index, num := indexi, arr1nums[indexi] //本次要找的最小(大)元素的下标，最小(大)元素
+
+    if isASC { //升序排序
       for indexj := indexi + 1; indexj < arr1numsLen; indexj++ {
         if arr1nums[indexj] < num { //如果找到更小的，就更新
           index, num = indexj, arr1nums[indexj]

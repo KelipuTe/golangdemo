@@ -29,19 +29,18 @@ func main() {
 func InsertionSort(arr1nums []int, isASC bool) {
   fmt.Println(arr1nums)
 
-  arr1numsLen := len(arr1nums)
-  for indexi := 1; indexi < arr1numsLen; indexi++ { //假定第一个有序，从第二个开始
-    indexj := indexi
-    num := arr1nums[indexj] //本次排序的数字
+  var arr1numsLen int = len(arr1nums)
+  for indexi := 1; indexi < arr1numsLen; indexi++ { //假定第一个元素有序，从第二个元素开始
+    indexj, num := indexi, arr1nums[indexi] //本次参与排序的位置和元素值
 
     if isASC { //升序排序
       for indexj > 0 && arr1nums[indexj-1] > num { //前面的数字大
-        arr1nums[indexj] = arr1nums[indexj-1] //把前面的大数字往后移
+        arr1nums[indexj] = arr1nums[indexj-1] //把大数字往后移
         indexj--
       }
     } else { //降序排序
       for indexj > 0 && arr1nums[indexj-1] < num { //前面的数字小
-        arr1nums[indexj] = arr1nums[indexj-1] //把前面的小数字往后移
+        arr1nums[indexj] = arr1nums[indexj-1] //把小数字往后移
         indexj--
       }
     }
