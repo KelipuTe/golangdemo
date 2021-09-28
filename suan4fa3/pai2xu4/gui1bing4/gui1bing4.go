@@ -1,4 +1,4 @@
-//归并排序
+//归并排序，MergeSort
 package main
 
 import (
@@ -17,7 +17,7 @@ func main() {
   }
 
   fmt.Println(arr1nums)
-  MergeSort(arr1nums, 0, len(arr1nums)-1, true)
+  gui1bing4(arr1nums, 0, len(arr1nums)-1, true)
   fmt.Println(arr1nums)
 
   rand.Seed(time.Now().UnixNano())
@@ -26,15 +26,15 @@ func main() {
   }
 
   fmt.Println(arr1nums)
-  MergeSort(arr1nums, 0, len(arr1nums)-1, false)
+  gui1bing4(arr1nums, 0, len(arr1nums)-1, false)
   fmt.Println(arr1nums)
 }
 
-func MergeSort(arr1nums []int, indexStart int, indexEnd int, isASC bool) {
+func gui1bing4(arr1nums []int, indexStart int, indexEnd int, isASC bool) {
   if indexStart < indexEnd {
     var indexMid int = indexStart + (indexEnd-indexStart)>>1
-    MergeSort(arr1nums, indexStart, indexMid, isASC)
-    MergeSort(arr1nums, indexMid+1, indexEnd, isASC)
+    gui1bing4(arr1nums, indexStart, indexMid, isASC)
+    gui1bing4(arr1nums, indexMid+1, indexEnd, isASC)
     he2bing4(arr1nums, indexStart, indexEnd, isASC)
   }
 }

@@ -1,4 +1,4 @@
-//希尔排序，又称减小增量排序，是插入排序的改进版
+//希尔排序，ShellSort，又称减小增量排序，是插入排序的改进版
 package main
 
 import (
@@ -16,17 +16,17 @@ func main() {
     arr1nums[i] = rand.Intn(999)
   }
 
-  ShellSort(arr1nums, true)
+  xi1er3(arr1nums, true)
 
   rand.Seed(time.Now().UnixNano())
   for i := 0; i < arr1numsLen; i++ {
     arr1nums[i] = rand.Intn(999)
   }
 
-  ShellSort(arr1nums, false)
+  xi1er3(arr1nums, false)
 }
 
-func ShellSort(arr1nums []int, isASC bool) {
+func xi1er3(arr1nums []int, isASC bool) {
   fmt.Println(arr1nums)
 
   var arr1numsLen int = len(arr1nums)

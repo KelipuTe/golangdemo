@@ -1,4 +1,4 @@
-//快速排序
+//快速排序，QuickSort
 package main
 
 import (
@@ -18,7 +18,7 @@ func main() {
 
   fmt.Println(arr1nums)
   fmt.Println(QuickSortMinK(arr1nums, 0, len(arr1nums)-1, 4))
-  QuickSort(arr1nums, 0, len(arr1nums)-1, true)
+  kuai4su4(arr1nums, 0, len(arr1nums)-1, true)
   fmt.Println(arr1nums)
 
   rand.Seed(time.Now().UnixNano())
@@ -27,11 +27,11 @@ func main() {
   }
 
   fmt.Println(arr1nums)
-  QuickSort(arr1nums, 0, len(arr1nums)-1, false)
+  kuai4su4(arr1nums, 0, len(arr1nums)-1, false)
   fmt.Println(arr1nums)
 }
 
-func QuickSort(arr1nums []int, indexStart int, indexEnd int, isASC bool) {
+func kuai4su4(arr1nums []int, indexStart int, indexEnd int, isASC bool) {
   if indexStart >= indexEnd {
     return
   }
@@ -71,8 +71,8 @@ func QuickSort(arr1nums []int, indexStart int, indexEnd int, isASC bool) {
     }
   }
 
-  QuickSort(arr1nums, indexStart, indexi, isASC)
-  QuickSort(arr1nums, indexStart+1, indexEnd, isASC)
+  kuai4su4(arr1nums, indexStart, indexi, isASC)
+  kuai4su4(arr1nums, indexStart+1, indexEnd, isASC)
 }
 
 //第k小的元素（第k大的元素同理）

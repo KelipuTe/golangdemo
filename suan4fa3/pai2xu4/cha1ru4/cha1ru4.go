@@ -1,4 +1,4 @@
-//插入排序InsertionSort
+//插入排序，InsertionSort
 package main
 
 import (

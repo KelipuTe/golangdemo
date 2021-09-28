@@ -1,4 +1,4 @@
-//选择排序
+//选择排序，SelecionSort
 package main
 
 import (
@@ -16,17 +16,17 @@ func main() {
     arr1nums[i] = rand.Intn(999)
   }
 
-  SelecionSort(arr1nums, true)
+  xuan3ze2(arr1nums, true)
 
   rand.Seed(time.Now().UnixNano())
   for i := 0; i < arr1numsLen; i++ {
     arr1nums[i] = rand.Intn(999)
   }
 
-  SelecionSort(arr1nums, false)
+  xuan3ze2(arr1nums, false)
 }
 
-func SelecionSort(arr1nums []int, isASC bool) {
+func xuan3ze2(arr1nums []int, isASC bool) {
   fmt.Println(arr1nums)
 
   var arr1numsLen int = len(arr1nums)

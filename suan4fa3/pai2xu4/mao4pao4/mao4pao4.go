@@ -1,4 +1,4 @@
-//冒泡排序
+//冒泡排序，BubbleSort
 package main
 
 import (
@@ -16,17 +16,17 @@ func main() {
     arr1nums[i] = rand.Intn(999)
   }
 
-  BubbleSort(arr1nums, true)
+  mao4pao4(arr1nums, true)
 
   rand.Seed(time.Now().UnixNano())
   for i := 0; i < arr1numsLen; i++ {
     arr1nums[i] = rand.Intn(999)
   }
 
-  BubbleSort(arr1nums, false)
+  mao4pao4(arr1nums, false)
 }
 
-func BubbleSort(arr1nums []int, isASC bool) {
+func mao4pao4(arr1nums []int, isASC bool) {
   fmt.Println(arr1nums)
 
   var arr1numsLen int = len(arr1nums)

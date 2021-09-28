@@ -1,4 +1,4 @@
-//堆排序
+//堆排序，HeapSort
 package main
 
 import (
@@ -16,17 +16,17 @@ func main() {
     arr1nums[i] = rand.Intn(999)
   }
 
-  HeapSort(arr1nums, true)
+  dui1(arr1nums, true)
 
   rand.Seed(time.Now().UnixNano())
   for i := 0; i < arr1numsLen; i++ {
     arr1nums[i] = rand.Intn(999)
   }
 
-  HeapSort(arr1nums, false)
+  dui1(arr1nums, false)
 }
 
-func HeapSort(arr1nums []int, isASC bool) {
+func dui1(arr1nums []int, isASC bool) {
   fmt.Println(arr1nums)
 
   var arr1numsLen int = len(arr1nums)
