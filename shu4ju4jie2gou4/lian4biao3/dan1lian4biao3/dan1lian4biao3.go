@@ -9,20 +9,22 @@ type ListNode struct {
 }
 
 func main() {
-  var phead *ListNode = ListInit()
+  var phead *ListNode = ListInit() //头结点
 
-  AddNodeListToTail(phead, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+  AddNodeToTail(phead, 1)
+  AddNodeListToTail(phead, 2, 3, 4, 5, 6, 7, 8)
 
   PrintList(phead)
 
-  DelNthFromTail(phead, 9)
+  DelNthFromTail(phead, 8)
+  DelNthFromTail(phead, 1)
 
   PrintList(phead)
 }
 
 //初始化
 func ListInit() *ListNode {
-  return &ListNode{0, nil} //头结点，只记录链表起始结点的地址，不记录数据
+  return &ListNode{0, nil}
 }
 
 //输出链表
