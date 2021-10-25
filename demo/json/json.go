@@ -6,9 +6,11 @@ import (
 )
 
 func main() {
+  fmt.Println("demo run")
   jsonEncode()
   jsonDecodeIntoMap()
   jsonDecodeIntoStruct()
+  fmt.Println("demo finish")
 }
 
 type ObjStruct struct {

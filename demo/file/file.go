@@ -8,14 +8,12 @@ import (
 )
 
 func main() {
-  RunDemo1()
-}
-
-func RunDemo1() {
+  fmt.Println("demo run")
   WriteTxtToFile("./demo/file/demo.txt", "写入文本", false)
   ReadTxtFromFile("./demo/file/demo.txt")
   WriteTxtToFile("./demo/file/demo.txt", "追加文本", false)
   ReadTxtFromFile("./demo/file/demo.txt")
+  fmt.Println("demo finish")
 }
 
 //写入文件

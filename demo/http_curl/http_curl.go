@@ -10,13 +10,16 @@ import (
 )
 
 func main() {
+  fmt.Println("demo run")
   curlGetJson()
   curlGetXml()
   curlGetWithParam()
   curlPostWithForm()
   curlPostWithJson()
+  fmt.Println("demo finish")
 }
 
+//处理异常
 func errThrow(title string, err error) {
   if err != nil {
     fmt.Printf("%s,err:%v\n", title, err)
@@ -24,6 +27,7 @@ func errThrow(title string, err error) {
   }
 }
 
+//get json
 func curlGetJson() {
   apiUrl := "http://127.0.0.1:8000/api/test/get_json"
 
@@ -37,6 +41,7 @@ func curlGetJson() {
   fmt.Println(string(resio))
 }
 
+//get xml
 func curlGetXml() {
   apiUrl := "http://127.0.0.1:8000/api/test/get_xml"
 
@@ -50,6 +55,7 @@ func curlGetXml() {
   fmt.Println(string(resio))
 }
 
+//get json with url param
 func curlGetWithParam() {
   apiUrl := "http://127.0.0.1:8000/api/test/get_json_with_param"
   param := url.Values{}
@@ -70,6 +76,7 @@ func curlGetWithParam() {
   fmt.Println(string(resio))
 }
 
+//post form
 func curlPostWithForm() {
   apiUrl := "http://127.0.0.1:8000/api/test/post_json_with_form"
   data := "num=1&str=str"
@@ -84,6 +91,7 @@ func curlPostWithForm() {
   fmt.Println(string(resio))
 }
 
+//post json
 func curlPostWithJson() {
   apiUrl := "http://127.0.0.1:8000/api/test/post_json_with_json"
   data := "{\"num\":\"1\",\"str\":\"str\"}"
