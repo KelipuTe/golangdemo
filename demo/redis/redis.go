@@ -78,4 +78,9 @@ func ListTest(pRedisClient *redis.Client) {
   arr1Result, err = pRedisClient.LRange(testKey, 0, listLen-1).Result()
   checkErr(err)
   fmt.Printf("%s=%v\r\n", testKey, arr1Result)
+
+  //阻塞式读取
+  result2, err := pRedisClient.BLPop(5*time.Second, "test_list").Result()
+  checkErr(err)
+  fmt.Printf("blpop=%v\r\n", result2)
 }
