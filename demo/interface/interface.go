@@ -12,6 +12,8 @@ func main() {
   fmt.Println("demo finish")
 }
 
+//##########demo1##########
+
 //结构体实现接口
 func RunDemo1() {
   var pts1 *DemoStruct1 = &DemoStruct1{}
@@ -68,10 +70,18 @@ func (ts DemoStruct1) ReadData12() int {
   return ts.Data
 }
 
+//##########demo1##########
+
+//##########demo2##########
+
 //使用sort.Interface接口对结构体2切片排序
 func RunDemo2() {
-  var sli1demo DemoStruct2Slice = DemoStruct2Slice{
-    DemoStruct2{"10", 10}, DemoStruct2{"20", 20}, DemoStruct2{"50", 50}, DemoStruct2{"40", 40}, DemoStruct2{"30", 30},
+  sli1demo := DemoStruct2Slice{
+    DemoStruct2{"10", 10},
+    DemoStruct2{"20", 20},
+    DemoStruct2{"50", 50},
+    DemoStruct2{"40", 40},
+    DemoStruct2{"30", 30},
   }
   fmt.Println(sli1demo)
   sort.Sort(sli1demo)
@@ -105,3 +115,5 @@ func (sli1 DemoStruct2Slice) Less(i, j int) bool {
 func (sli1 DemoStruct2Slice) Swap(i, j int) {
   sli1[i], sli1[j] = sli1[j], sli1[i]
 }
+
+//##########demo2##########
