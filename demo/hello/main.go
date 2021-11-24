@@ -2,6 +2,7 @@ package main
 
 import "fmt"
 
+//古老仪式
 func main() {
-  fmt.Println("hello world")
+  fmt.Printf("hello, world")
 }
