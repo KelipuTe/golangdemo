@@ -8,6 +8,7 @@ import (
 //range表达式只会在for语句开始执行时被求值一次，无论后边会有多少次迭代。
 //range表达式的求值结果会被复制，被迭代的对象是range表达式结果值的副本而不是原数据。
 //对于不同种类的range表达式结果值，for语句的迭代变量的数量可以有所不同。
+
 func main() {
   arr1Num := [...]int{1, 2, 3, 4, 5, 6} //数组
   arr1NumLen := len(arr1Num)
