@@ -1,4 +1,4 @@
-module go0yang4li4
+module demo_golang
 
 go 1.17
 
@@ -11,7 +11,6 @@ require (
 require (
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
-	github.com/jmoiron/sqlx v1.3.4 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/onsi/ginkgo v1.12.0 // indirect
 	github.com/onsi/gomega v1.7.1 // indirect
