@@ -22,9 +22,10 @@ type NetService struct {
   NowTcpCnctNum  int                       // 当前连接数
   MaxTcpCnctNum  int                       // 最大连接数
 
-  OnStart   func(p1NetSvc *NetService)
-  OnError   func(errStr string)
-  OnConnect func(p1TcpCnct *TcpConnection)
+  OnStart   func(p1NetSvc *NetService)     // 服务启动事件回调
+  OnError   func(errStr string)            // 服务错误事件回调
+  OnConnect func(p1TcpCnct *TcpConnection) // tcp连接事件回调
+  OnClose   func(p1TcpCnct *TcpConnection) // tcp关闭事件回调
 }
 
 // 拼接地址和端口
@@ -48,6 +49,8 @@ func (p1this *NetService) Start() {
 
 // 输出服务配置和环境参数
 func (p1this *NetService) StartInfo() {
+  fmt.Println("NetService.AppDebug=", p1this.AppDebug)
+  fmt.Println("NetService.ServiceRunning=", p1this.ServiceRunning)
   fmt.Println("NetService.ProtocolName=", p1this.ProtocolName)
   fmt.Println("NetService.Address=", p1this.Address)
   fmt.Println("NetService.Port=", p1this.Port)
@@ -62,7 +65,7 @@ func (p1this *NetService) StartListen() {
   for 1 == p1this.ServiceRunning {
     conn, err := p1this.Listener.Accept()
     if nil != err {
-      p1this.OnError("StartListen()," + err.Error())
+      p1this.OnError("StartListen(),Accept()," + err.Error())
       return
     }
     if p1this.NowTcpCnctNum >= p1this.MaxTcpCnctNum {
@@ -70,12 +73,12 @@ func (p1this *NetService) StartListen() {
     }
     p1TcpCnct, err := MakeTcpConnection(p1this, conn)
     if nil != err {
-      p1this.OnError("StartListen()," + err.Error())
+      p1this.OnError("StartListen(),MakeTcpConnection()," + err.Error())
       return
     }
     p1this.AddTcpCnct(p1TcpCnct)
     p1this.OnConnect(p1TcpCnct)
-    go p1TcpCnct.HandleMessage()
+    go p1TcpCnct.HandleTcpConnection()
   }
 }
 
@@ -83,4 +86,9 @@ func (p1this *NetService) StartListen() {
 func (p1this *NetService) AddTcpCnct(p1TcpCnct *TcpConnection) {
   p1this.MapTcpCnctPool[p1TcpCnct.Conn.RemoteAddr().String()] = p1TcpCnct
   p1this.NowTcpCnctNum++
+}
+
+// 移除tcp连接
+func (p1this *NetService) DelTcpCnct(p1TcpCnct *TcpConnection) {
+
 }

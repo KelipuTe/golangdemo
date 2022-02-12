@@ -10,7 +10,7 @@ func main() {
     AppDebug:       1,
     ServiceRunning: 1,
 
-    ProtocolName: "tcp",
+    ProtocolName: "http",
     Address:      "127.0.0.1",
     Port:         9501,
 
@@ -21,6 +21,7 @@ func main() {
     OnStart:   MyOnStart,
     OnError:   MyOnError,
     OnConnect: MyOnConnect,
+    OnClose:   MyOnClose,
   }
   netSvc.Start()
 }
@@ -36,4 +37,8 @@ func MyOnError(errStr string) {
 
 func MyOnConnect(p1TcpCnct *service.TcpConnection) {
   fmt.Println("NetService.MyOnConnect")
+}
+
+func MyOnClose(p1TcpCnct *service.TcpConnection) {
+  fmt.Println("NetService.MyOnClose")
 }
