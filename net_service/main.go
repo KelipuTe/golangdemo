@@ -1,26 +1,26 @@
 package main
 
 import (
+  "demo_golang/net_service/config"
   "demo_golang/net_service/service"
   "fmt"
 )
 
 func main() {
   netSvc := service.NetService{
-    AppDebug:       1,
-    ServiceRunning: 1,
-
-    ProtocolName: "http",
-    Address:      "127.0.0.1",
-    Port:         9501,
+    ServiceRunning: service.SERVICE_RUNNING_ON,
+    ProtocolName:   config.STR_HTTP,
+    Address:        config.ADDRESS,
+    Port:           config.PORT,
 
     MapTcpCnctPool: make(map[string]*service.TcpConnection),
     NowTcpCnctNum:  0,
-    MaxTcpCnctNum:  1024,
+    MaxTcpCnctNum:  config.TCP_CONNECTION_MAX_NUM,
 
     OnStart:   MyOnStart,
     OnError:   MyOnError,
     OnConnect: MyOnConnect,
+    OnRequest: MyOnRequest,
     OnClose:   MyOnClose,
   }
   netSvc.Start()
@@ -37,6 +37,10 @@ func MyOnError(errStr string) {
 
 func MyOnConnect(p1TcpCnct *service.TcpConnection) {
   fmt.Println("NetService.MyOnConnect")
+}
+
+func MyOnRequest(p1TcpCnct *service.TcpConnection) {
+  fmt.Println("NetService.MyOnRequest")
 }
 
 func MyOnClose(p1TcpCnct *service.TcpConnection) {

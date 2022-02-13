@@ -1,9 +1,7 @@
 package protocol
 
 import (
-  "demo_golang/net_service/helper"
   "errors"
-  "fmt"
   "strconv"
   "strings"
 )
@@ -17,10 +15,12 @@ const (
   HTTP_STATUS_TOO_LONG   = 3 // 报文太长
   HTTP_STATUS_ATOI_ERR   = 4 // 请求体长度字符串转长度数字出错
   HTTP_STATUS_NOT_FINISH = 5 // 数据不完整
+
+  STR_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded" // Post请求体类型
 )
 
 type Http struct {
-  Status int // 解析状态
+  ParseStatus int // 解析状态
 
   HeaderLength int // http报文请求头数据长度
   BodyLength   int // http报文请求体数据长度
@@ -40,7 +40,7 @@ func (p1this *Http) DataLength(data []byte) (dataLength int, err error) {
 
   totalLen := len(data)
   if 0 == totalLen {
-    p1this.Status = HTTP_STATUS_NO_DATA
+    p1this.ParseStatus = HTTP_STATUS_NO_DATA
     err = errors.New("HTTP_STATUS_NO_DATA")
     return
   }
@@ -49,17 +49,17 @@ func (p1this *Http) DataLength(data []byte) (dataLength int, err error) {
   // 找到\r\n\r\n的位置，这个位置分隔请求头和请求体
   indexRNRN := strings.Index(dataStr, "\r\n\r\n")
   if -1 == indexRNRN {
-    p1this.Status = HTTP_STATUS_NOT_HTTP
+    p1this.ParseStatus = HTTP_STATUS_NOT_HTTP
     err = errors.New("HTTP_STATUS_NOT_HTTP")
     return
   }
   if 0 == indexRNRN {
-    p1this.Status = HTTP_STATUS_WRONG_DATA
+    p1this.ParseStatus = HTTP_STATUS_WRONG_DATA
     err = errors.New("HTTP_STATUS_WRONG_DATA")
     return
   }
   if indexRNRN >= HTTP_MSG_MAX_LENGTH {
-    p1this.Status = HTTP_STATUS_TOO_LONG
+    p1this.ParseStatus = HTTP_STATUS_TOO_LONG
     err = errors.New("HTTP_STATUS_TOO_LONG")
     return
   }
@@ -74,19 +74,19 @@ func (p1this *Http) DataLength(data []byte) (dataLength int, err error) {
     indexBody := strings.IndexByte(tempStr, '\r')
     // 截取Content-Length的字符串值
     bodyLenStr := tempStr[0:indexBody]
-    helper.PrintlnInDebug(1, "Http,bodyLenStr=", bodyLenStr)
     bodyLenNum, errAtoi := strconv.Atoi(bodyLenStr)
     if nil != errAtoi {
-      p1this.Status = HTTP_STATUS_ATOI_ERR
+      p1this.ParseStatus = HTTP_STATUS_ATOI_ERR
       err = errors.New("HTTP_STATUS_ATOI_ERR")
       return
     }
     p1this.BodyLength = bodyLenNum
   }
+
   dataLength = p1this.HeaderLength + p1this.BodyLength
   if totalLen < dataLength {
-    // 报文没接接收全的情况
-    p1this.Status = HTTP_STATUS_NOT_FINISH
+    // 报文没接收全
+    p1this.ParseStatus = HTTP_STATUS_NOT_FINISH
     err = errors.New("HTTP_STATUS_NOT_FINISH")
     return
   }
@@ -94,7 +94,7 @@ func (p1this *Http) DataLength(data []byte) (dataLength int, err error) {
   return
 }
 
-func (p1this *Http) DataDecode(data []byte) (decodeData int, err error) {
+func (p1this *Http) DataDecode(data []byte) (decodeData []byte, err error) {
   dataStr := string(data)
   headerStr := dataStr[0:p1this.HeaderLength]
   bodyStr := dataStr[p1this.HeaderLength:]
@@ -104,6 +104,7 @@ func (p1this *Http) DataDecode(data []byte) (decodeData int, err error) {
   return
 }
 
+// 解析请求头
 func (p1this *Http) ParseHeader(headerStr string) {
   p1this.MapHeader = make(map[string]string)
   arr1Header := strings.Split(headerStr, "\r\n")
@@ -124,8 +125,8 @@ func (p1this *Http) ParseHeader(headerStr string) {
   }
 }
 
+// 解析查询参数
 func (p1this *Http) ParseQuery(uriStr string) {
-  fmt.Println(uriStr)
   index := strings.Index(uriStr, "?")
   if index > 0 {
     // 有?号
@@ -144,12 +145,12 @@ func (p1this *Http) ParseQuery(uriStr string) {
   }
 }
 
+// 解析请求体
 func (p1this *Http) ParseBody(bodyStr string) {
-  fmt.Println(bodyStr)
   ct, ok := p1this.MapHeader["content-type"]
   if ok {
     switch ct {
-    case "application/x-www-form-urlencoded":
+    case STR_X_WWW_FORM_URLENCODED:
       p1this.MapBody = make(map[string]string)
       arr1Body := strings.Split(bodyStr, "&")
       for _, val := range arr1Body {
@@ -162,6 +163,6 @@ func (p1this *Http) ParseBody(bodyStr string) {
   }
 }
 
-func (p1this *Http) DataEecode(data []byte) (encodeData int, err error) {
+func (p1this *Http) DataEncode(data []byte) (encodeData []byte, err error) {
   return
 }
