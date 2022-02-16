@@ -2,6 +2,7 @@ package service
 
 import (
   "demo_golang/net_service/config"
+  "demo_golang/net_service/http"
   "demo_golang/net_service/protocol"
   "demo_golang/net_service/tool"
   "errors"
@@ -17,7 +18,7 @@ const (
 
 // tcp连接结构体
 type TcpConnection struct {
-  NetService        *NetService                  // 服务结构体实例地址
+  NetService        *NetService                  // 服务端结构体实例地址
   ConnectionRunning int                          // 连接运行状态，1=连接运行
   ProtocolName      string                       // 协议名称
   Protocol          protocol.Protocol            // 协议接口实例
@@ -33,6 +34,9 @@ func MakeTcpConnection(p1NetSvc *NetService, conn net.Conn) (p1TcpCnct *TcpConne
   switch p1NetSvc.ProtocolName {
   case config.STR_HTTP:
     ptc = &protocol.Http{}
+    break
+  case config.STR_STREAM:
+    ptc = &protocol.Stream{}
     break
   }
   p1TcpCnct = &TcpConnection{
@@ -103,11 +107,17 @@ func (p1this *TcpConnection) HandleMessageWithProtocol() {
       ptcHttp.DataDecode(firstMsg)
       tool.DebugPrintln(ptcHttp)
       p1this.NetService.OnRequest(p1this)
-      resp := &Response{}
+      resp := &http.Response{}
       resp.HandInit()
       respStr := resp.MakeData(200, "hello, world")
       tool.DebugPrintln("respStr=", respStr)
       p1this.Send(respStr)
+      break
+    case config.STR_STREAM:
+      ptcStream := p1this.Protocol.(*protocol.Stream)
+      ptcStream.DataDecode(firstMsg)
+      tool.DebugPrintln(ptcStream)
+      break
     }
 
     // 计算剩余的数据

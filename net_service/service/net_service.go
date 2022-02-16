@@ -14,7 +14,7 @@ const (
   SERVICE_RUNNING_ON  = 1
 )
 
-// 服务结构体
+// 服务端结构体
 type NetService struct {
   ServiceRunning int          // 服务运行状态，1=服务运行
   ProtocolName   string       // 协议名称，[tcp,stream,http,websocket]
@@ -84,7 +84,7 @@ func (p1this *NetService) AddTcpCnct(p1TcpCnct *TcpConnection) {
   // 在go中也可以获得文件描述符，但是文件描述符不是唯一的
   p1NetTcpConn := p1TcpCnct.Conn.(*net.TCPConn)
   fd, _ := p1NetTcpConn.File()
-  tool.DebugPrintln("p1NetTcpConn.File()", fd)
+  tool.DebugPrintln("p1NetTcpConn.File()", fd.Fd())
 
   p1this.MapTcpCnctPool[p1TcpCnct.Conn.RemoteAddr().String()] = p1TcpCnct
   p1this.NowTcpCnctNum++

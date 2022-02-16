@@ -9,7 +9,7 @@ import (
 func main() {
   netSvc := service.NetService{
     ServiceRunning: service.SERVICE_RUNNING_ON,
-    ProtocolName:   config.STR_HTTP,
+    ProtocolName:   config.STR_STREAM,
     Address:        config.ADDRESS,
     Port:           config.PORT,
 
