@@ -9,7 +9,7 @@ import (
   pkg_errors "github.com/pkg/errors"
 )
 
-// 第二周作业
+// 第 2 周作业
 // 我们在做数据库操作的时候，假设在 dao 层中遇到一个 sql.ErrNoRows ，是否应该
 // Wrap 这个 error，抛给上层。为什么，应该怎么做请写出代码？
 
