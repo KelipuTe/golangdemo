@@ -1,7 +1,7 @@
 package main
 
 import (
-  "demo_golang/http_service_v1"
+  http_service "demo_golang/http_service_v2"
   "fmt"
   "net/http"
 )
@@ -13,11 +13,11 @@ type ApiJson struct {
 }
 
 func main() {
-  p1hsv1 := http_service_v1.NewHTTPSrevice(
+  p1hsv1 := http_service.NewHTTPSrevice(
     "http-service",
-    http_service_v1.Test1MiddlewareBuilder,
-    http_service_v1.Test2MiddlewareBuilder,
-    http_service_v1.TimeCostMiddlewareBuilder,
+    http_service.Test1MiddlewareBuilder,
+    http_service.Test2MiddlewareBuilder,
+    http_service.TimeCostMiddlewareBuilder,
   )
 
   httpApi(p1hsv1)
@@ -25,13 +25,13 @@ func main() {
   fmt.Println("done")
 }
 
-func httpApi(p1hsv1 http_service_v1.Service) {
-  p1hsv1.RegisteRoute(http.MethodGet, "/api/test", func(p1c *http_service_v1.HTTPContext) {
+func httpApi(p1hsv1 http_service.Service) {
+  p1hsv1.RegisteRoute(http.MethodGet, "/api/test", func(p1c *http_service.HTTPContext) {
     p1c.P1resW.WriteHeader(http.StatusOK)
     _, _ = p1c.P1resW.Write([]byte("response, http.MethodGet, /api/test"))
   })
 
-  p1hsv1.RegisteRoute(http.MethodPost, "/api/post_json", func(p1c *http_service_v1.HTTPContext) {
+  p1hsv1.RegisteRoute(http.MethodPost, "/api/post_json", func(p1c *http_service.HTTPContext) {
     reqData := &ApiJson{}
     err := p1c.ReadJson(reqData)
     if nil != err {
@@ -42,22 +42,22 @@ func httpApi(p1hsv1 http_service_v1.Service) {
     p1c.WriteJson(http.StatusOK, reqData)
   })
 
-  p1hsv1.RegisteRoute(http.MethodGet, "/user/info", func(p1c *http_service_v1.HTTPContext) {
+  p1hsv1.RegisteRoute(http.MethodGet, "/user/info", func(p1c *http_service.HTTPContext) {
     p1c.P1resW.WriteHeader(http.StatusOK)
     _, _ = p1c.P1resW.Write([]byte("response, http.MethodGet, /user/info/1"))
   })
 
-  p1hsv1.RegisteRoute(http.MethodGet, "/user/*", func(p1c *http_service_v1.HTTPContext) {
+  p1hsv1.RegisteRoute(http.MethodGet, "/user/*", func(p1c *http_service.HTTPContext) {
     p1c.P1resW.WriteHeader(http.StatusOK)
     _, _ = p1c.P1resW.Write([]byte("response, http.MethodGet, /user/*"))
   })
 
-  p1hsv1.RegisteRoute(http.MethodGet, "/user/order", func(p1c *http_service_v1.HTTPContext) {
+  p1hsv1.RegisteRoute(http.MethodGet, "/user/order", func(p1c *http_service.HTTPContext) {
     p1c.P1resW.WriteHeader(http.StatusOK)
     _, _ = p1c.P1resW.Write([]byte("response, http.MethodGet, /user/order"))
   })
 
-  p1hsv1.RegisteRoute(http.MethodGet, "/user/info", func(p1c *http_service_v1.HTTPContext) {
+  p1hsv1.RegisteRoute(http.MethodGet, "/user/info", func(p1c *http_service.HTTPContext) {
     p1c.P1resW.WriteHeader(http.StatusOK)
     _, _ = p1c.P1resW.Write([]byte("response, http.MethodGet, /user/info/2"))
   })

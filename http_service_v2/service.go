@@ -1,4 +1,4 @@
-package http_service_v1
+package http_service_v2
 
 import (
   "fmt"

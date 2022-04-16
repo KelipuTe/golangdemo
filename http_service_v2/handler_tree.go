@@ -1,10 +1,10 @@
-package http_service_v1
+package http_service_v2
 
 import (
-  "errors"
-  "fmt"
-  "net/http"
-  "strings"
+	"errors"
+	"fmt"
+	"net/http"
+	"strings"
 )
 
 var _ HTTPHandler = &HTTPHandlerTree{}

@@ -1,9 +1,9 @@
-package http_service_v1
+package http_service_v2
 
 import (
-  "encoding/json"
-  "io"
-  "net/http"
+	"encoding/json"
+	"io"
+	"net/http"
 )
 
 // HTTPContext 封装 Handler.ServeHTTP 方法的两个参数
