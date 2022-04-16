@@ -15,11 +15,20 @@ type MiddlewareFunc func(c *HTTPContext)
 type MiddlewareBuilder func(next MiddlewareFunc) MiddlewareFunc
 
 // Test1MiddlewareBuilder 测试调用顺序
-func TestMiddlewareBuilder(next MiddlewareFunc) MiddlewareFunc {
+func Test1MiddlewareBuilder(next MiddlewareFunc) MiddlewareFunc {
   return func(c *HTTPContext) {
-    fmt.Printf("request before test middleware.\n")
+    fmt.Printf("request before test1 middleware.\n")
     next(c)
-    fmt.Printf("request after test middleware.\n")
+    fmt.Printf("request after test1 middleware.\n")
+  }
+}
+
+// Test2MiddlewareBuilder 测试调用顺序
+func Test2MiddlewareBuilder(next MiddlewareFunc) MiddlewareFunc {
+  return func(c *HTTPContext) {
+    fmt.Printf("request before test2 middleware.\n")
+    next(c)
+    fmt.Printf("request after test2 middleware.\n")
   }
 }
 
