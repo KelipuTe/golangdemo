@@ -38,7 +38,8 @@ func (p1h *HTTPHandlerMap) HandlerHTTP(c *HTTPContext) {
 }
 
 // RegisteRoute HTTPHandler.HTTPRoute.RegisteRoute
-func (p1h *HTTPHandlerMap) RegisteRoute(method string, pattern string, hhFunc HTTPHandlerFunc) {
+func (p1h *HTTPHandlerMap) RegisteRoute(method string, pattern string, hhFunc HTTPHandlerFunc) error {
   // 这里用 HTTP 方法和路由构造一个唯一键，实现区分不同 HTTP 方法的路由
   p1h.mapRoute[method+"#"+pattern] = hhFunc
+  return nil
 }

@@ -1,14 +1,5 @@
 package http_service_v1
 
-// HTTPHandlerFunc 路由对应的处理方法
-type HTTPHandlerFunc func(c *HTTPContext)
-
-// HTTPRoute 路由接口
-type HTTPRoute interface {
-  // RegisteRoute 注册路由。method HTTP 方法；pattern 路由；
-  RegisteRoute(method string, pattern string, hhFunc HTTPHandlerFunc)
-}
-
 // HTTPHandler 请求处理接口
 type HTTPHandler interface {
   // HandlerHTTP 请求处理的入口方法
@@ -17,3 +8,12 @@ type HTTPHandler interface {
   // 请求处理接口需要能够注册路由
   HTTPRoute
 }
+
+// HTTPRoute 路由接口
+type HTTPRoute interface {
+  // RegisteRoute 注册路由。method HTTP 方法；pattern 路由；
+  RegisteRoute(method string, pattern string, hhFunc HTTPHandlerFunc) error
+}
+
+// HTTPHandlerFunc 路由对应的处理方法
+type HTTPHandlerFunc func(c *HTTPContext)

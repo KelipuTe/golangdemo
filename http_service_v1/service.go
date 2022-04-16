@@ -23,12 +23,13 @@ type HTTPService struct {
   entrance MiddlewareFunc
 }
 
-// NewHTTPSrevice 新建一个 Service 接口的实例，指定服务的名字和中间件组
+// NewHTTPSrevice 创建一个 Service 接口的实例，指定服务的名字和中间件组
 func NewHTTPSrevice(name string, arr1Builder ...MiddlewareBuilder) Service {
   // 这里实例化一个 HTTPHandler 接口的实例
-  var p1h HTTPHandler = NewHTTPHandlerMap()
+  // var p1h HTTPHandler = NewHTTPHandlerMap()
+  var p1h HTTPHandler = NewHTTPHandlerTree()
 
-  // 在使用中间件的时候，需要对请求处理的入口方法进行包装
+  // 在使用中间件的时候，需要对请求处理的入口方法进行包装。
   var hf MiddlewareFunc = p1h.HandlerHTTP
   // 反过来遍历中间件建造器数组。像洋葱一样，数组最前面的对应最外层。
   // 套娃完成后，请求处理的入口方法应该在最里面。表示请求通过层层中间件后进入业务逻辑。
@@ -68,6 +69,6 @@ func (p1s *HTTPService) Start(addr string, port string) error {
 }
 
 // RegisteRoute Service.HTTPRoute.RegisteRoute
-func (p1s *HTTPService) RegisteRoute(method string, pattern string, hhFunc HTTPHandlerFunc) {
-  p1s.handler.RegisteRoute(method, pattern, hhFunc)
+func (p1s *HTTPService) RegisteRoute(method string, pattern string, hhFunc HTTPHandlerFunc) error {
+  return p1s.handler.RegisteRoute(method, pattern, hhFunc)
 }
