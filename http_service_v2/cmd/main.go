@@ -15,8 +15,7 @@ type ApiJson struct {
 func main() {
   p1hsv1 := http_service.NewHTTPSrevice(
     "http-service",
-    http_service.Test1MiddlewareBuilder,
-    http_service.Test2MiddlewareBuilder,
+    http_service.TestMiddlewareBuilder,
     http_service.TimeCostMiddlewareBuilder,
   )
 
@@ -52,9 +51,19 @@ func httpApi(p1hsv1 http_service.Service) {
     _, _ = p1c.P1resW.Write([]byte("response, http.MethodGet, /user/*"))
   })
 
+  p1hsv1.RegisteRoute(http.MethodGet, "/user/:id", func(p1c *http_service.HTTPContext) {
+    p1c.P1resW.WriteHeader(http.StatusOK)
+    _, _ = p1c.P1resW.Write([]byte("response, http.MethodGet, /user/" + p1c.PathParams["id"]))
+  })
+
   p1hsv1.RegisteRoute(http.MethodGet, "/user/order", func(p1c *http_service.HTTPContext) {
     p1c.P1resW.WriteHeader(http.StatusOK)
     _, _ = p1c.P1resW.Write([]byte("response, http.MethodGet, /user/order"))
+  })
+
+  p1hsv1.RegisteRoute(http.MethodGet, "/user/order/:id/detail", func(p1c *http_service.HTTPContext) {
+    p1c.P1resW.WriteHeader(http.StatusOK)
+    _, _ = p1c.P1resW.Write([]byte("response, http.MethodGet, /user/order/" + p1c.PathParams["id"] + "/detail"))
   })
 
   p1hsv1.RegisteRoute(http.MethodGet, "/user/info", func(p1c *http_service.HTTPContext) {
