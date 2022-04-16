@@ -12,29 +12,33 @@ type ApiJson struct {
 }
 
 func main() {
-  // 创建 HTTP 服务，并指定中间件
-  httpService := http_service_v1.NewHTTPSrevice(
+
+  p1hsv1 := http_service_v1.NewHTTPSrevice(
     "http-service",
-    http_service_v1.TestMiddlewareBuilder,
+    http_service_v1.Test1MiddlewareBuilder,
+    http_service_v1.Test2MiddlewareBuilder,
     http_service_v1.TimeCostMiddlewareBuilder,
   )
 
-  // 注册路由和对应的处理方法
-  httpService.RegisteRoute("GET", "/api/text", func(c *http_service_v1.Context) {
-    c.ResW.WriteHeader(http.StatusOK)
-    _, _ = c.ResW.Write([]byte("GET /api/text response"))
+  httpApi(p1hsv1)
+  p1hsv1.Start("127.0.0.1", "9501")
+}
+
+// 注册 http 路由和对应的处理方法
+func httpApi(p1hsv1 http_service_v1.Service) {
+  p1hsv1.RegisteRoute("GET", "/api/text", func(p1c *http_service_v1.HTTPContext) {
+    p1c.P1resW.WriteHeader(http.StatusOK)
+    _, _ = p1c.P1resW.Write([]byte("GET /api/text response"))
   })
-  httpService.RegisteRoute("POST", "/api/json", func(c *http_service_v1.Context) {
+
+  p1hsv1.RegisteRoute("POST", "/api/json", func(p1c *http_service_v1.HTTPContext) {
     reqData := &ApiJson{}
-    err := c.ReadJson(reqData)
+    err := p1c.ReadJson(reqData)
     if nil != err {
-      c.WriteJson(http.StatusUnprocessableEntity, err.Error())
+      p1c.WriteJson(http.StatusUnprocessableEntity, err.Error())
       return
     }
     reqData.JsonText = "POST /api/json response"
-    c.WriteJson(http.StatusOK, reqData)
+    p1c.WriteJson(http.StatusOK, reqData)
   })
-
-  // 启动服务
-  httpService.Start("127.0.0.1", "9501")
 }
