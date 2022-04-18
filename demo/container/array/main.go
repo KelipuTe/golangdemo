@@ -3,12 +3,14 @@ package main
 import "fmt"
 
 func main() {
-  array1()
+  array()
   array2()
 }
 
-// array1 一维数组
-func array1() {
+// array 一维数组
+func array() {
+  fmt.Printf("array1\r\n")
+
   var t1arr1a [3]int
   // len() 返回数组中元素的个数，cap() 返回数组的容量
   fmt.Printf("t1arr1a: %+v, len: %d, cap: %d\r\n", t1arr1a, len(t1arr1a), cap(t1arr1a))
@@ -37,6 +39,8 @@ func array1() {
 
 // array2 二（多）维数组
 func array2() {
+  fmt.Printf("array2\r\n")
+
   var t1arr2a [3][2]int
 
   // 多维数组也可以按下标读取和修改，但是需要注意每一维的类型

@@ -82,7 +82,7 @@ func stringSplit() {
   t1string := "hello, world"
   // 先找到截断的位置
   index := strings.Index(t1string, ",")
-  // 然后用切片操作。注意，切片操作左闭又开
+  // 然后用切片操作。注意，切片操作左闭右开
   t2string := t1string[:index]
   fmt.Printf("t2string: %s\r\n", t2string)
   t3string := t1string[index:]

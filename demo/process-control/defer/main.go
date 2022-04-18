@@ -4,7 +4,7 @@ import (
   "fmt"
 )
 
-//先defer的语句在后面执行，因为底层用的就是栈结构
+// 先 defer 的语句在后面执行，因为底层用的就是栈结构
 
 func main() {
   defer fmt.Println("defer1")
