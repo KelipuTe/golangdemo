@@ -1,6 +1,7 @@
 package http_service_v2
 
 import (
+  "context"
   "fmt"
   "net/http"
   "sync"
@@ -9,6 +10,8 @@ import (
 // Service 服务接口
 type Service interface {
   Start(addr string, port string) error
+  // Shutdown 服务关闭
+  Shutdown(c context.Context) error
   HTTPRoute
 }
 
@@ -19,6 +22,8 @@ type HTTPService struct {
   entrance MiddlewareFunc
   // 资源池，复用 HTTPContext
   hcPool sync.Pool
+  // 启动服务时，保存实例，用于服务关闭
+  p1HTTPServer *http.Server
 }
 
 // NewHTTPSrevice 创建一个 Service 接口的实例，指定服务的名字和中间件组
@@ -54,8 +59,18 @@ func (p1s *HTTPService) ServeHTTP(p1resW http.ResponseWriter, p1req *http.Reques
 
 // Start Service.Start
 func (p1s *HTTPService) Start(addr string, port string) error {
-  fmt.Printf("HTTPService %s start at %s...\n", p1s.Name, addr+":"+port)
-  return http.ListenAndServe(addr+":"+port, p1s)
+  fmt.Printf("HTTPService %s start at %s...\r\n", p1s.Name, addr+":"+port)
+  p1s.p1HTTPServer = &http.Server{
+    Addr:    addr + ":" + port,
+    Handler: p1s,
+  }
+  return p1s.p1HTTPServer.ListenAndServe()
+}
+
+// Shutdown Service.Shutdown
+func (p1s *HTTPService) Shutdown(c context.Context) error {
+  fmt.Printf("HTTPService %s shutdown\r\n", p1s.Name)
+  return p1s.p1HTTPServer.Shutdown(c)
 }
 
 // RegisteRoute Service.HTTPRoute.RegisteRoute

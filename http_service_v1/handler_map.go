@@ -15,7 +15,7 @@ type HTTPHandlerMap struct {
   mapRoute map[string]HTTPHandlerFunc
 }
 
-func NewHTTPHandlerMap() *HTTPHandlerMap {
+func NewHTTPHandlerMap() HTTPHandler {
   return &HTTPHandlerMap{
     mapRoute: make(map[string]HTTPHandlerFunc),
   }

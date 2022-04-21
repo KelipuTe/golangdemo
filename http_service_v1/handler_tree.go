@@ -15,7 +15,7 @@ type HTTPHandlerTree struct {
   p1root *node
 }
 
-func NewHTTPHandlerTree() *HTTPHandlerTree {
+func NewHTTPHandlerTree() HTTPHandler {
   return &HTTPHandlerTree{
     p1root: &node{},
   }

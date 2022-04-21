@@ -21,7 +21,7 @@ type HTTPHandlerTree struct {
   mapp1root map[string]*node
 }
 
-func NewHTTPHandlerTree() *HTTPHandlerTree {
+func NewHTTPHandlerTree() HTTPHandler {
   t1mapp1root := make(map[string]*node, len(arr1supportedMethod))
   for _, method := range arr1supportedMethod {
     t1mapp1root[method] = newRootNode(method)
