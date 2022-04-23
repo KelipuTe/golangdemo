@@ -1,56 +1,59 @@
 package stream
 
 import (
-  tool "demo_golang/tcp_service_v1/internal/tool/debug"
   "encoding/binary"
   "errors"
 )
 
 type Stream struct {
-  ParseStatus int    // 解析状态
-  BodyLength  int    // 数据长度
-  BodyStr     string // 数据
+  // 解析状态
+  ParseStatus uint8
+  // 数据长度
+  bodyLength uint32
+  // 请求报文
+  Sli1Msg []byte
+  // 解析后的数据
+  DecodeMsg string
 }
 
-func (p1this *Stream) DataLength(data []byte) (dataLength uint64, err error) {
-  totalLen := len(data)
-  if 0 == totalLen {
-    err = errors.New("STREAM_STATUS_NO_DATA")
-    return
-  }
-  if totalLen < 4 {
-    err = errors.New("STREAM_STATUS_NOT_FINISH")
-    return
-  }
-  tool.DebugPrintln("Stream.DataLength()", data[0:4])
-
-  dataLength = uint64(binary.BigEndian.Uint32(data[0:4]))
-  if uint64(totalLen) < 4+dataLength {
-    err = errors.New("STREAM_STATUS_NOT_FINISH")
-    return
-  }
-  p1this.BodyLength = int(dataLength)
-  dataLength = 4 + dataLength
-
-  return
+func NewStream() *Stream {
+  return &Stream{}
 }
 
-func (p1this *Stream) DataDecode(data []byte) (decodeData []byte, err error) {
-  decodeData = data[4:]
-  p1this.BodyStr = string(decodeData)
-  return
+func (p1this *Stream) FirstMsgLength(sli1recv []byte) (uint64, error) {
+  recvLen := uint32(len(sli1recv))
+  if 0 >= recvLen {
+    return 0, errors.New("STREAM_STATUS_NO_DATA")
+  }
+  if 4 > recvLen {
+    return 0, errors.New("STREAM_STATUS_NOT_FINISH")
+  }
+
+  // 前 4 个字节，是大端字节序格式的 uint32
+  p1this.bodyLength = binary.BigEndian.Uint32(sli1recv[0:4])
+  if recvLen < 4+p1this.bodyLength {
+    return 0, errors.New("STREAM_STATUS_NOT_FINISH")
+  }
+
+  return uint64(4 + p1this.bodyLength), nil
 }
 
-func (p1this *Stream) DataEncode(data []byte) (encodeData []byte, err error) {
-  dataLength := len(data)
-  if 0 == dataLength {
-    err = errors.New("STREAM_STATUS_NO_DATA")
-    return
-  }
-  tempData := make([]byte, 4+dataLength)
-  binary.BigEndian.PutUint32(tempData[0:4], uint32(dataLength))
-  tempData = append(tempData[0:4], data...)
-  encodeData = tempData
+func (p1this *Stream) Decode(sli1msg []byte) error {
+  p1this.DecodeMsg = string(sli1msg[4:])
+  return nil
+}
 
-  return
+func (p1this *Stream) Encode() ([]byte, error) {
+  var sli1msg []byte
+
+  bodyLen := len(p1this.DecodeMsg)
+  if 0 >= bodyLen {
+    return sli1msg, errors.New("STREAM_STATUS_NO_DATA")
+  }
+  t1sli1BodyLen := make([]byte, 4)
+  // 把 uint32 格式的数据长度转换成大端字节序，放在最前面 4 个字节的位置上
+  binary.BigEndian.PutUint32(t1sli1BodyLen, uint32(bodyLen))
+  sli1msg = append(t1sli1BodyLen, p1this.DecodeMsg...)
+
+  return sli1msg, nil
 }

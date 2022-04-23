@@ -24,9 +24,9 @@ const (
 
 // TCPService TCP 服务端
 type TCPService struct {
-  // runningStatus 服务状态，0（关闭）；1（运行）
+  // runningStatus 服务状态，详见 RunningStatus 开头的常量
   runningStatus uint8
-  // debugStatus debug 开关，0（关）；1（开）
+  // debugStatus debug 开关，详见 DebugStatus 开头的常量
   debugStatus uint8
 
   // protocolName 协议名称
@@ -39,7 +39,7 @@ type TCPService struct {
   // p1Listener net.Listener
   p1Listener net.Listener
 
-  // mapConnectionPool 连接池
+  // mapConnectionPool TCPConnection 连接池
   mapConnectionPool map[string]*TCPConnection
   // maxConnectionNum 最大连接数
   maxConnectionNum uint32

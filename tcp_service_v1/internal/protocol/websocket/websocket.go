@@ -1,6 +1,7 @@
 package websocket
 
 import (
+  "crypto/md5"
   "crypto/sha1"
   "demo_golang/tcp_service_v1/internal/protocol"
   "demo_golang/tcp_service_v1/internal/protocol/http"
@@ -11,9 +12,10 @@ import (
 )
 
 const (
-  handshakeStatusNo  uint8 = 0 // 没有握手
-  handshakeStatusYes uint8 = 1 // 已经握手
-
+  handshakeStatusNo  uint8 = iota // 没有握手
+  handshakeStatusYes              // 已经握手
+)
+const (
   opcodeText   uint8 = 0x01 // 文本帧
   opcodeBinary uint8 = 0x02 // 二进制帧
   opcodeClose  uint8 = 0x08 // 连接断开
@@ -34,8 +36,7 @@ type WebSocket struct {
   // 握手阶段要用 HTTP 协议
   p1HttpInner *http.HTTP
 
-  // 握手状态
-  // 0（没有握手）；1（已经握手）；
+  // 握手状态，详见 handshakeStatus 开头的常量
   handshakeStatus uint8
 
   // FIN，1 bit
@@ -44,6 +45,7 @@ type WebSocket struct {
   // opcode，4 bit
   opcode uint8
   // MASK，1 bit
+  // 0（没有 Masking-key）；1（有 Masking-key）；
   mask bool
   // Payload len，7 bit
   payloadLen8 uint8
@@ -54,13 +56,17 @@ type WebSocket struct {
   // Masking-key，4 byte
   arr1MaskingKey [4]byte
 
-  // WebSocket 消息头部长度
+  // 头部长度
   headerLength uint8
+  // 消息体长度
+  bodyLength uint64
 
   // 请求报文
   Sli1Msg []byte
   // 解析后的数据
   DecodeMsg string
+
+  SecWebSocketKey string
 }
 
 func NewWebSocket() *WebSocket {
@@ -144,6 +150,7 @@ func (p1this *WebSocket) FirstMsgLength(sli1recv []byte) (uint64, error) {
       msgLen = uint64(p1this.headerLength) + uint64(p1this.payloadLen8)
     }
 
+    p1this.bodyLength = msgLen
     if msgLen > uint64(recvLen) {
       // 计算出来的报文长度大于接收缓冲区中数据长度
       return 0, ErrDataIncomplete
@@ -249,4 +256,58 @@ func (p1this *WebSocket) Handshake() ([]byte, error) {
   sli1msg = []byte(msg)
 
   return sli1msg, nil
+}
+
+func (p1this *WebSocket) HandShakeClient() (msg []byte, err error) {
+
+  nonstr := "bf"
+  key := md5.Sum([]byte(nonstr))
+  secWebSocketKey := base64.StdEncoding.EncodeToString(key[:])
+  p1this.SecWebSocketKey = secWebSocketKey
+
+  text := fmt.Sprintf("GET /chat HTTP/1.1\r\n")
+  text += fmt.Sprintf("Upgrade: websocket\r\n")
+  text += fmt.Sprintf("Connection: Upgrade\r\n")
+  text += fmt.Sprintf("Sec-WebSocket-Key: %v\r\n", secWebSocketKey)
+  text += fmt.Sprintf("Sec-WebSocket-Version: 13\r\n\r\n")
+
+  msg = []byte(text)
+
+  return
+}
+
+func (this *WebSocket) VerifyShakeHand() (err error) {
+
+  connection, ok := this.p1HttpInner.MapHeader["connection"]
+  if !ok {
+    err = errors.New("响应报文connection字段不存在")
+    return
+  }
+  upgrade, ok := this.p1HttpInner.MapHeader["upgrade"]
+  if !ok {
+    err = errors.New("响应报文upgrade字段不存在")
+    return
+  }
+
+  secWebsocketAccept, ok := this.p1HttpInner.MapHeader["sec-websocket-accept"]
+  if !ok {
+    err = errors.New("响应报文sec-websocket-accept字段不存在")
+    return
+  }
+
+  if connection != "Upgrade" || upgrade != "websocket" {
+    err = errors.New("握手失败请重试")
+    return
+  }
+
+  acceptSumArg := this.SecWebSocketKey + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
+  acceptKeySha := sha1.Sum([]byte(acceptSumArg))
+  acceptKeyStr := base64.StdEncoding.EncodeToString(acceptKeySha[:])
+
+  if acceptKeyStr != secWebsocketAccept {
+    err = errors.New("握手失败请重试")
+    return
+  }
+
+  return
 }

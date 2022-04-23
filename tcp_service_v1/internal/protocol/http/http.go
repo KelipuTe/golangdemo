@@ -25,29 +25,29 @@ var _ protocol.Protocol = &HTTP{}
 
 // HTTP 协议
 type HTTP struct {
-  // 解析状态，详见 ParseStatus 开头的常量
+  // ParseStatus 解析状态，详见 ParseStatus 开头的常量
   ParseStatus uint8
 
-  // 请求头数据长度
+  // HeaderLength 请求头数据长度
   HeaderLength uint32
-  // 请求体数据长度
+  // ContentLength 请求体数据长度
   ContentLength uint32
 
-  // 请求报文
+  // Sli1Msg 请求报文
   Sli1Msg []byte
 
-  // 请求方法
+  // Method 请求方法
   Method string
-  // 请求路由
+  // Uri 请求路由
   Uri string
-  // 版本
+  // Version 版本
   Version string
 
-  // 解析后的请求头
+  // MapHeader 解析后的请求头
   MapHeader map[string]string
-  // 解析后的查询参数
+  // MapQuery 解析后的查询参数
   MapQuery map[string]string
-  // 解析后的请求体
+  // MapBody 解析后的请求体
   MapBody map[string]string
 }
 
@@ -60,7 +60,7 @@ func (p1this *HTTP) FirstMsgLength(sli1recv []byte) (uint64, error) {
   var firstMsgLen uint64 = 0
 
   recvLen := uint64(len(sli1recv))
-  if 0 == recvLen {
+  if 0 >= recvLen {
     p1this.ParseStatus = ParseStatusRecvBufferEmpty
     return firstMsgLen, goErrors.New("ParseStatusRecvBufferEmpty")
   }

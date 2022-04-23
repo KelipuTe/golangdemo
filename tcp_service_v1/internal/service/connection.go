@@ -3,6 +3,7 @@ package service
 import (
   "demo_golang/tcp_service_v1/internal/protocol"
   "demo_golang/tcp_service_v1/internal/protocol/http"
+  "demo_golang/tcp_service_v1/internal/protocol/stream"
   "demo_golang/tcp_service_v1/internal/protocol/websocket"
   "demo_golang/tcp_service_v1/internal/tool/debug"
   "errors"
@@ -13,17 +14,15 @@ import (
 const (
   // RecvBufferMax 接收缓冲区最大大小，1MB==2^20==1048576。
   // uint32，最大 2^32-1，差不多 4G，理论上应该够用了。uint64 只会更大。
-  RecvBufferMax uint64 = 1048576
+  RecvBufferMax uint64 = 10 * 1048576
 )
 
 // TCPConnection TCP 连接
 type TCPConnection struct {
-  // 连接状态，0（关闭）；1（运行）
+  // 连接状态，详见 RunningStatus 开头的常量
   runningStatus uint8
-  // debug 开关，0（关）；1（开）
-  debugStatus uint8
 
-  // TCP 连接结构体所属 TCP 服务端结构体
+  // TCP 连接所属 TCP 服务端
   p1service *TCPService
 
   // 协议名称
@@ -44,8 +43,8 @@ type TCPConnection struct {
 // NewTCPConnection 创建 TCPConnection
 func NewTCPConnection(p1service *TCPService, p1conn net.Conn) *TCPConnection {
   p1connection := &TCPConnection{
-    p1service:      p1service,
     runningStatus:  RunningStatusOn,
+    p1service:      p1service,
     protocolName:   "",
     p1protocol:     nil,
     p1Conn:         p1conn,
@@ -60,7 +59,7 @@ func NewTCPConnection(p1service *TCPService, p1conn net.Conn) *TCPConnection {
   case protocol.StrHTTP:
     p1connection.p1protocol = http.NewHTTP()
   case protocol.StrStream:
-    // p1connection.p1protocol = &protocol.Stream{}
+    p1connection.p1protocol = stream.NewStream()
   case protocol.StrWebSocket:
     p1connection.p1protocol = websocket.NewWebSocket()
   }
@@ -136,10 +135,11 @@ func (p1this *TCPConnection) HandleWithProtocol() {
 
       p1this.CloseConnection()
       return
-    // case config.STR_STREAM:
-    //   ptcStream := p1this.Protocol.(*protocol.Stream)
-    //   ptcStream.DataDecode(firstMsg)
-    //   tool.DebugPrintln(ptcStream)
+    case protocol.StrStream:
+      t1p1protocol := p1this.p1protocol.(*stream.Stream)
+      t1p1protocol.Decode(sli1firstMsg)
+      debug.Println(p1this.IsDebug(), "TCPConnection.HandleWithProtocol.Decode: ")
+      debug.Println(p1this.IsDebug(), fmt.Sprintf("%+v", t1p1protocol))
     case protocol.StrWebSocket:
       // 处理 WebSocket 请求
       t1p1protocol := p1this.p1protocol.(*websocket.WebSocket)
