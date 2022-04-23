@@ -1,11 +1,11 @@
 package client
 
 import (
-  "demo_golang/net_service/config"
-  "demo_golang/net_service/protocol"
-  "demo_golang/net_service/tool"
-  "errors"
-  "net"
+	"demo_golang/tcp_service_v1/config"
+	"demo_golang/tcp_service_v1/protocol"
+	"demo_golang/tcp_service_v1/tool"
+	"errors"
+	"net"
 )
 
 const (

@@ -1,8 +1,8 @@
 package main
 
 import (
-  "demo_golang/net_service/client"
-  "demo_golang/net_service/config"
+  "demo_golang/tcp_service_v1/client"
+  "demo_golang/tcp_service_v1/config"
   "fmt"
 )
 

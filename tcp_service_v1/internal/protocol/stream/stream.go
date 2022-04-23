@@ -1,7 +1,7 @@
-package protocol
+package stream
 
 import (
-  "demo_golang/net_service/tool"
+  tool "demo_golang/tcp_service_v1/internal/tool/debug"
   "encoding/binary"
   "errors"
 )
@@ -12,7 +12,7 @@ type Stream struct {
   BodyStr     string // 数据
 }
 
-func (p1this *Stream) DataLength(data []byte) (dataLength int, err error) {
+func (p1this *Stream) DataLength(data []byte) (dataLength uint64, err error) {
   totalLen := len(data)
   if 0 == totalLen {
     err = errors.New("STREAM_STATUS_NO_DATA")
@@ -24,12 +24,12 @@ func (p1this *Stream) DataLength(data []byte) (dataLength int, err error) {
   }
   tool.DebugPrintln("Stream.DataLength()", data[0:4])
 
-  dataLength = int(binary.BigEndian.Uint32(data[0:4]))
-  if totalLen < 4+dataLength {
+  dataLength = uint64(binary.BigEndian.Uint32(data[0:4]))
+  if uint64(totalLen) < 4+dataLength {
     err = errors.New("STREAM_STATUS_NOT_FINISH")
     return
   }
-  p1this.BodyLength = dataLength
+  p1this.BodyLength = int(dataLength)
   dataLength = 4 + dataLength
 
   return
