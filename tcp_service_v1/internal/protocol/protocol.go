@@ -1,11 +1,30 @@
 package protocol
 
+// 协议名称
 const (
-  StrTCP       = "tcp"
-  StrHTTP      = "http"
-  StrStream    = "stream"
-  StrWebSocket = "websocket"
+  TCPStr       string = "tcp"
+  HTTPStr      string = "http"
+  StreamStr    string = "stream"
+  WebSocketStr string = "websocket"
 )
+
+// mapsupported 支持的协议
+var mapsupported map[string]bool
+
+func init() {
+  mapsupported = map[string]bool{
+    TCPStr:       true,
+    HTTPStr:      true,
+    StreamStr:    true,
+    WebSocketStr: true,
+  }
+}
+
+// IsSupported 判断协议是否支持
+func IsSupported(name string) bool {
+  _, ok := mapsupported[name]
+  return ok
+}
 
 // Protocol 协议
 type Protocol interface {

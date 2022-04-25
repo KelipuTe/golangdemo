@@ -23,7 +23,9 @@ const (
 
 var _ protocol.Protocol = &HTTP{}
 
-// HTTP 协议
+// HTTP HTTP 1.1 协议
+// https://datatracker.ietf.org/doc/rfc2616/
+// https://www.rfc-editor.org/rfc/rfc2616
 type HTTP struct {
   // ParseStatus 解析状态，详见 ParseStatus 开头的常量
   ParseStatus uint8

@@ -5,14 +5,19 @@ import (
   "errors"
 )
 
+// Stream 自定义字节流协议
+// 报文前 4 个字节，表示后面的数据长度，后面是数据
 type Stream struct {
-  // 解析状态
+  // ParseStatus 解析状态
   ParseStatus uint8
-  // 数据长度
-  bodyLength uint32
-  // 请求报文
+
+  // BodyLength 去除前 4 个字节，后面的数据长度
+  BodyLength uint32
+
+  // Sli1Msg 请求报文
   Sli1Msg []byte
-  // 解析后的数据
+
+  // DecodeMsg 解析后的数据
   DecodeMsg string
 }
 
@@ -30,17 +35,22 @@ func (p1this *Stream) FirstMsgLength(sli1recv []byte) (uint64, error) {
   }
 
   // 前 4 个字节，是大端字节序格式的 uint32
-  p1this.bodyLength = binary.BigEndian.Uint32(sli1recv[0:4])
-  if recvLen < 4+p1this.bodyLength {
+  p1this.BodyLength = binary.BigEndian.Uint32(sli1recv[0:4])
+  if recvLen < 4+p1this.BodyLength {
     return 0, errors.New("STREAM_STATUS_NOT_FINISH")
   }
 
-  return uint64(4 + p1this.bodyLength), nil
+  return uint64(4 + p1this.BodyLength), nil
 }
 
 func (p1this *Stream) Decode(sli1msg []byte) error {
+  p1this.Sli1Msg = sli1msg
   p1this.DecodeMsg = string(sli1msg[4:])
   return nil
+}
+
+func (p1this *Stream) SetDecodeMsg(msg string) {
+  p1this.DecodeMsg = msg
 }
 
 func (p1this *Stream) Encode() ([]byte, error) {

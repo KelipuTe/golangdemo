@@ -31,6 +31,7 @@ var (
 var _ protocol.Protocol = &WebSocket{}
 
 // WebSocket 协议
+// https://datatracker.ietf.org/doc/rfc6455/
 // https://www.rfc-editor.org/rfc/rfc6455
 type WebSocket struct {
   // 握手阶段要用 HTTP 协议
