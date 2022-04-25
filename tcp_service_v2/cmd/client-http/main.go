@@ -1,16 +1,16 @@
 package main
 
 import (
-  "demo_golang/tcp_service_v1"
-  "demo_golang/tcp_service_v1/internal/client"
-  "demo_golang/tcp_service_v1/internal/protocol"
-  "demo_golang/tcp_service_v1/internal/tool/debug"
+  "demo_golang/tcp_service_v2"
+  "demo_golang/tcp_service_v2/internal/client"
+  "demo_golang/tcp_service_v2/internal/protocol"
+  "demo_golang/tcp_service_v2/internal/tool/debug"
   "fmt"
   "log"
 )
 
 func main() {
-  log.Println("version: ", tcp_service_v1.Version)
+  log.Println("version: ", tcp_service_v2.Version)
 
   p1client := client.NewTCPClient(protocol.StrHTTP, "127.0.0.1", 9501)
   p1client.OnStart = MyOnStart
