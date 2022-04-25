@@ -13,6 +13,8 @@ type Protocol interface {
   FirstMsgLength(sli1recv []byte) (uint64, error)
   // Decode 报文解码
   Decode(sli1msg []byte) error
+  GetDecodeMsg() string
   // Encode 报文编码
+  SetDecodeMsg(msg string)
   Encode() ([]byte, error)
 }

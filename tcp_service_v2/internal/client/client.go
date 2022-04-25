@@ -1,8 +1,6 @@
 package client
 
 import (
-  "demo_golang/tcp_service_v2/internal/protocol"
-  "demo_golang/tcp_service_v2/internal/protocol/websocket"
   "net"
   "strconv"
   "sync"
@@ -75,14 +73,6 @@ func (p1this *TCPClient) Start() {
   p1this.OnStart(p1this)
 
   p1this.p1connection = NewTCPConnection(p1this, p1conn)
-
-  if protocol.StrWebSocket == p1this.protocolName {
-    t1p1protocol := p1this.p1connection.p1protocol.(*websocket.WebSocket)
-    if t1p1protocol.IsHandshakeStatusNo() {
-      handshake, _ := t1p1protocol.HandShakeClient()
-      err = p1this.p1connection.WriteData(handshake)
-    }
-  }
 
   p1this.OnConnect(p1this.p1connection)
 

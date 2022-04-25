@@ -1,12 +1,12 @@
 package http
 
 import (
-	"demo_golang/tcp_service_v2/internal/protocol"
-	goErrors "errors"
-	"strconv"
-	"strings"
+  "demo_golang/tcp_service_v2/internal/protocol"
+  goErrors "errors"
+  "strconv"
+  "strings"
 
-	pkgErrors "github.com/pkg/errors"
+  pkgErrors "github.com/pkg/errors"
 )
 
 const (
@@ -99,6 +99,14 @@ func (p1this *HTTP) FirstMsgLength(sli1recv []byte) (uint64, error) {
   }
 
   return uint64(firstMsgLen), nil
+}
+
+func (p1this *HTTP) GetDecodeMsg() string {
+  return ""
+}
+
+func (p1this *HTTP) SetDecodeMsg(msg string) {
+  return
 }
 
 // Protocol.Decode

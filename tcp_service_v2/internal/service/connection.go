@@ -4,7 +4,6 @@ import (
 	"demo_golang/tcp_service_v2/internal/protocol"
 	"demo_golang/tcp_service_v2/internal/protocol/http"
 	"demo_golang/tcp_service_v2/internal/protocol/stream"
-	"demo_golang/tcp_service_v2/internal/protocol/websocket"
 	"demo_golang/tcp_service_v2/internal/tool/debug"
 	"errors"
 	"fmt"
@@ -60,8 +59,6 @@ func NewTCPConnection(p1service *TCPService, p1conn net.Conn) *TCPConnection {
     p1connection.p1protocol = http.NewHTTP()
   case protocol.StrStream:
     p1connection.p1protocol = stream.NewStream()
-  case protocol.StrWebSocket:
-    p1connection.p1protocol = websocket.NewWebSocket()
   }
 
   return p1connection
@@ -70,6 +67,10 @@ func NewTCPConnection(p1service *TCPService, p1conn net.Conn) *TCPConnection {
 // TCPService.IsDebug
 func (p1this *TCPConnection) IsDebug() bool {
   return p1this.p1service.IsDebug()
+}
+
+func (p1this *TCPConnection) GetProtocol() protocol.Protocol {
+  return p1this.p1protocol
 }
 
 // HandleConnection 处理连接
@@ -140,42 +141,15 @@ func (p1this *TCPConnection) HandleWithProtocol() {
       t1p1protocol.Decode(sli1firstMsg)
       debug.Println(p1this.IsDebug(), "TCPConnection.HandleWithProtocol.Decode: ")
       debug.Println(p1this.IsDebug(), fmt.Sprintf("%+v", t1p1protocol))
-    case protocol.StrWebSocket:
-      // 处理 WebSocket 请求
-      t1p1protocol := p1this.p1protocol.(*websocket.WebSocket)
-      t1p1protocol.Decode(sli1firstMsg)
-      debug.Println(p1this.IsDebug(), "TCPConnection.HandleWithProtocol.Decode: ")
-      debug.Println(p1this.IsDebug(), fmt.Sprintf("%+v", t1p1protocol))
+      p1this.p1service.OnRequest(p1this)
 
-      if t1p1protocol.IsHandshakeStatusNo() {
-        shakeHandMsg, err := t1p1protocol.Handshake()
-        debug.Println(p1this.IsDebug(), "TCPConnection.HandleWithProtocol.Handshake")
-        debug.Println(p1this.IsDebug(), string(shakeHandMsg))
-        if err != nil {
-          // 发送 400 给客户端，并且关闭连接
-          return
-        } else {
-          err = p1this.WriteData(shakeHandMsg)
-          if nil == err {
-            t1p1protocol.SetHandshakeStatusYes()
-          }
-        }
-      } else if t1p1protocol.IsHandshakeStatusYes() {
-        // 返回响应数据
-        resp := websocket.NewResponse()
-        sli1resp := resp.MakeResponse("this is service.")
-        debug.Println(p1this.IsDebug(), "TCPConnection.HandleWithProtocol.MakeResponse: ")
-        debug.Println(p1this.IsDebug(), sli1resp)
-        p1this.WriteData(sli1resp)
+      // 处理接收缓冲区中剩余的数据
+      p1this.sli1recvBuffer = p1this.sli1recvBuffer[firstMsgLength:]
+      p1this.recvBufferNow -= firstMsgLength
+      if p1this.recvBufferNow <= 0 {
+        p1this.recvBufferNow = 0
+        break
       }
-    }
-
-    // 处理接收缓冲区中剩余的数据
-    p1this.sli1recvBuffer = p1this.sli1recvBuffer[firstMsgLength:]
-    p1this.recvBufferNow -= firstMsgLength
-    if p1this.recvBufferNow <= 0 {
-      p1this.recvBufferNow = 0
-      break
     }
   }
 }
@@ -196,11 +170,11 @@ func (p1this *TCPConnection) SendMsg(msg string) {
 
   switch p1this.protocolName {
   case protocol.StrTCP, protocol.StrHTTP, protocol.StrWebSocket:
-    p1this.WriteData([]byte(msg))
-    // case protocol.StrStream:
-    //   encodeData, _ := p1this.p1protocol.Encode()
-    //   p1this.WriteData(encodeData)
-    //   break
+
+  case protocol.StrStream:
+    p1this.p1protocol.SetDecodeMsg(msg)
+    t1msg, _ := p1this.p1protocol.Encode()
+    p1this.WriteData(t1msg)
   }
 }
 
