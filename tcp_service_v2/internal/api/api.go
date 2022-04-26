@@ -5,7 +5,10 @@ const (
   TypeResponse              // 响应
 )
 
+// 自定义的交互数据结构
 type APIPackage struct {
+  // 数据结构的 ID
+  Id string
   // Type 数据包类型，详见 Type 开头的常量
   Type uint8
   // Action 访问的方法
@@ -14,7 +17,8 @@ type APIPackage struct {
   Data string
 }
 
-type ReqInRegiste struct {
+//
+type ReqInRegisteServiceProvider struct {
   Name      string   `json:"name"`
   Sli1Route []string `json:"route"`
 }

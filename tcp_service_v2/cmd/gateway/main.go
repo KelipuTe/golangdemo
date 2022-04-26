@@ -1,13 +1,13 @@
 package main
 
 import (
-	"demo_golang/tcp_service_v2"
-	"demo_golang/tcp_service_v2/internal/gateway"
-	"demo_golang/tcp_service_v2/internal/protocol"
-	"demo_golang/tcp_service_v2/internal/service"
-	"demo_golang/tcp_service_v2/internal/tool/signal"
-	"fmt"
-	"log"
+  "demo_golang/tcp_service_v2"
+  "demo_golang/tcp_service_v2/internal/gateway"
+  "demo_golang/tcp_service_v2/internal/protocol"
+  "demo_golang/tcp_service_v2/internal/service"
+  "demo_golang/tcp_service_v2/internal/tool/signal"
+  "fmt"
+  "log"
 )
 
 var p1service *service.TCPService
@@ -32,7 +32,7 @@ func main() {
     if p1service.IsDebug() {
       fmt.Println(fmt.Sprintf("%s.OnConnRequest", p1service.GetName()))
     }
-    gateway.P1gateway.RegisteServiceProvider(p1connection)
+    gateway.P1gateway.DispatchInnerRequest(p1connection)
   }
 
   go p1service.Start()
@@ -45,7 +45,7 @@ func main() {
     if p1service.IsDebug() {
       fmt.Println(fmt.Sprintf("%s.OnServiceStart", p1service.GetName()))
     }
-    gateway.P1gateway.GetConn("user_service").SendMsg([]byte("aaa"))
+    gateway.P1gateway.DispatchOpenRequest(p1connection)
   }
 
   go p1linkservice.Start()

@@ -82,6 +82,10 @@ func (p1this *TCPConnection) GetProtocol() protocol.Protocol {
   return p1this.p1protocol
 }
 
+func (p1this *TCPConnection) GetNetConnRemoteAddr() string {
+  return p1this.p1conn.RemoteAddr().String()
+}
+
 // HandleConnection 处理连接
 func (p1this *TCPConnection) HandleConnection() {
   for p1this.IsRun() {
@@ -140,17 +144,13 @@ func (p1this *TCPConnection) HandleBuffer() {
 
     switch p1this.protocolName {
     case protocol.HTTPStr:
-      // 处理完一条消息就关闭连接
       p1this.HandleHTTPMsg(sli1firstMsg)
       p1this.p1service.OnConnRequest(p1this)
-      p1this.CloseConnection()
       return
     case protocol.StreamStr:
-      // 处理完一条消息不关闭连接，继续处理下一条
       p1this.HandleStreamMsg(sli1firstMsg)
       p1this.p1service.OnConnRequest(p1this)
     case protocol.WebSocketStr:
-      // 处理完一条消息不关闭连接，继续处理下一条
       err := p1this.HandleWebSocketMsg(sli1firstMsg)
       if nil != err {
         p1this.CloseConnection()

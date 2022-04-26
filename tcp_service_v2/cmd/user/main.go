@@ -27,6 +27,12 @@ func main() {
     user.P1UserService.RegisteServiceProvider()
   }
 
+  p1client.OnConnRequest = func(p1connection *client.TCPConnection) {
+    if p1client.IsDebug() {
+      fmt.Println(fmt.Sprintf("%s.OnConnConnect", p1client.GetName()))
+    }
+    user.P1UserService.DispatchRequest(p1connection)
+  }
   p1client.Start()
 
   signal.WaitForShutdown()
