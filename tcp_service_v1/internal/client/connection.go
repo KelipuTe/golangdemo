@@ -135,9 +135,7 @@ func (p1this *TCPConnection) HandleBuffer() {
   sli1Copy := p1this.sli1recvBuffer[0:p1this.recvBufferNow]
   for p1this.recvBufferNow > 0 {
     firstMsgLength, err := p1this.p1protocol.FirstMsgLength(sli1Copy)
-
     sli1firstMsg := p1this.sli1recvBuffer[0:firstMsgLength]
-    p1this.p1client.OnConnRequest(p1this)
 
     switch p1this.protocolName {
     case protocol.StreamStr:
@@ -146,7 +144,9 @@ func (p1this *TCPConnection) HandleBuffer() {
 
       if p1this.IsDebug() {
         fmt.Println(fmt.Sprintf("%s.TCPConnection.HandleBuffer.StreamStr.Decode: ", p1this.p1client.name))
+        fmt.Println(fmt.Sprintf("%+v", t1p1protocol))
       }
+      p1this.p1client.OnConnRequest(p1this)
     case protocol.WebSocketStr:
       t1p1protocol := p1this.p1protocol.(*websocket.WebSocket)
       t1p1protocol.Decode(sli1firstMsg)
@@ -164,15 +164,18 @@ func (p1this *TCPConnection) HandleBuffer() {
         if p1this.IsDebug() {
           fmt.Println(fmt.Sprintf("%s.TCPConnection.HandleBuffer.WebSocketStr.Decode: ", p1this.p1client.name))
           fmt.Println(fmt.Sprintf("%+v", t1p1protocol))
+          p1this.p1client.OnConnRequest(p1this)
         }
       }
     }
 
     p1this.sli1recvBuffer = p1this.sli1recvBuffer[firstMsgLength:]
-    p1this.recvBufferNow -= firstMsgLength
-    if p1this.recvBufferNow <= 0 {
+    // recvBufferNow 是 uint64 类型的，做减法的时候小心溢出
+    if p1this.recvBufferNow <= firstMsgLength {
       p1this.recvBufferNow = 0
       break
+    } else {
+      p1this.recvBufferNow -= firstMsgLength
     }
   }
 }

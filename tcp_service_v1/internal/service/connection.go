@@ -131,19 +131,24 @@ func (p1this *TCPConnection) HandleBuffer() {
       }
       break
     }
-    // 取出第 1 条完整的报文
+    // 取出第 1 条完整的消息
     sli1firstMsg := p1this.sli1recvBuffer[0:firstMsgLength]
-    p1this.p1service.OnConnRequest(p1this)
 
     switch p1this.protocolName {
     case protocol.HTTPStr:
+      // 处理完一条消息就关闭连接
       p1this.HandleHTTPMsg(sli1firstMsg)
+      p1this.p1service.OnConnRequest(p1this)
+      p1this.CloseConnection()
       return
     case protocol.StreamStr:
+      // 处理完一条消息不关闭连接，继续处理下一条
       p1this.HandleStreamMsg(sli1firstMsg)
-      return
+      p1this.p1service.OnConnRequest(p1this)
     case protocol.WebSocketStr:
+      // 处理完一条消息不关闭连接，继续处理下一条
       err := p1this.HandleWebSocketMsg(sli1firstMsg)
+      p1this.p1service.OnConnRequest(p1this)
       if nil != err {
         p1this.CloseConnection()
       }
@@ -151,10 +156,12 @@ func (p1this *TCPConnection) HandleBuffer() {
 
     // 处理接收缓冲区中剩余的数据
     p1this.sli1recvBuffer = p1this.sli1recvBuffer[firstMsgLength:]
-    p1this.recvBufferNow -= firstMsgLength
-    if p1this.recvBufferNow <= 0 {
+    // recvBufferNow 是 uint64 类型的，做减法的时候小心溢出
+    if p1this.recvBufferNow <= firstMsgLength {
       p1this.recvBufferNow = 0
       break
+    } else {
+      p1this.recvBufferNow -= firstMsgLength
     }
   }
 }
@@ -174,8 +181,6 @@ func (p1this *TCPConnection) HandleHTTPMsg(sli1firstMsg []byte) {
   resp.SetStatusCode(http.StatusOk)
   respStr := resp.MakeResponse(fmt.Sprintf("this is %s.", p1this.p1service.name))
   p1this.SendMsg([]byte(respStr))
-
-  p1this.CloseConnection()
 }
 
 // HandleStreamMsg 处理自定义字节流消息
@@ -190,8 +195,6 @@ func (p1this *TCPConnection) HandleStreamMsg(sli1firstMsg []byte) {
 
   t1p1protocol.SetDecodeMsg(fmt.Sprintf("this is %s.", p1this.p1service.name))
   p1this.SendMsg([]byte{})
-
-  p1this.CloseConnection()
 }
 
 // HandleWebSocketMsg 处理 WebSocket 消息

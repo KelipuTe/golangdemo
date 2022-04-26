@@ -101,14 +101,6 @@ func (p1this *HTTP) FirstMsgLength(sli1recv []byte) (uint64, error) {
   return uint64(firstMsgLen), nil
 }
 
-func (p1this *HTTP) GetDecodeMsg() string {
-  return ""
-}
-
-func (p1this *HTTP) SetDecodeMsg(msg string) {
-  return
-}
-
 // Protocol.Decode
 func (p1this *HTTP) Decode(sli1msg []byte) error {
   p1this.Sli1Msg = sli1msg

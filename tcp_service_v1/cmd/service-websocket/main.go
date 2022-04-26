@@ -9,6 +9,9 @@ import (
   "log"
 )
 
+// 可以用 EasySwoole-WebSocket在线测试工具 测试
+// http://www.easyswoole.com/wstool.html
+// 也可以直接用 JavaScript 的 WebSocket 工具
 func main() {
   log.Println("version: ", tcp_service_v1.Version)
 
