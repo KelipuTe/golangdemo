@@ -130,6 +130,7 @@ func (p1this *TCPConnection) HandleConnection(deferFunc func()) {
   }
 }
 
+// HandleBuffer 处理缓冲区
 func (p1this *TCPConnection) HandleBuffer() {
   sli1Copy := p1this.sli1recvBuffer[0:p1this.recvBufferNow]
   for p1this.recvBufferNow > 0 {

@@ -380,36 +380,32 @@ func (p1this *WebSocket) MakeHandShakeReq() ([]byte, error) {
 
 // CheckHandShakeResp 校验握手消息（服务端对客户端申请协议升级的响应）
 func (this *WebSocket) CheckHandShakeResp() (err error) {
-
   connection, ok := this.p1HttpInner.MapHeader["connection"]
   if !ok {
-    err = errors.New("响应报文connection字段不存在")
-    return
+    return errors.New("http header missing connection.")
   }
   upgrade, ok := this.p1HttpInner.MapHeader["upgrade"]
   if !ok {
-    err = errors.New("响应报文upgrade字段不存在")
-    return
+    return errors.New("http header missing upgrade.")
+  }
+  upgradeIndex := strings.Index(connection, "Upgrade")
+  websocketIndex := strings.Index(upgrade, "websocket")
+  if upgradeIndex < 0 || websocketIndex < 0 {
+    return errors.New("connection is not \"Upgrade\" or upgrade is not \"websocket\".")
   }
 
   secWebsocketAccept, ok := this.p1HttpInner.MapHeader["sec-websocket-accept"]
   if !ok {
-    err = errors.New("响应报文sec-websocket-accept字段不存在")
-    return
+    return errors.New("http header missing sec-websocket-accept.")
   }
 
-  if connection != "Upgrade" || upgrade != "websocket" {
-    err = errors.New("握手失败请重试")
-    return
-  }
+  // 校验 sec-websocket-accept
+  secAcceptStr := this.SecWebSocketKey + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
+  secAcceptSHA1 := sha1.Sum([]byte(secAcceptStr))
+  secAcceptBase64 := base64.StdEncoding.EncodeToString(secAcceptSHA1[:])
 
-  acceptSumArg := this.SecWebSocketKey + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
-  acceptKeySha := sha1.Sum([]byte(acceptSumArg))
-  acceptKeyStr := base64.StdEncoding.EncodeToString(acceptKeySha[:])
-
-  if acceptKeyStr != secWebsocketAccept {
-    err = errors.New("握手失败请重试")
-    return
+  if secAcceptBase64 != secWebsocketAccept {
+    return errors.New("sec-websocket-accept is wrong.")
   }
 
   return
