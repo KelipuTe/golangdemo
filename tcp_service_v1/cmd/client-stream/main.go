@@ -14,6 +14,5 @@ func main() {
   p1client := client.NewTCPClient(protocol.StreamStr, "127.0.0.1", 9501)
   p1client.SetName(fmt.Sprintf("%s-client", protocol.StreamStr))
   p1client.SetDebugStatusOn()
-
   p1client.Start()
 }

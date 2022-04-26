@@ -143,7 +143,10 @@ func (p1this *TCPConnection) HandleBuffer() {
       p1this.HandleStreamMsg(sli1firstMsg)
       return
     case protocol.WebSocketStr:
-      p1this.HandleWebSocketMsg(sli1firstMsg)
+      err := p1this.HandleWebSocketMsg(sli1firstMsg)
+      if nil != err {
+        p1this.CloseConnection()
+      }
     }
 
     // 处理接收缓冲区中剩余的数据
@@ -192,7 +195,7 @@ func (p1this *TCPConnection) HandleStreamMsg(sli1firstMsg []byte) {
 }
 
 // HandleWebSocketMsg 处理 WebSocket 消息
-func (p1this *TCPConnection) HandleWebSocketMsg(sli1firstMsg []byte) {
+func (p1this *TCPConnection) HandleWebSocketMsg(sli1firstMsg []byte) error {
   t1p1protocol := p1this.p1protocol.(*websocket.WebSocket)
   t1p1protocol.Decode(sli1firstMsg)
 
@@ -202,46 +205,47 @@ func (p1this *TCPConnection) HandleWebSocketMsg(sli1firstMsg []byte) {
   }
 
   if t1p1protocol.IsHandshakeStatusNo() {
-    shakeHandMsg, err := t1p1protocol.Handshake()
+    sli1respMsg, err := t1p1protocol.CheckHandshakeReq()
 
     if p1this.IsDebug() {
-      fmt.Println(fmt.Sprintf("%s.TCPConnection.HandleWebSocketMsg.Handshake: ", p1this.p1service.name))
-      fmt.Println(fmt.Sprintf("%+v", string(shakeHandMsg)))
+      fmt.Println(fmt.Sprintf("%s.TCPConnection.HandleWebSocketMsg.CheckHandshakeReq: ", p1this.p1service.name))
+      fmt.Println(fmt.Sprintf("%+v", string(sli1respMsg)))
     }
 
-    if err != nil {
+    if nil != err {
       // 发送 400 给客户端，并且关闭连接
-      return
+      resp := http.NewResponse()
+      resp.SetStatusCode(http.StatusBadRequest)
+      respStr := resp.MakeResponse(fmt.Sprintf("this is %s. handshake err: %s", p1this.p1service.name, err))
+      p1this.WriteData([]byte(respStr))
+
+      return err
     } else {
-      err = p1this.WriteData(shakeHandMsg)
+      // SendMsg 方法会编码，这里走 WriteData 方法直接发
+      err = p1this.WriteData(sli1respMsg)
       if nil == err {
         t1p1protocol.SetHandshakeStatusYes()
       }
     }
-  } else if t1p1protocol.IsHandshakeStatusYes() {
+  } else {
     // 返回响应数据
-    resp := websocket.NewResponse()
-    sli1resp := resp.MakeResponse("this is service.")
-
-    if p1this.IsDebug() {
-      fmt.Println("TCPConnection.HandleWithProtocol.MakeResponse: ")
-      fmt.Println(sli1resp)
-    }
-
-    p1this.WriteData(sli1resp)
+    t1p1protocol.SetDecodeMsg(fmt.Sprintf("this is %s.", p1this.p1service.name))
+    p1this.SendMsg([]byte{})
   }
+
+  return nil
 }
 
 // SendMsg 发送数据
 func (p1this *TCPConnection) SendMsg(sli1msg []byte) {
   switch p1this.protocolName {
-  case protocol.TCPStr, protocol.HTTPStr, protocol.WebSocketStr:
+  case protocol.TCPStr, protocol.HTTPStr:
     if p1this.IsDebug() {
       fmt.Println(fmt.Sprintf("%s.TCPConnection.SendMsg: ", p1this.p1service.name))
       fmt.Println(string(sli1msg))
     }
     p1this.WriteData(sli1msg)
-  case protocol.StreamStr:
+  case protocol.StreamStr, protocol.WebSocketStr:
     t1sli1msg, _ := p1this.p1protocol.Encode()
     if p1this.IsDebug() {
       fmt.Println(fmt.Sprintf("%s.TCPConnection.SendMsg: ", p1this.p1service.name))

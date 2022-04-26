@@ -1,12 +1,12 @@
 package client
 
 import (
-	"fmt"
-	"net"
-	"strconv"
-	"sync"
+  "fmt"
+  "net"
+  "strconv"
+  "sync"
 
-	pkgErrors "github.com/pkg/errors"
+  pkgErrors "github.com/pkg/errors"
 )
 
 const (
