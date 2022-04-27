@@ -144,17 +144,58 @@ func (p1this *TCPConnection) HandleBuffer() {
 
     switch p1this.protocolName {
     case protocol.HTTPStr:
+      // 这里模仿的是 HTTP 1.1 协议，短连接。
       p1this.HandleHTTPMsg(sli1firstMsg)
       p1this.p1service.OnConnRequest(p1this)
+
+      // ## v2 逻辑 ##
+      // v2 需要把消息返回给外部实现处理
+      // 所以这里不再负责响应消息和关闭 TCP 连接
+      // #### v2 逻辑 ####
+
+      // ## v1 逻辑 ##
+      // 直接响应一个固定的测试消息
+      // resp := http.NewResponse()
+      // resp.SetStatusCode(http.StatusOk)
+      // respStr := resp.MakeResponse(fmt.Sprintf("this is %s.", p1this.p1service.name))
+      // p1this.SendMsg([]byte(respStr))
+      // 处理完一条消息后，直接关闭 TCP 连接
+      // p1this.CloseConnection()
+      // #### v1 逻辑 ####
       return
     case protocol.StreamStr:
+      // 这里模仿的是自定义 Stream 协议，长链接
       p1this.HandleStreamMsg(sli1firstMsg)
       p1this.p1service.OnConnRequest(p1this)
+
+      // ## v2 逻辑 ##
+      // v2 需要把消息返回给外部实现处理
+      // 所以这里不再负责响应消息和关闭 TCP 连接
+      // #### v2 逻辑 ####
+
+      // ## v1 逻辑 ##
+      // 直接响应一个固定的测试消息
+      // t1p1protocol := p1this.p1protocol.(*stream.Stream)
+      // t1p1protocol.SetDecodeMsg(fmt.Sprintf("this is %s.", p1this.p1service.name))
+      // p1this.SendMsg([]byte{})
+      // #### v1 逻辑 ####
+
+      // 处理完一条消息后，不会关闭 TCP 连接
     case protocol.WebSocketStr:
+      // 这里模仿的是 WebSocket 协议，长链接
       err := p1this.HandleWebSocketMsg(sli1firstMsg)
       if nil != err {
         p1this.CloseConnection()
+        return
       }
+      p1this.p1service.OnConnRequest(p1this)
+      // 如果握手成功，就直接响应一个固定的测试消息
+      // t1p1protocol := p1this.p1protocol.(*websocket.WebSocket)
+      // if t1p1protocol.IsHandshakeStatusYes() {
+      //   t1p1protocol.SetDecodeMsg(fmt.Sprintf("this is %s.", p1this.p1service.name))
+      //   p1this.SendMsg([]byte{})
+      // }
+      // 处理完一条消息后，不会关闭 TCP 连接
     }
 
     // 处理接收缓冲区中剩余的数据
@@ -178,12 +219,6 @@ func (p1this *TCPConnection) HandleHTTPMsg(sli1firstMsg []byte) {
     fmt.Println(fmt.Sprintf("%s.TCPConnection.HandelHTTPMsg.Decode: ", p1this.p1service.name))
     fmt.Println(fmt.Sprintf("%+v", t1p1protocol))
   }
-
-  // 返回响应数据
-  // resp := http.NewResponse()
-  // resp.SetStatusCode(http.StatusOk)
-  // respStr := resp.MakeResponse(fmt.Sprintf("this is %s.", p1this.p1service.name))
-  // p1this.SendMsg([]byte(respStr))
 }
 
 // HandleStreamMsg 处理自定义字节流消息
@@ -195,9 +230,6 @@ func (p1this *TCPConnection) HandleStreamMsg(sli1firstMsg []byte) {
     fmt.Println(fmt.Sprintf("%s.TCPConnection.HandelStreamMsg.Decode: ", p1this.p1service.name))
     fmt.Println(fmt.Sprintf("%+v", t1p1protocol))
   }
-
-  // t1p1protocol.SetDecodeMsg(fmt.Sprintf("this is %s.", p1this.p1service.name))
-  // p1this.SendMsg([]byte{})
 }
 
 // HandleWebSocketMsg 处理 WebSocket 消息
@@ -210,6 +242,7 @@ func (p1this *TCPConnection) HandleWebSocketMsg(sli1firstMsg []byte) error {
     fmt.Println(fmt.Sprintf("%+v", t1p1protocol))
   }
 
+  // 如果还没有握手成功，就走握手流程
   if t1p1protocol.IsHandshakeStatusNo() {
     sli1respMsg, err := t1p1protocol.CheckHandshakeReq()
 
@@ -227,16 +260,13 @@ func (p1this *TCPConnection) HandleWebSocketMsg(sli1firstMsg []byte) error {
 
       return err
     } else {
-      // SendMsg 方法会编码，这里走 WriteData 方法直接发
+      // 握手消息是通过 websocket.WebSocket 内部的 http.HTTP 处理的
+      // 走 SendMsg 方法会判断成 WebSocket，走编码逻辑，所以这里通过 WriteData 方法直接发送
       err = p1this.WriteData(sli1respMsg)
       if nil == err {
         t1p1protocol.SetHandshakeStatusYes()
       }
     }
-  } else {
-    // 返回响应数据
-    // t1p1protocol.SetDecodeMsg(fmt.Sprintf("this is %s.", p1this.p1service.name))
-    // p1this.SendMsg([]byte{})
   }
 
   return nil

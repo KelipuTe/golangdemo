@@ -82,6 +82,7 @@ func (p1this *TCPConnection) HandleConnection(deferFunc func()) {
     deferFunc()
   }()
 
+  // 连上服务端之后，发送测试消息
   switch p1this.protocolName {
   case protocol.HTTPStr:
     // 发送 HTTP 消息
@@ -101,6 +102,7 @@ func (p1this *TCPConnection) HandleConnection(deferFunc func()) {
     p1this.WriteData(sli1respMsg)
   }
 
+  // 发送完了之后等待服务端响应
   for p1this.IsRun() {
     byteNum, err := p1this.p1conn.Read(p1this.sli1recvBuffer[p1this.recvBufferNow:])
 
@@ -138,7 +140,18 @@ func (p1this *TCPConnection) HandleBuffer() {
     sli1firstMsg := p1this.sli1recvBuffer[0:firstMsgLength]
 
     switch p1this.protocolName {
+    case protocol.HTTPStr:
+      // HTTP 1.1 协议的消息，解析之后直接输出
+      t1p1protocol := p1this.p1protocol.(*http.HTTP)
+      t1p1protocol.Decode(sli1firstMsg)
+
+      if p1this.IsDebug() {
+        fmt.Println(fmt.Sprintf("%s.TCPConnection.HandleBuffer.StreamStr.Decode: ", p1this.p1client.name))
+        fmt.Println(fmt.Sprintf("%+v", t1p1protocol))
+      }
+      p1this.p1client.OnConnRequest(p1this)
     case protocol.StreamStr:
+      // 自定义 Stream 协议的消息，解析之后直接输出
       t1p1protocol := p1this.p1protocol.(*stream.Stream)
       t1p1protocol.Decode(sli1firstMsg)
 
@@ -148,10 +161,12 @@ func (p1this *TCPConnection) HandleBuffer() {
       }
       p1this.p1client.OnConnRequest(p1this)
     case protocol.WebSocketStr:
+      // WebSocket 协议的消息，需要判断是握手消息还是测试消息
       t1p1protocol := p1this.p1protocol.(*websocket.WebSocket)
       t1p1protocol.Decode(sli1firstMsg)
 
       if t1p1protocol.IsHandshakeStatusNo() {
+        // 握手消息，校验一下服务端响应的握手消息
         err = t1p1protocol.CheckHandShakeResp()
         if err == nil {
           t1p1protocol.SetHandshakeStatusYes()
@@ -161,6 +176,7 @@ func (p1this *TCPConnection) HandleBuffer() {
           p1this.CloseConnection()
         }
       } else {
+        // 测试消息，解析之后直接输出
         if p1this.IsDebug() {
           fmt.Println(fmt.Sprintf("%s.TCPConnection.HandleBuffer.WebSocketStr.Decode: ", p1this.p1client.name))
           fmt.Println(fmt.Sprintf("%+v", t1p1protocol))
