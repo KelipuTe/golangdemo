@@ -188,17 +188,17 @@ func (p1this *TCPService) StartListen() {
 }
 
 // AddConnection 添加连接
-func (p1this *TCPService) AddConnection(p1connection *TCPConnection) {
+func (p1this *TCPService) AddConnection(p1tcpConn *TCPConnection) {
   // 用 Linux C 编码时，可以通过 socket 的文件描述符区分 TCP 连接
   // 在 go 中也可以获得文件描述符，但是文件描述符不是唯一的，不能用于区分
   if p1this.IsDebug() {
-    fd, err := p1connection.p1conn.(*net.TCPConn).File()
+    fd, err := p1tcpConn.p1conn.(*net.TCPConn).File()
     fmt.Println("net.TCPConn.File", fd.Fd(), err)
   }
 
-  addrStr := p1connection.p1conn.RemoteAddr().String()
+  addrStr := p1tcpConn.p1conn.RemoteAddr().String()
   p1this.nowConnNum++
-  p1this.mapConnPool[addrStr] = p1connection
+  p1this.mapConnPool[addrStr] = p1tcpConn
 
   if p1this.IsDebug() {
     fmt.Println("net.TCPConn.RemoteAddr.String", addrStr)
@@ -206,8 +206,8 @@ func (p1this *TCPService) AddConnection(p1connection *TCPConnection) {
 }
 
 // DeleteConnection 移除连接
-func (p1this *TCPService) DeleteConnection(p1connection *TCPConnection) {
-  addrStr := p1connection.p1conn.RemoteAddr().String()
+func (p1this *TCPService) DeleteConnection(p1tcpConn *TCPConnection) {
+  addrStr := p1tcpConn.p1conn.RemoteAddr().String()
   if _, ok := p1this.mapConnPool[addrStr]; ok {
     delete(p1this.mapConnPool, addrStr)
     p1this.nowConnNum--

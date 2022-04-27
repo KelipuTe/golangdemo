@@ -126,6 +126,11 @@ func (p1this *TCPClient) IsDebug() bool {
   return DebugStatusOn == p1this.debugStatus
 }
 
+// GetTCPConn 获取 TCP 客户端内部的 TCP 连接
+func (p1this *TCPClient) GetTCPConn() *TCPConnection {
+  return p1this.p1conn
+}
+
 func (p1this *TCPClient) Start() {
   p1this.OnClientStart(p1this)
 

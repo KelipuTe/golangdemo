@@ -147,6 +147,7 @@ func (p1this *HTTP) parseQuery(uri string) {
   index := strings.Index(uri, "?")
   if index > 0 {
     // 有 "?"
+    p1this.Uri = uri[:index]
     query := uri[index+1:]
     if "" != query {
       // 有查询参数

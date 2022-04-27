@@ -40,30 +40,30 @@ type TCPConnection struct {
 }
 
 // NewTCPConnection 创建 TCPConnection
-func NewTCPConnection(p1client *TCPClient, p1conn net.Conn) *TCPConnection {
-  p1connection := &TCPConnection{
+func NewTCPConnection(p1client *TCPClient, p1netConn net.Conn) *TCPConnection {
+  p1tcpConn := &TCPConnection{
     runStatus:      RunStatusOn,
     p1client:       p1client,
     protocolName:   "",
     p1protocol:     nil,
-    p1conn:         p1conn,
+    p1conn:         p1netConn,
     sli1recvBuffer: make([]byte, RecvBufferMax),
     recvBufferMax:  RecvBufferMax,
     recvBufferNow:  0,
   }
 
-  p1connection.protocolName = p1client.protocolName
+  p1tcpConn.protocolName = p1client.protocolName
 
-  switch p1connection.protocolName {
+  switch p1tcpConn.protocolName {
   case protocol.HTTPStr:
-    p1connection.p1protocol = http.NewHTTP()
+    p1tcpConn.p1protocol = http.NewHTTP()
   case protocol.StreamStr:
-    p1connection.p1protocol = stream.NewStream()
+    p1tcpConn.p1protocol = stream.NewStream()
   case protocol.WebSocketStr:
-    p1connection.p1protocol = websocket.NewWebSocket()
+    p1tcpConn.p1protocol = websocket.NewWebSocket()
   }
 
-  return p1connection
+  return p1tcpConn
 }
 
 // IsRun TCP 连接是不是正在运行
@@ -238,6 +238,6 @@ func (p1this *TCPConnection) WriteData(sli1data []byte) (err error) {
 func (p1this *TCPConnection) CloseConnection() {
   p1this.runStatus = RunStatusOff
   p1this.recvBufferNow = 0
-  p1this.p1conn.Close()
   p1this.p1client.OnConnClose(p1this)
+  p1this.p1conn.Close()
 }

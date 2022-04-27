@@ -1,14 +1,14 @@
 package service
 
 import (
-  "demo_golang/tcp_service_v2/internal/protocol"
-  "demo_golang/tcp_service_v2/internal/protocol/http"
-  "demo_golang/tcp_service_v2/internal/protocol/stream"
-  "demo_golang/tcp_service_v2/internal/protocol/websocket"
-  "errors"
-  "fmt"
-  "io"
-  "net"
+	"demo_golang/tcp_service_v2/internal/protocol"
+	"demo_golang/tcp_service_v2/internal/protocol/http"
+	"demo_golang/tcp_service_v2/internal/protocol/stream"
+	"demo_golang/tcp_service_v2/internal/protocol/websocket"
+	"errors"
+	"fmt"
+	"io"
+	"net"
 )
 
 const (
@@ -42,30 +42,30 @@ type TCPConnection struct {
 }
 
 // NewTCPConnection 创建 TCPConnection
-func NewTCPConnection(p1service *TCPService, p1conn net.Conn) *TCPConnection {
-  p1connection := &TCPConnection{
+func NewTCPConnection(p1service *TCPService, p1netConn net.Conn) *TCPConnection {
+  p1tcpConn := &TCPConnection{
     runStatus:      RunStatusOn,
     p1service:      p1service,
     protocolName:   "",
     p1protocol:     nil,
-    p1conn:         p1conn,
+    p1conn:         p1netConn,
     sli1recvBuffer: make([]byte, RecvBufferMax),
     recvBufferMax:  RecvBufferMax,
     recvBufferNow:  0,
   }
 
-  p1connection.protocolName = p1service.protocolName
+  p1tcpConn.protocolName = p1service.protocolName
 
-  switch p1connection.protocolName {
+  switch p1tcpConn.protocolName {
   case protocol.HTTPStr:
-    p1connection.p1protocol = http.NewHTTP()
+    p1tcpConn.p1protocol = http.NewHTTP()
   case protocol.StreamStr:
-    p1connection.p1protocol = stream.NewStream()
+    p1tcpConn.p1protocol = stream.NewStream()
   case protocol.WebSocketStr:
-    p1connection.p1protocol = websocket.NewWebSocket()
+    p1tcpConn.p1protocol = websocket.NewWebSocket()
   }
 
-  return p1connection
+  return p1tcpConn
 }
 
 // IsRun TCP 连接是不是正在运行
@@ -78,10 +78,12 @@ func (p1this *TCPConnection) IsDebug() bool {
   return p1this.p1service.IsDebug()
 }
 
+// 获取连接的协议实例
 func (p1this *TCPConnection) GetProtocol() protocol.Protocol {
   return p1this.p1protocol
 }
 
+// GetNetConnRemoteAddr 获取连接 IP 和端口
 func (p1this *TCPConnection) GetNetConnRemoteAddr() string {
   return p1this.p1conn.RemoteAddr().String()
 }
@@ -315,7 +317,7 @@ func (p1this *TCPConnection) WriteData(sli1data []byte) error {
 func (p1this *TCPConnection) CloseConnection() {
   p1this.runStatus = RunStatusOff
   p1this.recvBufferNow = 0
+  p1this.p1service.OnConnClose(p1this)
   p1this.p1conn.Close()
   p1this.p1service.DeleteConnection(p1this)
-  p1this.p1service.OnConnClose(p1this)
 }

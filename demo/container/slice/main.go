@@ -3,15 +3,15 @@ package main
 import "fmt"
 
 func main() {
-  sliceInit()
-  sliceAppend()
-  sliceMake()
+  // sliceInit()
+  // sliceAppend()
+  // sliceMake()
   sliceFor()
-  sliceFromArray()
-  sliceFromSlice()
-  sliceCopy()
-  sliceDelete()
-  slice2()
+  // sliceFromArray()
+  // sliceFromSlice()
+  // sliceCopy()
+  // sliceDelete()
+  // slice2()
 }
 
 func sliceInit() {
@@ -57,7 +57,7 @@ func sliceMake() {
 func sliceFor() {
   fmt.Printf("sliceFor\r\n")
 
-  t1arr1a := []int{1, 2, 3, 4}
+  t1arr1a := []int{11, 22, 33, 44}
 
   // 可以用下标遍历
   for i := 0; i < len(t1arr1a); i++ {
@@ -68,6 +68,12 @@ func sliceFor() {
   // 也可以用 range 遍历
   for i, v := range t1arr1a {
     fmt.Printf("t1arr1a, i: %d,v: %d; ", i, v)
+  }
+  fmt.Printf("\r\n")
+
+  // 用 range 遍历，只接收一个返回值时，收到的是下标
+  for i := range t1arr1a {
+    fmt.Printf("t1arr1a, i: %d; ", i)
   }
   fmt.Printf("\r\n")
 }
