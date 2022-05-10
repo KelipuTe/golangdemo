@@ -19,4 +19,5 @@
 - `http_service_v1/`，用 net/http 包，实现一个简单的 http 服务框架。
 - `http_service_v2/`，基于 http_service_v1 继续演进。
 - `leetcode/`，leetcode 算法题。
-- `tcp_service_v1/`，用 net/tcp 包，实现一个简单的 web 服务。
+- `tcp_service_v1/`，用 net/tcp 包，实现一个简单的 http 服务。
+- `tcp_service_v2/`，基于 tcp_service_v1 ，实现一个简单的分布式服务。
