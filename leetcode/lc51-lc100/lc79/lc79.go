@@ -2,64 +2,132 @@ package main
 
 import "fmt"
 
+// 79. 单词搜索
+// 给定一个 m x n 二维字符网格 board 和一个字符串单词 word 。如果 word 存在于网格中，返回 true ；否则，返回 false 。
+// 单词必须按照字母顺序，通过相邻的单元格内的字母构成，其中“相邻”单元格是那些水平相邻或垂直相邻的单元格。同一个单元格内的字母不允许被重复使用。
+
+// 解题思路：回溯
+// 每次回溯都有 4 种选择，上右下左，碰到边界的时候终止回溯
+// 字母不允许被重复使用，所以需要一个二维数组用于标记已经使用过的字母
+// 如果找到答案了就直接返回，不要继续回溯了
+
 func main() {
-  // fmt.Println(exist([][]byte{{'A', 'B', 'C', 'E'}, {'S', 'F', 'C', 'S'}, {'A', 'D', 'E', 'E'}}, "ABCCED"))
-  // fmt.Println(exist([][]byte{{'A', 'B', 'C', 'E'}, {'S', 'F', 'C', 'S'}, {'A', 'D', 'E', 'E'}}, "SEE"))
-  // fmt.Println(exist([][]byte{{'A', 'B', 'C', 'E'}, {'S', 'F', 'C', 'S'}, {'A', 'D', 'E', 'E'}}, "ABCB"))
-  fmt.Println(exist([][]byte{{'C', 'A', 'A'}, {'A', 'A', 'A'}, {'B', 'C', 'D'}}, "AAB"))
+  // fmt.Println(exist([][]byte{
+  //   {'A', 'B', 'C', 'E'},
+  //   {'S', 'F', 'C', 'S'},
+  //   {'A', 'D', 'E', 'E'},
+  // }, "ABCCED"))
+  // fmt.Println(exist([][]byte{
+  //   {'A', 'B', 'C', 'E'},
+  //   {'S', 'F', 'C', 'S'},
+  //   {'A', 'D', 'E', 'E'},
+  // }, "SEE"))
+  // fmt.Println(exist([][]byte{
+  //   {'A', 'B', 'C', 'E'},
+  //   {'S', 'F', 'C', 'S'},
+  //   {'A', 'D', 'E', 'E'},
+  // }, "ABCB"))
+  // fmt.Println(exist([][]byte{
+  //   {'C', 'A', 'A'},
+  //   {'A', 'A', 'A'},
+  //   {'B', 'C', 'D'},
+  // }, "AAB"))
+  // fmt.Println(exist([][]byte{
+  //   {'a', 'a', 'a'},
+  //   {'a', 'a', 'a'},
+  //   {'a', 'a', 'b'},
+  // }, "baaaaaaaa"))
+  fmt.Println(exist([][]byte{
+    {'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'},
+    {'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'},
+    {'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'},
+    {'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'},
+    {'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'},
+    {'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'},
+    {'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'},
+    {'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'},
+    {'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'},
+    {'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'},
+    {'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'},
+    {'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'},
+    {'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'},
+    {'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'},
+    {'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'},
+    {'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'},
+    {'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'},
+    {'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'},
+    {'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'},
+    {'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'},
+    {'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'},
+    {'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'},
+    {'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'},
+    {'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'},
+    {'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'},
+    {'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'},
+    {'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'},
+    {'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'},
+    {'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'},
+    {'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'b'},
+  }, "baaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"))
 }
 
-//给定一个m行n列的二维字符网格board和一个字符串单词word。如果word存在于网格中，返回true，否则，返回false
-//单词必须按照字母顺序，通过相邻的单元格内的字母构成，其中相邻单元格是那些水平相邻或垂直相邻的单元格
-//同一个单元格内的字母不允许被重复使用
-//m==board.length;n=board[i].length;1<=m,n<=6;1<=word.length<=15;board和word仅由大小写英文字母组成
+var isFound bool         // 结果
+var sli2isVisit [][]bool // 访问过的元素
 
-//回溯
-//每次回溯都有4种选择，上右下左，碰到边界的时候终止回溯
-//字母不允许被重复使用，所以需要一个二维数组用于标记已经使用过的字母
-
-var bFound bool //结果
-
-//79-单词搜索
 func exist(board [][]byte, word string) bool {
-  iM, iN := len(board), len(board[0])
-  var bsli2Visit [][]bool = make([][]bool, iM) //访问过的元素
-  for ii := 0; ii < len(board); ii++ {
-    bsli2Visit[ii] = make([]bool, iN)
+  line, column := len(board), len(board[0])
+
+  // 初始化
+  isFound = false
+  sli2isVisit = make([][]bool, line)
+  for i := 0; i < len(board); i++ {
+    sli2isVisit[i] = make([]bool, column)
   }
-  bFound = false //初始化
-  for ii := 0; ii < iM; ii++ {
-    for ij := 0; ij < iN; ij++ {
-      hui2su4(board, iM, iN, ii, ij, word, bsli2Visit)
+
+  for i := 0; i < line; i++ {
+    for j := 0; j < column; j++ {
+      hui2su4(board, line, column, word, i, j, sli2isVisit)
     }
   }
-  return bFound
+  return isFound
 }
 
-func hui2su4(board [][]byte, iM int, iN int, ii int, ij int, word string, bsli2Visit [][]bool) {
-  if board[ii][ij] == word[0] {
-    if len(word) > 1 {
-      bsli2Visit[ii][ij] = true //标记
-      tsWord := word[1:]        //找剩下的字符串
-      //上
-      if ii > 0 && !bsli2Visit[ii-1][ij] {
-        hui2su4(board, iM, iN, ii-1, ij, tsWord, bsli2Visit)
+func hui2su4(board [][]byte, line int, column int, t0word string, i int, j int, sli2isVisit [][]bool) {
+  if board[i][j] == t0word[0] {
+    if len(t0word) > 1 {
+      sli2isVisit[i][j] = true // 标记
+      t0word = t0word[1:]      // 找剩下的字符串
+      // 上
+      if i > 0 && !sli2isVisit[i-1][j] {
+        hui2su4(board, line, column, t0word, i-1, j, sli2isVisit)
       }
-      //右
-      if ij < iN-1 && !bsli2Visit[ii][ij+1] {
-        hui2su4(board, iM, iN, ii, ij+1, tsWord, bsli2Visit)
+      if isFound {
+        return
       }
-      //下
-      if ii < iM-1 && !bsli2Visit[ii+1][ij] {
-        hui2su4(board, iM, iN, ii+1, ij, tsWord, bsli2Visit)
+      // 右
+      if j < column-1 && !sli2isVisit[i][j+1] {
+        hui2su4(board, line, column, t0word, i, j+1, sli2isVisit)
       }
-      //左
-      if ij > 0 && !bsli2Visit[ii][ij-1] {
-        hui2su4(board, iM, iN, ii, ij-1, tsWord, bsli2Visit)
+      if isFound {
+        return
       }
-      bsli2Visit[ii][ij] = false //标记复位
+      // 下
+      if i < line-1 && !sli2isVisit[i+1][j] {
+        hui2su4(board, line, column, t0word, i+1, j, sli2isVisit)
+      }
+      if isFound {
+        return
+      }
+      // 左
+      if j > 0 && !sli2isVisit[i][j-1] {
+        hui2su4(board, line, column, t0word, i, j-1, sli2isVisit)
+      }
+      if isFound {
+        return
+      }
+      sli2isVisit[i][j] = false // 标记复位
     } else {
-      bFound = true
+      isFound = true
     }
   }
 }
