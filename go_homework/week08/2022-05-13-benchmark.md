@@ -1,5 +1,7 @@
 ## redis benchmark
 
+如果能打开 github page 的话，https://kelipute.github.io/2022/05/13/benchmark.html，推荐看这个 jekyll 部署过的。
+
 ### 支持的参数
 
 ```
