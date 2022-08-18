@@ -7,8 +7,8 @@
 package article
 
 import (
-	admin2 "demo_golang/go_homework/week04/internal/data/model/admin"
-	blog2 "demo_golang/go_homework/week04/internal/data/model/blog"
+	admin2 "demo-golang/go_homework/week04/internal/data/model/admin"
+	blog2 "demo-golang/go_homework/week04/internal/data/model/blog"
 	"demo_golang/go_homework/week04/internal/data/repository/admin"
 	"demo_golang/go_homework/week04/internal/data/repository/blog"
 )

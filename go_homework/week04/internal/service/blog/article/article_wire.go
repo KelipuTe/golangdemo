@@ -6,8 +6,8 @@ package article
 import (
   "demo_golang/go_homework/week04/internal/data/model/admin"
   "demo_golang/go_homework/week04/internal/data/model/blog"
-  admin_repo "demo_golang/go_homework/week04/internal/data/repository/admin"
-  blog_repo "demo_golang/go_homework/week04/internal/data/repository/blog"
+  admin_repo "demo-golang/go_homework/week04/internal/data/repository/admin"
+  blog_repo "demo-golang/go_homework/week04/internal/data/repository/blog"
 
   "github.com/google/wire"
 )

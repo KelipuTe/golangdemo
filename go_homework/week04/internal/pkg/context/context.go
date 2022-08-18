@@ -5,7 +5,7 @@ import (
 
   "github.com/gin-gonic/gin"
 
-  pkg_log "demo_golang/go_homework/week04/internal/pkg/log"
+  pkg_log "demo-golang/go_homework/week04/internal/pkg/log"
 )
 
 type BlogContextKey string

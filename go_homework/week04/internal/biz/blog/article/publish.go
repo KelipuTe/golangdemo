@@ -2,8 +2,8 @@ package article
 
 import (
   "demo_golang/go_homework/week04/internal/biz/response"
-  pkg_context "demo_golang/go_homework/week04/internal/pkg/context"
-  blog_article "demo_golang/go_homework/week04/internal/service/blog/article"
+  pkg_context "demo-golang/go_homework/week04/internal/pkg/context"
+  blog_article "demo-golang/go_homework/week04/internal/service/blog/article"
   "fmt"
 
   "github.com/gin-gonic/gin"

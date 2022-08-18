@@ -1,7 +1,7 @@
 package main
 
 import (
-  http_service "demo_golang/http_service_v2"
+  http_service "demo-golang/http_service_v2"
   "fmt"
   "net/http"
 )

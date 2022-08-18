@@ -4,7 +4,7 @@ import (
   "context"
   "demo_golang/go_homework/week04/internal/data/model/admin"
   "demo_golang/go_homework/week04/internal/data/model/blog"
-  blog_repo "demo_golang/go_homework/week04/internal/data/repository/blog"
+  blog_repo "demo-golang/go_homework/week04/internal/data/repository/blog"
   "log"
 
   "github.com/pkg/errors"

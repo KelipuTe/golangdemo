@@ -1,8 +1,8 @@
 package http
 
 import (
-  admin_mid "demo_golang/go_homework/week04/internal/biz/admin/middleware"
-  blog_biz "demo_golang/go_homework/week04/internal/biz/blog/article"
+  admin_mid "demo-golang/go_homework/week04/internal/biz/admin/middleware"
+  blog_biz "demo-golang/go_homework/week04/internal/biz/blog/article"
 
   "github.com/gin-gonic/gin"
 )

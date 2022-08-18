@@ -9,8 +9,8 @@ import (
 
   "github.com/gin-gonic/gin"
 
-  api_v1_http "demo_golang/go_homework/week04/api/v1/http"
-  tp_viper "demo_golang/go_homework/week04/internal/third-party/viper"
+  api_v1_http "demo-golang/go_homework/week04/api/v1/http"
+  tp_viper "demo-golang/go_homework/week04/internal/third-party/viper"
 )
 
 var p1ge *gin.Engine
