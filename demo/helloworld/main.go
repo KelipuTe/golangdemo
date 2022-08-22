@@ -1,10 +1,10 @@
 package main
 
 import (
-  "fmt"
+	"fmt"
 )
 
 // 古老仪式
 func main() {
-  fmt.Printf("hello, world\r\n")
+	fmt.Printf("hello, world\r\n")
 }

@@ -1,14 +1,8 @@
 package reflect
 
 import (
-	"errors"
 	"reflect"
 )
-
-var ErrMustStruct = errors.New("input must be struct")
-var ErrMustStructPointer = errors.New("input must be struct pointer")
-var ErrFieldNotFound = errors.New("field not found")
-var ErrFieldCannotSet = errors.New("field cannot set")
 
 // IterateStructField 通过反射遍历结构体的字段
 func IterateStructField(input any) (map[string]any, error) {

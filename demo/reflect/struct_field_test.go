@@ -16,24 +16,28 @@ func TestIterateStructField(t *testing.T) {
 			// 非法输入，nil
 			name:    "nil",
 			input:   nil,
+			wantRes: nil,
 			wantErr: ErrMustStruct,
 		},
 		{
 			// 非法输入，数组
 			name:    "array",
 			input:   [2]int{1, 2},
+			wantRes: nil,
 			wantErr: ErrMustStruct,
 		},
 		{
 			// 非法输入，切片
 			name:    "slice",
 			input:   []int{1, 2},
+			wantRes: nil,
 			wantErr: ErrMustStruct,
 		},
 		{
 			// 非法输入，map
 			name:    "map",
 			input:   map[string]string{"a": "aa", "b": "bb"},
+			wantRes: nil,
 			wantErr: ErrMustStruct,
 		},
 		{
@@ -43,6 +47,7 @@ func TestIterateStructField(t *testing.T) {
 				i := 1
 				return &i
 			}(),
+			wantRes: nil,
 			wantErr: ErrMustStruct,
 		},
 		{
@@ -50,12 +55,14 @@ func TestIterateStructField(t *testing.T) {
 			name:    "normal struct",
 			input:   User{Name: "aaa", Sex: 1, age: 18},
 			wantRes: map[string]any{"Name": "aaa", "Sex": 1, "age": 0},
+			wantErr: nil,
 		},
 		{
 			// 一级结构体指针
 			name:    "struct pointer",
 			input:   &User{Name: "aaa", Sex: 1, age: 18},
 			wantRes: map[string]any{"Name": "aaa", "Sex": 1, "age": 0},
+			wantErr: nil,
 		},
 		{
 			// 二级结构体指针
@@ -65,6 +72,7 @@ func TestIterateStructField(t *testing.T) {
 				return &p1u
 			}(),
 			wantRes: map[string]any{"Name": "aaa", "Sex": 1, "age": 0},
+			wantErr: nil,
 		},
 	}
 	for _, icase := range slicase {

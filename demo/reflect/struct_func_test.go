@@ -14,6 +14,13 @@ func TestIterateStructFunc(t *testing.T) {
 		wantErr error
 	}{
 		{
+			// 非法输入，nil
+			name:    "nil",
+			input:   nil,
+			wantRes: nil,
+			wantErr: ErrMustStructOrStructPointer,
+		},
+		{
 			// 普通结构体
 			name:  "normal struct",
 			input: User{Name: "aaa", Sex: 1, age: 18},
@@ -25,6 +32,7 @@ func TestIterateStructFunc(t *testing.T) {
 					SliRes:    []any{"aaa"},
 				},
 			},
+			wantErr: nil,
 		},
 		{
 			// 一级结构体指针
@@ -44,6 +52,7 @@ func TestIterateStructFunc(t *testing.T) {
 					SliRes:    []any{0},
 				},
 			},
+			wantErr: nil,
 		},
 	}
 

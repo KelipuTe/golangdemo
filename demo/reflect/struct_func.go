@@ -1,11 +1,8 @@
 package reflect
 
 import (
-	"errors"
 	"reflect"
 )
-
-var ErrMustStructOrStructPointer = errors.New("input must be struct or struct pointer")
 
 type StructFuncInfo struct {
 	Name      string
@@ -16,6 +13,10 @@ type StructFuncInfo struct {
 
 // IterateStructFunc 通过反射遍历结构体的方法
 func IterateStructFunc(input any) (map[string]*StructFuncInfo, error) {
+	if nil == input {
+		return nil, ErrMustStructOrStructPointer
+	}
+
 	t1type := reflect.TypeOf(input)
 	if t1type.Kind() != reflect.Struct && t1type.Kind() != reflect.Pointer {
 		return nil, ErrMustStructOrStructPointer
