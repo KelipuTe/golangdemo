@@ -14,7 +14,7 @@ func IterateStructField(input any) (map[string]any, error) {
 	t1val := reflect.ValueOf(input)
 
 	// 处理结构体指针（一级或多级指针）
-	for t1type.Kind() == reflect.Pointer {
+	for reflect.Pointer==t1type.Kind(){
 		t1type = t1type.Elem()
 		t1val = t1val.Elem()
 	}

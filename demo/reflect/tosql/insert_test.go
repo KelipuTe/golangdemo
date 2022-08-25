@@ -15,18 +15,24 @@ func TestInsertStmt(t *testing.T) {
 		wantArgs []interface{}
 	}{
 		{
-			name:    "nil",
-			wantErr: errInvalidEntity,
+			name:     "nil",
+			entity:   nil,
+			wantErr:  errInvalidEntity,
+			wantSQL:  "",
+			wantArgs: nil,
 		},
 		{
-			name:    "empty struct",
-			entity:  Empty{},
-			wantErr: errInvalidEntity,
+			name:     "empty struct",
+			entity:   Empty{},
+			wantErr:  errInvalidEntity,
+			wantSQL:  "",
+			wantArgs: nil,
 		},
 		{
-			name:   "simple struct",
-			entity: BaseEntity{},
-			// 稍微注意一下，这里我们用反射取出来的不是存粹的 nil，而是一个带了类型的 nil
+			name:    "simple struct",
+			entity:  BaseEntity{},
+			wantErr: nil,
+			// 这里用反射取出来的不是存粹的 nil，而是一个带了类型的 nil
 			wantArgs: []interface{}{int64(0), (*int64)(nil)},
 			wantSQL:  "INSERT INTO `BaseEntity`(`CreateTime`,`UpdateTime`) VALUES(?,?);",
 		},
@@ -124,7 +130,7 @@ func TestInsertStmt(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			query, args, err := InsertStmt(tc.entity)
+			query, args, err := InsertStatement(tc.entity)
 			assert.Equal(t, tc.wantErr, err)
 			if tc.wantErr != nil {
 				// 预期会有错误返回，就不需要进一步校验其它两个返回值了
@@ -171,6 +177,10 @@ type Customer struct {
 // 而在 Buyer 的模式下，我们会认为它们是同一张表。
 type Seller struct {
 	User User
+}
+
+type Seller2 struct {
+	User
 }
 
 func ptrInt64(val int64) *int64 {
