@@ -14,7 +14,7 @@ func IterateStructField(input any) (map[string]any, error) {
 	t1val := reflect.ValueOf(input)
 
 	// 处理结构体指针（一级或多级指针）
-	for reflect.Pointer==t1type.Kind(){
+	for reflect.Pointer == t1type.Kind() {
 		t1type = t1type.Elem()
 		t1val = t1val.Elem()
 	}
@@ -26,7 +26,7 @@ func IterateStructField(input any) (map[string]any, error) {
 	// 有几个字段
 	t1num := t1type.NumField()
 	mapres := make(map[string]any, t1num)
-	// 遍历属性
+	// 遍历字段
 	for i := 0; i < t1num; i++ {
 		t1Field := t1type.Field(i)
 		t1FieldVal := t1val.Field(i)

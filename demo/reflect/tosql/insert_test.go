@@ -179,10 +179,6 @@ type Seller struct {
 	User User
 }
 
-type Seller2 struct {
-	User
-}
-
 func ptrInt64(val int64) *int64 {
 	return &val
 }
