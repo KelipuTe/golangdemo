@@ -37,7 +37,7 @@ func (s *UserServiceGen) Get(ctx context.Context, req *GetUserReq) (*GetUserResp
 }
 
 func (s *UserServiceGen) Update(ctx context.Context, req *UpdateUserReq) (*UpdateUserResp, error) {
-	url := s.Endpoint + s.Path + "/Update"
+	url := s.Endpoint + s.Path + "/user/update"
 	bs, err := json.Marshal(req)
 	if err != nil {
 		return nil, err

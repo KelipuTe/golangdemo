@@ -230,10 +230,10 @@ func idents(names ...string) []*ast.Ident {
 func Test_gen(t *testing.T) {
 	//// 我们使用 testdata 目录来测试
 	// 文件是追加模式，需要手动删除
-	//err := gen("./testdata")
-	//if err != nil {
-	//	t.Fatal(err)
-	//}
+	err := gen("./testdata")
+	if err != nil {
+		t.Fatal(err)
+	}
 	testCases := []struct {
 		name     string
 		genFile  string

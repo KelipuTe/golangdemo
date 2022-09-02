@@ -24,7 +24,7 @@ type {{ $service }} struct {
 }
 {{range $idx, $method := .Methods}}
 func (s *{{$service}}) {{$method.Name}}(ctx context.Context, req *{{$method.ReqTypeName}}) (*{{$method.RespTypeName}}, error) {
-	url := s.Endpoint + s.Path + "/{{$method.Name}}"
+	url := s.Endpoint + s.Path + "{{$method.Path}}"
 	bs, err := json.Marshal(req)
 	if err != nil {
 		return nil, err
