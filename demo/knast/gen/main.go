@@ -77,7 +77,7 @@ func genFiles(src string, defs []http.ServiceDefinition) error {
 func parseFiles(srcFiles []string) ([]http.ServiceDefinition, error) {
 	defs := make([]http.ServiceDefinition, 0, 20)
 	for _, src := range srcFiles {
-		fmt.Println(src)
+		//fmt.Println(src)
 		// 你需要利用 annotation 里面的东西来扫描 src，然后生成 file
 		var file annotation.File
 
@@ -169,6 +169,9 @@ func scanFiles(src string) ([]string, error) {
 		log.Fatal(err)
 	}
 	for i := range s5fileName {
+		if strings.Contains(s5fileName[i].Name(), "gen") {
+			continue
+		}
 		if strings.Contains(s5fileName[i].Name(), ".go") {
 			t4fp, _ := filepath.Abs(src + "/" + s5fileName[i].Name())
 			s5file = append(s5file, t4fp)

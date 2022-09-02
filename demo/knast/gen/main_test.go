@@ -226,8 +226,10 @@ func idents(names ...string) []*ast.Ident {
 
 // 注意，如果你在 http 里面写的模板跟我不同，那么你需要修改相应的 .txt 文件
 // 即期望结果
+// 生成出来的文件看上去已经是一样的了，不知道哪个地方的格式不一致，测试过不去
 func Test_gen(t *testing.T) {
 	//// 我们使用 testdata 目录来测试
+	// 文件是追加模式，需要手动删除
 	//err := gen("./testdata")
 	//if err != nil {
 	//	t.Fatal(err)
