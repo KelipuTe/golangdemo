@@ -6,9 +6,10 @@ import (
 
 // FileParsingEntrance 文件的 ast 解析入口
 type FileParsingEntrance struct {
-	// p7node *ast.File，整个文件
+	// *ast.File，整个文件
 	p7node ast.Node
-	p7fv   *fileVisitor
+	// *fileVisitor 负责解析这个 *ast.File
+	p7fv *fileVisitor
 }
 
 // Visit 实现 ast.Visitor
@@ -40,9 +41,11 @@ func (p7this *FileParsingEntrance) GetRes() FileRes {
 
 // fileVisitor 文件层面的访问
 type fileVisitor struct {
-	// s5comment package 的注释
+	// package 的注释
 	s5comment []Comment
-	// s5p7node []*ast.TypeSpec，文件中的每个 type
+	// []*ast.TypeSpec，文件中的每个 type
+	// []*typeVisitor，负责解析每个 *ast.TypeSpec
+	// 这两个切片可以通过下标对应起来
 	s5p7node []ast.Node
 	s5p7tv   []*typeVisitor
 }
@@ -84,7 +87,9 @@ type FileRes struct {
 type typeVisitor struct {
 	// type 的注释
 	s5comment []Comment
-	// s5p7node []*ast.Field，type 的字段
+	// []*ast.Field，type 的字段
+	// []*fieldVisitor，负责解析每个 *ast.Field
+	// 这两个切片可以通过下标对应起来
 	s5p7node []ast.Node
 	s5p7tf   []*fieldVisitor
 }

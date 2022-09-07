@@ -5,6 +5,8 @@ line2
 */
 package knast
 
+import "context"
+
 type (
 	// KNFunc is a test func
 	// @type func()
@@ -17,9 +19,6 @@ type (
 type (
 	// EmptyStruct is a test struct
 	// @type empty struct
-	/* @multiple line1
-	line2
-	*/
 	EmptyStruct struct {
 	}
 
@@ -28,10 +27,11 @@ type (
 	NormalStruct struct {
 		// PublicInt is a test public field
 		// @type int
-		/* @multiple line1
-		line2
-		*/
 		PublicInt int
+
+		// PublicString is a test public field
+		// @type string
+		PublicString string
 	}
 )
 
@@ -68,5 +68,11 @@ type (
 		// @return int
 		// @return int64
 		funcWithNamed2Out() (i int, i64 int64)
+
+		// funcWithCtxInAndErrOut is a test func
+		// @type normal func
+		// @return context.Context
+		// @return error
+		funcWithCtxInAndErrOut(ctx context.Context) error
 	}
 )

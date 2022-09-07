@@ -7,9 +7,8 @@ import (
 
 // Comment 每个自定义注释的结构，自定义注释的结构就对应这个结构体的字段
 // 这里自定义注释的结构如下
-// 单行注释
-// `// @key value`
-// 多行注释，解析的时候字符串里面可能会有 `\r`、`\n`、`\t`
+// 单行注释：`// @key value`
+// 多行注释，字符串里面可能会有 `\r`、`\n`、`\t`
 // `/* @key line1`
 // `line2`
 // `*/`
@@ -44,7 +43,8 @@ func ParseCommentGroup(p7cg *ast.CommentGroup) []Comment {
 			// 如果都不是，就跳过
 			continue
 		}
-		// 注释结构长这样：`@key value`、`@key line1\nline2`
+		// 注释结构差不多长这样，主要注意多行注释会有特殊符号
+		// `@key value`、`@key line1\r\n\tline2\r\n\t`
 		if strings.HasPrefix(t4text, "@") {
 			// 判断一下有没有 @，然后用 ` ` 切成两份
 			t4s5text := strings.SplitN(t4text, " ", 2)
