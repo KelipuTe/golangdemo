@@ -1,6 +1,9 @@
 package v2
 
-import "regexp"
+import (
+	"regexp"
+	"strings"
+)
 
 const (
 	// 静态路由
@@ -35,4 +38,28 @@ type routingNode struct {
 
 	// f4handler 命中路由之后的处理逻辑
 	f4handler HTTPHandleFunc
+}
+
+func newRoutingNode(part string) *routingNode {
+	return &routingNode{}
+}
+
+func (p7this *routingNode) findChild(part string) *routingNode {
+	// 通配符路由
+	if "*" == part {
+		return p7this.p7anyChild
+	}
+	// 路径参数路由和正则表达式路由以 `:` 开头
+	if ':' == part[0] {
+		// 正则表达式用括号包裹
+		t4regIndex := strings.Index(part, "(")
+		if -1 != t4regIndex {
+			// 正则表达式路由
+			return p7this.p7regexpChild
+		} else {
+			// 路径参数路由
+			return p7this.p7paramChild
+		}
+	}
+	return nil
 }

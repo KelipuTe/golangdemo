@@ -1,11 +1,11 @@
-package main
+package http
 
 import (
 	"log"
 	"net/http"
 )
 
-func main() {
+func Mode04() {
 	// ServeMux 实现了 Handle 接口
 	p7sm := http.NewServeMux()
 	// 第二个参数进去会被强转成 HandlerFunc

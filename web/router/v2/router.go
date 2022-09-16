@@ -1,5 +1,10 @@
 package v2
 
+import (
+	"fmt"
+	"strings"
+)
+
 type RouterInterface interface {
 	addRoute(method string, path string, f4handler HTTPHandleFunc)
 }
@@ -43,4 +48,15 @@ func (p7this *router) addRoute(method string, path string, f4h HTTPHandleFunc) {
 		return
 	}
 
+	s5path := strings.Split(path[1:], "/")
+	for _, part := range s5path {
+		if "" == part {
+			panic(fmt.Sprintf("\"\" == part, path=[%s]", path))
+		}
+		t4p7child := p7node.findChild(part)
+		if nil == t4p7child {
+			t4p7child = createChild(part)
+		}
+		p7node = t4p7child
+	}
 }

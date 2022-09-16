@@ -3,7 +3,9 @@
 - 2022-09-15
 - go version go1.19
 
-使用 http 包的时候，需要关注的最核心的部分，就是 Handler 接口 (src/net/http/server.go)。
+在 Go 中有多种方式，可以实现 HTTP 服务。可以使用官方提供的封装好的 `net/http` 包，也可以直接使用 net 包从 TCP 开始自行实现。
+
+使用 `net/http` 包的时候，需要关注的最核心的部分，就是 Handler 接口 (src/net/http/server.go)。
 
 ```go
 type Handler interface {
