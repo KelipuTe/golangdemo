@@ -5,5 +5,5 @@ import "net/http"
 type HTTPContext struct {
 	I9writer    http.ResponseWriter
 	P7request   *http.Request
-	S5pathParam map[string]string
+	M3pathParam map[string]string
 }
