@@ -1,4 +1,4 @@
-package v2
+package router
 
 import (
 	"regexp"
@@ -34,10 +34,10 @@ var (
 type routingNode struct {
 	// nodeType 结点类型
 	nodeType int
-	// path 路径
-	path string
-
+	// part 这个路由结点代表的那段路径
 	part string
+	// path 从根路由到这个路由结点的全路径
+	path string
 
 	// f4handler 命中路由之后的处理逻辑
 	f4handler HTTPHandleFunc
@@ -77,14 +77,22 @@ func (p7this *routingNode) findChild(part string) *routingNode {
 			return p7this.p7paramChild
 		}
 	}
-	// 找通配符路由，
+	// 找通配符路由
 	if "*" == part {
 		return p7this.p7anyChild
 	}
 	return nil
 }
 
-func (p7this *routingNode) createChild(part string) *routingNode {
+func (p7this *routingNode) checkChild(part string) {
+	if ':' == part[0] {
+		if p7this.part != part {
+			panic(StrParamChildExist)
+		}
+	}
+}
+
+func (p7this *routingNode) createChild(part string, path string) *routingNode {
 	if ':' == part[0] {
 		t4regIndex1 := strings.Index(part, "(")
 		t4regIndex2 := strings.Index(part, ")")
@@ -101,7 +109,8 @@ func (p7this *routingNode) createChild(part string) *routingNode {
 
 			p7this.p7regexpChild = &routingNode{
 				nodeType:  nodeTypeRegexp,
-				path:      part,
+				part:      part,
+				path:      path,
 				paramName: part[1:t4regIndex1],
 				p7regexp:  regexp.MustCompile(part[t4regIndex1+1 : t4regIndex2]),
 			}
@@ -119,7 +128,8 @@ func (p7this *routingNode) createChild(part string) *routingNode {
 
 			p7this.p7paramChild = &routingNode{
 				nodeType:  nodeTypeParam,
-				path:      part,
+				part:      part,
+				path:      path,
 				paramName: part[1:],
 			}
 			return p7this.p7paramChild
@@ -138,7 +148,8 @@ func (p7this *routingNode) createChild(part string) *routingNode {
 
 		p7this.p7anyChild = &routingNode{
 			nodeType: nodeTypeAny,
-			path:     part,
+			part:     part,
+			path:     path,
 		}
 		return p7this.p7anyChild
 	}
@@ -153,7 +164,8 @@ func (p7this *routingNode) createChild(part string) *routingNode {
 
 	p7this.m3routingTree[part] = &routingNode{
 		nodeType: nodeTypeStatic,
-		path:     part,
+		part:     part,
+		path:     path,
 	}
 	return p7this.m3routingTree[part]
 }

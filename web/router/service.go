@@ -1,15 +1,16 @@
-package v2
+package router
 
 import (
+	"fmt"
 	"net/http"
 )
 
 type HTTPHandleFunc func(p7ctx *HTTPContext)
 
 type HTTPServiceInterface interface {
-	RouterInterface
 	http.Handler
 	Start(addr string) error
+	RouterInterface
 }
 
 type HTTPService struct {
@@ -47,10 +48,13 @@ func (p7this *HTTPService) doServeHTTP(p7ctx *HTTPContext) {
 	p7ri := p7this.findRoute(p7ctx.P7request.Method, p7ctx.P7request.URL.Path)
 	if nil == p7ri || nil == p7ri.p7node || nil == p7ri.p7node.f4handler {
 		p7ctx.I9writer.WriteHeader(404)
-		p7ctx.I9writer.Write([]byte("Not Found"))
+		p7ctx.I9writer.Write([]byte(fmt.Sprintf("Not Found:%s %s\r\n", p7ctx.P7request.Method, p7ctx.P7request.URL.Path)))
 		return
 	}
+
 	p7ctx.M3pathParam = p7ri.m3pathParam
+	p7ctx.p7routingNode = p7ri.p7node
+
 	p7ri.p7node.f4handler(p7ctx)
 }
 

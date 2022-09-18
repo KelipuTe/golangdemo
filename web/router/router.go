@@ -1,4 +1,4 @@
-package v2
+package router
 
 import (
 	"strings"
@@ -16,6 +16,7 @@ var (
 
 type RouterInterface interface {
 	addRoute(method string, path string, f4handler HTTPHandleFunc)
+	findRoute(method string, path string) *routeInfo
 }
 
 // router 路由器
@@ -26,7 +27,7 @@ type router struct {
 }
 
 // addRoute 添加路由
-func (p7this *router) addRoute(method string, path string, f4handler HTTPHandleFunc) {
+func (p7this *router) addRoute(method string, path string, f4h HTTPHandleFunc) {
 	if "" == path {
 		panic(StrPathCannotBeEmpty)
 	}
@@ -37,30 +38,38 @@ func (p7this *router) addRoute(method string, path string, f4handler HTTPHandleF
 		panic(StrPathCannotEndWithSlash)
 	}
 
+	// 按 http method 区分路由树
 	p7node, ok := p7this.m3routingTree[method]
 	if !ok {
 		// 创建路由树根结点
 		p7node = &routingNode{
-			path: "/",
+			nodeType: nodeTypeStatic,
+			part:     "/",
+			path:     "/",
 		}
 		p7this.m3routingTree[method] = p7node
 	}
+	// 如果添加的根路由，处理完直接返回
 	if "/" == path {
 		if nil != p7node.f4handler {
 			panic(StrRootNodeExist)
 		}
-		p7node.f4handler = f4handler
+		p7node.f4handler = f4h
 		return
 	}
 	// 分段处理路由
 	s5path := strings.Split(path[1:], "/")
+	t4path := ""
 	for _, part := range s5path {
 		if "" == part {
 			panic(StrPartCannotBeEmpty)
 		}
+		t4path += "/" + part
 		t4p7child := p7node.findChild(part)
 		if nil == t4p7child {
-			t4p7child = p7node.createChild(part)
+			t4p7child = p7node.createChild(part, t4path)
+		} else {
+			t4p7child.checkChild(part)
 		}
 		p7node = t4p7child
 	}
@@ -68,9 +77,10 @@ func (p7this *router) addRoute(method string, path string, f4handler HTTPHandleF
 	if nil != p7node.f4handler {
 		panic(StrPathExist)
 	}
-	p7node.f4handler = f4handler
+	p7node.f4handler = f4h
 }
 
+// 查找路由
 func (p7this *router) findRoute(method string, path string) *routeInfo {
 	p7node, ok := p7this.m3routingTree[method]
 	if !ok {
@@ -83,7 +93,6 @@ func (p7this *router) findRoute(method string, path string) *routeInfo {
 		}
 	}
 
-	// 分段处理路由
 	p7ri := &routeInfo{}
 	s5path := strings.Split(path[1:], "/")
 	for _, part := range s5path {
