@@ -5,18 +5,22 @@ import (
 	"net/http"
 )
 
+// HTTPHandleFunc 路由对应的处理方法的定义
 type HTTPHandleFunc func(p7ctx *HTTPContext)
 
+// HTTPServiceInterface 核心服务的接口定义
 type HTTPServiceInterface interface {
 	http.Handler
 	Start(addr string) error
 	MiddlewareInterface
 }
 
+// HTTPService 核心服务
 type HTTPService struct {
 	s5middleware []HTTPMiddleware
 }
 
+// 确保 HTTPService 实现了 HTTPServiceInterface 接口
 var _ HTTPServiceInterface = &HTTPService{}
 
 func NewHTTPService() *HTTPService {
@@ -30,11 +34,13 @@ func (p7this *HTTPService) ServeHTTP(i9w http.ResponseWriter, p7r *http.Request)
 	}
 
 	// 倒过来组装，先组装的在里层，里层的后执行
-	// 最里层应该是找路由然后执行代码的逻辑
+	// 最里层应该是找路由然后执行业务代码
 	t4chain := p7this.doServeHTTP
 	for i := len(p7this.s5middleware) - 1; i > 0; i-- {
 		t4chain = p7this.s5middleware[i](t4chain)
 	}
+	// 写入响应数据这个中间件应该由框架开发者处理
+	// 它是最后一个环节，应该在最外层
 	t4m := FlashRespMiddleware()
 	t4chain = t4m(t4chain)
 	t4chain(p7ctx)
