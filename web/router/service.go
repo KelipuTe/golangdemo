@@ -5,14 +5,17 @@ import (
 	"net/http"
 )
 
+// HTTPHandleFunc 路由对应的处理方法的定义
 type HTTPHandleFunc func(p7ctx *HTTPContext)
 
+// HTTPServiceInterface 核心服务的接口定义
 type HTTPServiceInterface interface {
 	http.Handler
 	Start(addr string) error
 	RouterInterface
 }
 
+// HTTPService 核心服务
 type HTTPService struct {
 	router
 }

@@ -56,6 +56,7 @@ type routingNode struct {
 	p7anyChild *routingNode
 }
 
+// findChild 构建路由树时，查询子结点
 func (p7this *routingNode) findChild(part string) *routingNode {
 	// 找静态路由
 	if nil != p7this.m3routingTree {
@@ -84,7 +85,9 @@ func (p7this *routingNode) findChild(part string) *routingNode {
 	return nil
 }
 
+// checkChild 构建路由树时，校验子结点是否可以继续操作
 func (p7this *routingNode) checkChild(part string) {
+	// 这里需要校验路径参数路由和正则表达式路由是否冲突
 	if ':' == part[0] {
 		if p7this.part != part {
 			panic(StrParamChildExist)
@@ -92,6 +95,7 @@ func (p7this *routingNode) checkChild(part string) {
 	}
 }
 
+// createChild 构建路由树时，构造新的子结点
 func (p7this *routingNode) createChild(part string, path string) *routingNode {
 	if ':' == part[0] {
 		t4regIndex1 := strings.Index(part, "(")
@@ -170,13 +174,17 @@ func (p7this *routingNode) createChild(part string, path string) *routingNode {
 	return p7this.m3routingTree[part]
 }
 
+// matchChild 查询路由时，匹配子结点
 func (p7this *routingNode) matchChild(part string) *routingNode {
+	// 这里的查询优先级可以根据需要进行调整
+	// 先查询静态路由
 	if nil != p7this.m3routingTree {
 		p7node, ok := p7this.m3routingTree[part]
 		if ok {
 			return p7node
 		}
 	}
+	// 然后依次查询，正则表达式路由、路径参数路由、通配符路由
 	if nil != p7this.p7regexpChild {
 		return p7this.p7regexpChild
 	} else if nil != p7this.p7paramChild {

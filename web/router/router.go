@@ -14,6 +14,7 @@ var (
 	StrPathExist     = "重复注册路由"
 )
 
+// RouterInterface 路由器的接口定义
 type RouterInterface interface {
 	addRoute(method string, path string, f4handler HTTPHandleFunc)
 	findRoute(method string, path string) *routeInfo
@@ -80,7 +81,7 @@ func (p7this *router) addRoute(method string, path string, f4h HTTPHandleFunc) {
 	p7node.f4handler = f4h
 }
 
-// 查找路由
+// findRoute 查找路由
 func (p7this *router) findRoute(method string, path string) *routeInfo {
 	p7node, ok := p7this.m3routingTree[method]
 	if !ok {
@@ -125,11 +126,15 @@ func newRouter() router {
 	}
 }
 
+// routeInfo 路由查询结果
 type routeInfo struct {
-	p7node      *routingNode
+	// 命中的路由结点
+	p7node *routingNode
+	// 提取出来的路径参数
 	m3pathParam map[string]string
 }
 
+// addPathParam 添加路径参数
 func (p7this *routeInfo) addPathParam(k string, v string) {
 	if nil == p7this.m3pathParam {
 		p7this.m3pathParam = map[string]string{k: v}
