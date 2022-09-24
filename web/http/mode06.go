@@ -1,6 +1,7 @@
 package http
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 )
@@ -12,5 +13,6 @@ func Mode06() {
 
 	log.Println("http.ListenAndServe...")
 	// 第二个参数传 nil 的时候，里面就会使用默认的那个 ServeMux
-	http.ListenAndServe("127.0.0.1:9510", nil)
+	err := http.ListenAndServe("127.0.0.1:9510", nil)
+	fmt.Println(err)
 }

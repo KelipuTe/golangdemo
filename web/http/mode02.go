@@ -1,6 +1,7 @@
 package http
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 )
@@ -18,7 +19,8 @@ func Mode02() {
 	}
 
 	log.Println("http.Server.ListenAndServe...")
-	p7hs.ListenAndServe()
+	err := p7hs.ListenAndServe()
+	fmt.Println(err)
 }
 
 type HTTPServiceV2 struct{}

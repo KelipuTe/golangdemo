@@ -30,5 +30,6 @@ func main() {
 	s.Post("/order/create", f4handler)
 	s.Post("/order/:id/delete", f4handler)
 
-	s.Start("127.0.0.1:9510")
+	err := s.Start("127.0.0.1:9510")
+	fmt.Println(err)
 }

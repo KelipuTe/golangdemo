@@ -17,7 +17,7 @@ type HTTPServiceInterface interface {
 
 // HTTPService 核心服务
 type HTTPService struct {
-	s5middleware []HTTPMiddleware
+	s5f4middleware []HTTPMiddleware
 }
 
 // 确保 HTTPService 实现了 HTTPServiceInterface 接口
@@ -36,8 +36,8 @@ func (p7this *HTTPService) ServeHTTP(i9w http.ResponseWriter, p7r *http.Request)
 	// 倒过来组装，先组装的在里层，里层的后执行
 	// 最里层应该是找路由然后执行业务代码
 	t4chain := p7this.doServeHTTP
-	for i := len(p7this.s5middleware) - 1; i > 0; i-- {
-		t4chain = p7this.s5middleware[i](t4chain)
+	for i := len(p7this.s5f4middleware) - 1; i > 0; i-- {
+		t4chain = p7this.s5f4middleware[i](t4chain)
 	}
 	// 写入响应数据这个中间件应该由框架开发者处理
 	// 它是最后一个环节，应该在最外层
@@ -57,10 +57,9 @@ func (p7this *HTTPService) Start(addr string) error {
 	return http.ListenAndServe(addr, p7this)
 }
 
-func (p7this *HTTPService) AddMiddleware(s5mw ...HTTPMiddleware) {
-	if nil == p7this.s5middleware {
-		p7this.s5middleware = s5mw
-		return
+func (p7this *HTTPService) AddMiddleware(s5f4mw ...HTTPMiddleware) {
+	if nil == p7this.s5f4middleware {
+		p7this.s5f4middleware = make([]HTTPMiddleware, 0, len(s5f4mw))
 	}
-	p7this.s5middleware = append(p7this.s5middleware, s5mw...)
+	p7this.s5f4middleware = append(p7this.s5f4middleware, s5f4mw...)
 }

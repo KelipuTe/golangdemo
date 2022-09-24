@@ -1,6 +1,7 @@
 package http
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 )
@@ -19,7 +20,8 @@ func Mode04() {
 	}
 
 	log.Println("http.Server.ListenAndServe...")
-	p7hs.ListenAndServe()
+	err := p7hs.ListenAndServe()
+	fmt.Println(err)
 }
 
 func HandleFuncV2(w http.ResponseWriter, r *http.Request) {
