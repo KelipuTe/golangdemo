@@ -1,12 +1,13 @@
 package main
 
 import (
-	"demo-golang/web/middleware"
+	web "demo-golang/web/middleware"
+	"demo-golang/web/middleware/middleware"
 	"fmt"
 )
 
 func main() {
-	s := middleware.NewHTTPService()
+	s := web.NewHTTPService()
 	s.AddMiddleware(
 		middleware.RecoveryMiddleware(),
 		middleware.ReqBodyMiddleware(),

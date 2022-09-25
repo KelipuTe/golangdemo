@@ -1,8 +1,10 @@
 package middleware
 
-func RecoveryMiddleware() HTTPMiddleware {
-	return func(next HTTPHandleFunc) HTTPHandleFunc {
-		return func(p7ctx *HTTPContext) {
+import "demo-golang/web/middleware"
+
+func RecoveryMiddleware() middleware.HTTPMiddleware {
+	return func(next middleware.HTTPHandleFunc) middleware.HTTPHandleFunc {
+		return func(p7ctx *middleware.HTTPContext) {
 			defer func() {
 				if err := recover(); err != nil {
 					p7ctx.RespData = append(p7ctx.RespData, []byte("recover from panic\r\n")...)

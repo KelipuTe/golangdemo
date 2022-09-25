@@ -16,7 +16,9 @@ var (
 
 // RouterInterface 路由器的接口定义
 type RouterInterface interface {
+	// addRoute 添加路由
 	addRoute(method string, path string, f4handler HTTPHandleFunc)
+	// findRoute 查找路由
 	findRoute(method string, path string) *routeInfo
 }
 
@@ -27,7 +29,6 @@ type router struct {
 	m3routingTree map[string]*routingNode
 }
 
-// addRoute 添加路由
 func (p7this *router) addRoute(method string, path string, f4h HTTPHandleFunc) {
 	if "" == path {
 		panic(StrPathCannotBeEmpty)
@@ -74,14 +75,13 @@ func (p7this *router) addRoute(method string, path string, f4h HTTPHandleFunc) {
 		}
 		p7node = t4p7child
 	}
-	// 添加路由的处理方法
+	// 给路由添加处理方法
 	if nil != p7node.f4handler {
 		panic(StrPathExist)
 	}
 	p7node.f4handler = f4h
 }
 
-// findRoute 查找路由
 func (p7this *router) findRoute(method string, path string) *routeInfo {
 	p7node, ok := p7this.m3routingTree[method]
 	if !ok {
