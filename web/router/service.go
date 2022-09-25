@@ -13,9 +13,9 @@ type HTTPServiceInterface interface {
 
 // HTTPService 核心服务
 type HTTPService struct {
-	// 服务名
+	// name 服务名
 	name string
-	// 核心处理逻辑
+	// p7server 核心处理逻辑
 	p7server *http.Server
 }
 

@@ -20,5 +20,5 @@ type HTTPContext struct {
 
 // GetRoutingInfo 获取命中的路由结点的信息
 func (this HTTPContext) GetRoutingInfo() string {
-	return fmt.Sprintf("nodeType:%d\r\nrouting path:%s\r\n", this.p7routingNode.nodeType, this.p7routingNode.path)
+	return fmt.Sprintf("nodeType:%d;routing path:%s;", this.p7routingNode.nodeType, this.p7routingNode.path)
 }

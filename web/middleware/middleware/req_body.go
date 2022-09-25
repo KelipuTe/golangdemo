@@ -10,7 +10,7 @@ import (
 func ReqBodyMiddleware() middleware.HTTPMiddleware {
 	return func(next middleware.HTTPHandleFunc) middleware.HTTPHandleFunc {
 		return func(p7ctx *middleware.HTTPContext) {
-			p7ctx.RespData = append(p7ctx.RespData, []byte("ReqBodyMiddleware In\r\n")...)
+			p7ctx.RespData = append(p7ctx.RespData, []byte("ReqBodyMiddleware In;")...)
 
 			var err error
 			p7ctx.ReqBody, err = io.ReadAll(p7ctx.P7request.Body)
@@ -20,7 +20,7 @@ func ReqBodyMiddleware() middleware.HTTPMiddleware {
 			p7ctx.P7request.Body = io.NopCloser(bytes.NewBuffer(p7ctx.ReqBody))
 
 			next(p7ctx)
-			p7ctx.RespData = append(p7ctx.RespData, []byte("ReqBodyMiddleware Out\r\n")...)
+			p7ctx.RespData = append(p7ctx.RespData, []byte("ReqBodyMiddleware Out;")...)
 		}
 	}
 }

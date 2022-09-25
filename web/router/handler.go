@@ -28,16 +28,6 @@ func NewHTTPHandler() *HTTPHandler {
 	}
 }
 
-// Get 包装 addRoute
-func (p7this *HTTPHandler) Get(path string, f4h HTTPHandleFunc) {
-	p7this.router.addRoute(http.MethodGet, path, f4h)
-}
-
-// Post 包装 addRoute
-func (p7this *HTTPHandler) Post(path string, f4h HTTPHandleFunc) {
-	p7this.router.addRoute(http.MethodPost, path, f4h)
-}
-
 func (p7this *HTTPHandler) ServeHTTP(i9w http.ResponseWriter, p7r *http.Request) {
 	p7ctx := &HTTPContext{
 		I9writer:  i9w,
@@ -51,7 +41,7 @@ func (p7this *HTTPHandler) doServeHTTP(p7ctx *HTTPContext) {
 	// 如果找不到对应的路由结点或者路由结点上没有处理方法就返回 404
 	if nil == p7ri || nil == p7ri.p7node || nil == p7ri.p7node.f4handler {
 		p7ctx.I9writer.WriteHeader(404)
-		p7ctx.I9writer.Write([]byte(fmt.Sprintf("Not Found:%s %s\r\n", p7ctx.P7request.Method, p7ctx.P7request.URL.Path)))
+		_, _ = p7ctx.I9writer.Write([]byte(fmt.Sprintf("Not Found:%s %s\r\n", p7ctx.P7request.Method, p7ctx.P7request.URL.Path)))
 		return
 	}
 	// 这里可以把匹配结果存下来
@@ -59,4 +49,14 @@ func (p7this *HTTPHandler) doServeHTTP(p7ctx *HTTPContext) {
 	p7ctx.p7routingNode = p7ri.p7node
 	// 执行业务代码
 	p7ri.p7node.f4handler(p7ctx)
+}
+
+// Get 包装 addRoute
+func (p7this *HTTPHandler) Get(path string, f4h HTTPHandleFunc) {
+	p7this.router.addRoute(http.MethodGet, path, f4h)
+}
+
+// Post 包装 addRoute
+func (p7this *HTTPHandler) Post(path string, f4h HTTPHandleFunc) {
+	p7this.router.addRoute(http.MethodPost, path, f4h)
 }
