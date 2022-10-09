@@ -7,6 +7,8 @@ require (
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/google/wire v0.5.0
+	github.com/gotomicro/ekit v0.0.4
+	github.com/mattn/go-sqlite3 v1.14.15
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/viper v1.12.0
 	github.com/stretchr/testify v1.7.1
@@ -15,6 +17,7 @@ require (
 )
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.5.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
