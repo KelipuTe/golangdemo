@@ -3,14 +3,17 @@ package orm_select
 import "strings"
 
 type OrmSelect struct {
-	// 查询的字段
+	// s5column 查询的字段
 	s5column []string
-	// 表名
+	// tableName 表名
 	tableName string
-	// where
-	s5where   []Predicate
+	// s5where where 语句
+	s5where []Predicate
+	// s5groupBy group by 语句
 	s5groupBy []Column
-	s5having  []Predicate
+	// s5having group by 的 having 语句
+	s5having []Predicate
+	// s5orderBy order by 语句
 	s5orderBy []OrderBy
 	offset    int
 	limit     int
@@ -20,6 +23,7 @@ type OrmSelect struct {
 	s5parameter []any
 }
 
+// Where 添加 where 语句
 func (p7this *OrmSelect) Where(s5where ...Predicate) *OrmSelect {
 	if nil == p7this.s5where {
 		p7this.s5where = s5where
@@ -29,6 +33,7 @@ func (p7this *OrmSelect) Where(s5where ...Predicate) *OrmSelect {
 	return p7this
 }
 
+// addParameter 添加占位符对应的参数
 func (p7this *OrmSelect) addParameter(s5p ...any) {
 	if nil == p7this.s5parameter {
 		p7this.s5parameter = make([]any, 0, 2)
@@ -41,14 +46,17 @@ func (p7this *OrmSelect) BuildQuery() (*Query, error) {
 
 	p7this.sqlString.WriteString("SELECT ")
 
+	// 处理查询的列
 	p7this.sqlString.WriteString("*")
 
 	p7this.sqlString.WriteString(" FROM ")
 
+	// 处理表名
 	p7this.sqlString.WriteByte('`')
 	p7this.sqlString.WriteString(p7this.tableName)
 	p7this.sqlString.WriteByte('`')
 
+	// 处理 where
 	if 0 < len(p7this.s5where) {
 		p7this.sqlString.WriteString(" WHERE ")
 		err = p7this.buildPredicate(p7this.s5where)

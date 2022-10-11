@@ -1,6 +1,6 @@
 package orm_select
 
-// value where、having 子句的列名对应的数据
+// parameter 对应查询语句里的占位符对应的参数
 type parameter struct {
 	parameter any
 }
@@ -8,6 +8,7 @@ type parameter struct {
 func (this parameter) doExpression() {
 }
 
+// toParameter 把输入转换成查询语句里的占位符对应的参数
 func toParameter(p any) parameter {
 	return parameter{
 		parameter: p,

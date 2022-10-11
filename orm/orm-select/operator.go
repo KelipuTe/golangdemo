@@ -1,6 +1,6 @@
 package orm_select
 
-// operator 代表操作符
+// operator 代表查询语句里的操作符
 type operator string
 
 func (this operator) String() string {

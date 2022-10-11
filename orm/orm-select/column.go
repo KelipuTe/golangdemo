@@ -1,6 +1,6 @@
 package orm_select
 
-// Column where、having 子句的列名
+// Column 对应查询条件里的列名
 type Column struct {
 	name string
 }
