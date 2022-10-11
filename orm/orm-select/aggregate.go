@@ -1,6 +1,6 @@
 package orm_select
 
-// Aggregate 聚合函数
+// Aggregate 对应查询语句里的聚合函数
 type Aggregate struct {
 	// 聚合函数名
 	funcName string

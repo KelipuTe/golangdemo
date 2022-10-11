@@ -51,7 +51,7 @@ func (p7this *OrmSelect) GroupBy(s5c ...Column) *OrmSelect {
 	return p7this
 }
 
-// Having 添加 Having 子句
+// Having 添加 having 子句
 func (p7this *OrmSelect) Having(s5h ...Predicate) *OrmSelect {
 	if 0 >= len(s5h) {
 		return p7this
@@ -65,6 +65,7 @@ func (p7this *OrmSelect) Having(s5h ...Predicate) *OrmSelect {
 	return p7this
 }
 
+// OrderBy 添加 order by 子句
 func (p7this *OrmSelect) OrderBy(s5ob ...OrderBy) *OrmSelect {
 	if 0 >= len(s5ob) {
 		return p7this
@@ -78,11 +79,13 @@ func (p7this *OrmSelect) OrderBy(s5ob ...OrderBy) *OrmSelect {
 	return p7this
 }
 
+// Limit 添加 limit 子句
 func (p7this *OrmSelect) Limit(l int) *OrmSelect {
 	p7this.limit = l
 	return p7this
 }
 
+// Offset 添加 offset 子句
 func (p7this *OrmSelect) Offset(o int) *OrmSelect {
 	p7this.offset = o
 	return p7this
@@ -177,6 +180,7 @@ func (p7this *OrmSelect) BuildQuery() (*Query, error) {
 	}, nil
 }
 
+// buildColumn 处理列
 func (p7this *OrmSelect) buildColumn(c Column) error {
 	p7this.sqlString.WriteByte('`')
 	p7this.sqlString.WriteString(c.name)
@@ -184,6 +188,7 @@ func (p7this *OrmSelect) buildColumn(c Column) error {
 	return nil
 }
 
+// buildPredicate 处理查询条件
 func (p7this *OrmSelect) buildPredicate(s5p []Predicate) error {
 	t4p := s5p[0]
 	for i := 1; i < len(s5p); i++ {
@@ -192,6 +197,7 @@ func (p7this *OrmSelect) buildPredicate(s5p []Predicate) error {
 	return p7this.buildExpression(t4p)
 }
 
+// buildExpression 处理语句
 func (p7this *OrmSelect) buildExpression(e Expression) error {
 	var err error
 
