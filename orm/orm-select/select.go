@@ -1,10 +1,12 @@
 package orm_select
 
-import "strings"
+import (
+	"strings"
+)
 
 type OrmSelect struct {
-	// s5column 查询的字段
-	s5column []string
+	// s5select 查询的字段
+	s5select []canSelect
 	// tableName 表名
 	tableName string
 	// s5where where 语句
@@ -21,6 +23,25 @@ type OrmSelect struct {
 	sqlString strings.Builder
 	// sql 中占位符对应的数据
 	s5parameter []any
+}
+
+// canSelect 对应查询语句里的列或者聚合函数
+type canSelect interface {
+	canSelect()
+}
+
+// Select 添加 select 子句
+func (p7this *OrmSelect) Select(s5cs ...canSelect) *OrmSelect {
+	if 0 >= len(s5cs) {
+		return p7this
+	}
+
+	if nil == p7this.s5select {
+		p7this.s5select = s5cs
+		return p7this
+	}
+	p7this.s5select = append(p7this.s5select, s5cs...)
+	return p7this
 }
 
 // Where 添加 where 子句
@@ -105,7 +126,10 @@ func (p7this *OrmSelect) BuildQuery() (*Query, error) {
 	p7this.sqlString.WriteString("SELECT ")
 
 	// 处理查询的列
-	p7this.sqlString.WriteString("*")
+	err = p7this.buildSelect()
+	if nil != err {
+		return nil, err
+	}
 
 	p7this.sqlString.WriteString(" FROM ")
 
@@ -126,11 +150,11 @@ func (p7this *OrmSelect) BuildQuery() (*Query, error) {
 	// 处理 group by
 	if 0 < len(p7this.s5groupBy) {
 		p7this.sqlString.WriteString(" GROUP BY ")
-		for i, t4c := range p7this.s5groupBy {
+		for i, t4gb := range p7this.s5groupBy {
 			if i > 0 {
 				p7this.sqlString.WriteByte(',')
 			}
-			err = p7this.buildColumn(t4c)
+			err = p7this.buildColumn(t4gb)
 			if nil != err {
 				return nil, err
 			}
@@ -180,6 +204,45 @@ func (p7this *OrmSelect) BuildQuery() (*Query, error) {
 	}, nil
 }
 
+func (p7this *OrmSelect) buildSelect() error {
+	var err error
+
+	if 0 >= len(p7this.s5select) {
+		p7this.sqlString.WriteByte('*')
+		return nil
+	}
+
+	for i, t4s := range p7this.s5select {
+		if i > 0 {
+			p7this.sqlString.WriteByte(',')
+		}
+		switch t4s.(type) {
+		case Column:
+			// 处理列
+			t4c := t4s.(Column)
+			err = p7this.buildColumn(t4c)
+			if nil != err {
+				return err
+			}
+		case Aggregate:
+			// 处理聚合函数
+			t4a := t4s.(Aggregate)
+			err = p7this.buildAggregate(t4a)
+			if nil != err {
+				return err
+			}
+		case Raw:
+			// 处理原生 sql
+			t4r := t4s.(Raw)
+			p7this.sqlString.WriteString(t4r.raw)
+			if 0 >= len(t4r.s5parameter) {
+				p7this.addParameter(t4r.s5parameter...)
+			}
+		}
+	}
+	return nil
+}
+
 // buildColumn 处理列
 func (p7this *OrmSelect) buildColumn(c Column) error {
 	p7this.sqlString.WriteByte('`')
@@ -221,7 +284,12 @@ func (p7this *OrmSelect) buildExpression(e Expression) error {
 		if lIsP {
 			p7this.sqlString.WriteByte(')')
 		}
+
 		// 处理中间的操作符
+		// 如果没有操作符，那么就是原生 sql，没有右边的部分
+		if "" == t4predicate.op.String() {
+			return nil
+		}
 		p7this.sqlString.WriteByte(' ')
 		p7this.sqlString.WriteString(t4predicate.op.String())
 		p7this.sqlString.WriteByte(' ')
@@ -244,6 +312,20 @@ func (p7this *OrmSelect) buildExpression(e Expression) error {
 		if nil != err {
 			return err
 		}
+	case Aggregate:
+		// 处理聚合函数
+		t4a := e.(Aggregate)
+		err = p7this.buildAggregate(t4a)
+		if nil != err {
+			return err
+		}
+	case Raw:
+		// 处理原生 sql
+		t4r := e.(Raw)
+		p7this.sqlString.WriteString(t4r.raw)
+		if 0 < len(t4r.s5parameter) {
+			p7this.addParameter(t4r.s5parameter...)
+		}
 	case parameter:
 		// 处理占位符对应的参数
 		t4parameter := e.(parameter)
@@ -252,6 +334,15 @@ func (p7this *OrmSelect) buildExpression(e Expression) error {
 	default:
 		return NewErrUnsupportedExpressionType(e)
 	}
+	return nil
+}
+
+// buildAggregate 处理聚合函数
+func (p7this *OrmSelect) buildAggregate(a Aggregate) error {
+	p7this.sqlString.WriteString(a.funcName)
+	p7this.sqlString.WriteString("(`")
+	p7this.sqlString.WriteString(a.column.name)
+	p7this.sqlString.WriteString("`)")
 	return nil
 }
 

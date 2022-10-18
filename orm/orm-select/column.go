@@ -6,8 +6,9 @@ type Column struct {
 	name string
 }
 
-func (this Column) doExpression() {
-}
+func (this Column) doExpression() {}
+
+func (this Column) canSelect() {}
 
 func ToColumn(n string) Column {
 	return Column{

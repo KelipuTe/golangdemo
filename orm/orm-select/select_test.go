@@ -9,7 +9,7 @@ type TestModel struct {
 	Id   int
 	Name string
 	Age  int8
-	Sex  string
+	Sex  int8
 }
 
 func TestOrmSelect_BuildQuery(t *testing.T) {
@@ -204,7 +204,8 @@ func TestOrmSelect_GroupBy(t *testing.T) {
 		},
 		{
 			name: "group_by_one",
-			i9qb: NewOrmSelect().GroupBy(ToColumn("Age")),
+			i9qb: NewOrmSelect().
+				GroupBy(ToColumn("Age")),
 			wantQuery: &Query{
 				SQLString:   "SELECT * FROM `table_name` GROUP BY `Age`;",
 				S5parameter: nil,
@@ -212,7 +213,8 @@ func TestOrmSelect_GroupBy(t *testing.T) {
 		},
 		{
 			name: "group_by_two",
-			i9qb: NewOrmSelect().GroupBy(ToColumn("Age")).GroupBy(ToColumn("Sex")),
+			i9qb: NewOrmSelect().
+				GroupBy(ToColumn("Age")).GroupBy(ToColumn("Sex")),
 			wantQuery: &Query{
 				SQLString:   "SELECT * FROM `table_name` GROUP BY `Age`,`Sex`;",
 				S5parameter: nil,
@@ -248,7 +250,8 @@ func TestOrmSelect_Having(t *testing.T) {
 		},
 		{
 			name: "having_no_group_by",
-			i9qb: NewOrmSelect().Having(ToColumn("Age").GT(22)),
+			i9qb: NewOrmSelect().
+				Having(ToColumn("Age").GT(22)),
 			wantQuery: &Query{
 				SQLString:   "SELECT * FROM `table_name`;",
 				S5parameter: nil,
@@ -256,7 +259,9 @@ func TestOrmSelect_Having(t *testing.T) {
 		},
 		{
 			name: "having_one",
-			i9qb: NewOrmSelect().GroupBy(ToColumn("Age")).Having(ToColumn("Id").EQ(11)),
+			i9qb: NewOrmSelect().
+				GroupBy(ToColumn("Age")).
+				Having(ToColumn("Id").EQ(11)),
 			wantQuery: &Query{
 				SQLString:   "SELECT * FROM `table_name` GROUP BY `Age` HAVING `Id` = ?;",
 				S5parameter: []any{11},
@@ -311,39 +316,30 @@ func TestOrmSelect_OrderBy(t *testing.T) {
 			},
 		},
 		{
-			name: "having_no_group_by",
-			i9qb: NewOrmSelect().Having(ToColumn("Age").GT(22)),
+			name: "order_by_one_asc",
+			i9qb: NewOrmSelect().
+				OrderBy(Asc("Name")),
 			wantQuery: &Query{
-				SQLString:   "SELECT * FROM `table_name`;",
+				SQLString:   "SELECT * FROM `table_name` ORDER BY `Name` ASC;",
 				S5parameter: nil,
 			},
 		},
 		{
-			name: "having_one",
-			i9qb: NewOrmSelect().GroupBy(ToColumn("Age")).Having(ToColumn("Id").EQ(11)),
+			name: "order_by_one_desc",
+			i9qb: NewOrmSelect().
+				OrderBy(Desc("Name")),
 			wantQuery: &Query{
-				SQLString:   "SELECT * FROM `table_name` GROUP BY `Age` HAVING `Id` = ?;",
-				S5parameter: []any{11},
+				SQLString:   "SELECT * FROM `table_name` ORDER BY `Name` DESC;",
+				S5parameter: nil,
 			},
 		},
 		{
-			name: "group_by_two_having_one",
+			name: "order_by_two_asc_desc",
 			i9qb: NewOrmSelect().
-				GroupBy(ToColumn("Age")).GroupBy(ToColumn("Sex")).
-				Having(ToColumn("Id").EQ(11)),
+				OrderBy(Asc("Name")).OrderBy(Desc("Age")),
 			wantQuery: &Query{
-				SQLString:   "SELECT * FROM `table_name` GROUP BY `Age`,`Sex` HAVING `Id` = ?;",
-				S5parameter: []any{11},
-			},
-		},
-		{
-			name: "group_by_two_having_two",
-			i9qb: NewOrmSelect().
-				GroupBy(ToColumn("Age")).GroupBy(ToColumn("Sex")).
-				Having(ToColumn("Id").EQ(11)).Having(ToColumn("Name").EQ("aa")),
-			wantQuery: &Query{
-				SQLString:   "SELECT * FROM `table_name` GROUP BY `Age`,`Sex` HAVING (`Id` = ?) AND (`Name` = ?);",
-				S5parameter: []any{11, "aa"},
+				SQLString:   "SELECT * FROM `table_name` ORDER BY `Name` ASC,`Age` DESC;",
+				S5parameter: nil,
 			},
 		},
 	}
@@ -388,6 +384,149 @@ func TestOrmSelect_OffsetLimit(t *testing.T) {
 			wantQuery: &Query{
 				SQLString:   "SELECT * FROM `table_name` LIMIT ? OFFSET ?;",
 				S5parameter: []any{11, 111},
+			},
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			p7query, err := tc.i9qb.BuildQuery()
+			assert.Equal(t, tc.wantErr, err)
+			if err != nil {
+				return
+			}
+			assert.Equal(t, tc.wantQuery, p7query)
+		})
+	}
+}
+
+func TestOrmSelect_Select(t *testing.T) {
+	testCases := []struct {
+		name      string
+		i9qb      QueryBuilder
+		wantQuery *Query
+		wantErr   error
+	}{
+		{
+			name: "select_one_column",
+			i9qb: NewOrmSelect().
+				Select(ToColumn("Id")),
+			wantQuery: &Query{
+				SQLString:   "SELECT `Id` FROM `table_name`;",
+				S5parameter: nil,
+			},
+		},
+		{
+			name: "select_two_column",
+			i9qb: NewOrmSelect().
+				Select(ToColumn("Id")).Select(ToColumn("Name")),
+			wantQuery: &Query{
+				SQLString:   "SELECT `Id`,`Name` FROM `table_name`;",
+				S5parameter: nil,
+			},
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			p7query, err := tc.i9qb.BuildQuery()
+			assert.Equal(t, tc.wantErr, err)
+			if err != nil {
+				return
+			}
+			assert.Equal(t, tc.wantQuery, p7query)
+		})
+	}
+}
+
+func TestOrmSelect_Aggregate(t *testing.T) {
+	testCases := []struct {
+		name      string
+		i9qb      QueryBuilder
+		wantQuery *Query
+		wantErr   error
+	}{
+		{
+			name: "select_one_aggregate",
+			i9qb: NewOrmSelect().
+				Select(Count("Id")),
+			wantQuery: &Query{
+				SQLString:   "SELECT COUNT(`Id`) FROM `table_name`;",
+				S5parameter: nil,
+			},
+		},
+		{
+			name: "select_two_aggregate",
+			i9qb: NewOrmSelect().
+				Select(Count("Id")).Select(Avg("Age")),
+			wantQuery: &Query{
+				SQLString:   "SELECT COUNT(`Id`),AVG(`Age`) FROM `table_name`;",
+				S5parameter: nil,
+			},
+		},
+		{
+			name: "having_one_aggregate",
+			i9qb: NewOrmSelect().
+				GroupBy(ToColumn("Age")).
+				Having(Count("Id").GT(5)),
+			wantQuery: &Query{
+				SQLString:   "SELECT * FROM `table_name` GROUP BY `Age` HAVING COUNT(`Id`) > ?;",
+				S5parameter: []any{5},
+			},
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			p7query, err := tc.i9qb.BuildQuery()
+			assert.Equal(t, tc.wantErr, err)
+			if err != nil {
+				return
+			}
+			assert.Equal(t, tc.wantQuery, p7query)
+		})
+	}
+}
+
+func TestOrmSelect_Raw(t *testing.T) {
+	testCases := []struct {
+		name      string
+		i9qb      QueryBuilder
+		wantQuery *Query
+		wantErr   error
+	}{
+		{
+			name: "select_raw",
+			i9qb: NewOrmSelect().
+				Select(ToRaw("DISTINCT(Id)")),
+			wantQuery: &Query{
+				SQLString:   "SELECT COUNT(`Id`) FROM `table_name`;",
+				S5parameter: nil,
+			},
+		},
+		{
+			name: "where_raw",
+			i9qb: NewOrmSelect().
+				Where(ToRaw("Id > ?", 11).toPredicate()),
+			wantQuery: &Query{
+				SQLString:   "SELECT * FROM `table_name` WHERE Id > ?;",
+				S5parameter: []any{11},
+			},
+		},
+		{
+			name: "where_raw_and_one",
+			i9qb: NewOrmSelect().
+				Where(ToRaw("Id > ?", 11).toPredicate().And(ToColumn("Name").EQ("aa"))),
+			wantQuery: &Query{
+				SQLString:   "SELECT * FROM `table_name` WHERE (Id > ?) AND (`Name` = ?);",
+				S5parameter: []any{11, "aa"},
+			},
+		},
+		{
+			name: "having_raw",
+			i9qb: NewOrmSelect().
+				GroupBy(ToColumn("Age")).
+				Having(ToRaw("COUNT(Id) > ?", 5).toPredicate()),
+			wantQuery: &Query{
+				SQLString:   "SELECT * FROM `table_name` GROUP BY `Age` HAVING COUNT(Id) > ?;",
+				S5parameter: []any{5},
 			},
 		},
 	}

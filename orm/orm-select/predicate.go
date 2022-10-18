@@ -11,8 +11,7 @@ type Predicate struct {
 	right Expression
 }
 
-func (this Predicate) doExpression() {
-}
+func (this Predicate) doExpression() {}
 
 // And 与，左查询条件 与 右查询条件 => (`Id` = 11) AND (Name = 'aa')
 func (this Predicate) And(p Predicate) Predicate {
