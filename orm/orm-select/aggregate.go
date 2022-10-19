@@ -2,10 +2,10 @@ package orm_select
 
 // Aggregate 对应查询语句里的聚合函数
 type Aggregate struct {
-	// 聚合函数名
+	// funcName 聚合函数名
 	funcName string
-	// 列
-	column Column
+	// field 列
+	field Field
 }
 
 func (this Aggregate) doExpression() {}
@@ -39,20 +39,13 @@ func (this Aggregate) LT(p any) Predicate {
 func Count(n string) Aggregate {
 	return Aggregate{
 		funcName: "COUNT",
-		column:   Column{name: n},
-	}
-}
-
-func Sum(n string) Aggregate {
-	return Aggregate{
-		funcName: "SUM",
-		column:   Column{name: n},
+		field:    Field{name: n},
 	}
 }
 
 func Avg(n string) Aggregate {
 	return Aggregate{
 		funcName: "AVG",
-		column:   Column{name: n},
+		field:    Field{name: n},
 	}
 }

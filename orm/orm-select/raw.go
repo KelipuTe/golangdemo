@@ -1,10 +1,10 @@
 package orm_select
 
-// Raw 对应原生 sql
+// Raw 对应原生 SQL
 type Raw struct {
-	// 原生 sql
+	// raw 原生 SQL
 	raw string
-	// sql 中占位符对应的数据
+	// s5parameter SQL 中占位符对应的数据
 	s5parameter []any
 }
 
@@ -20,8 +20,8 @@ func (this Raw) toPredicate() Predicate {
 	}
 }
 
-func ToRaw(raw string, s5p ...any) *Raw {
-	return &Raw{
+func NewRaw(raw string, s5p ...any) Raw {
+	return Raw{
 		raw:         raw,
 		s5parameter: s5p,
 	}

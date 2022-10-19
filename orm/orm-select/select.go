@@ -4,6 +4,8 @@ import (
 	"strings"
 )
 
+// OrmSelect Select 构造器
+// 用于构造查询语句
 type OrmSelect struct {
 	// s5select 查询的字段
 	s5select []canSelect
@@ -12,20 +14,20 @@ type OrmSelect struct {
 	// s5where where 语句
 	s5where []Predicate
 	// s5groupBy group by 语句
-	s5groupBy []Column
+	s5groupBy []Field
 	// s5having group by 的 having 语句
 	s5having []Predicate
 	// s5orderBy order by 语句
 	s5orderBy []OrderBy
 	limit     int
 	offset    int
-	// 构造出来的 sql
+	// 构造出来的 SQL
 	sqlString strings.Builder
-	// sql 中占位符对应的数据
+	// SQL 中占位符对应的数据
 	s5parameter []any
 }
 
-// canSelect 对应查询语句里的列或者聚合函数
+// canSelect 对应查询语句里 select 子句的列或者聚合函数
 type canSelect interface {
 	canSelect()
 }
@@ -59,7 +61,7 @@ func (p7this *OrmSelect) Where(s5w ...Predicate) *OrmSelect {
 }
 
 // GroupBy 添加 group by 子句
-func (p7this *OrmSelect) GroupBy(s5c ...Column) *OrmSelect {
+func (p7this *OrmSelect) GroupBy(s5c ...Field) *OrmSelect {
 	if 0 >= len(s5c) {
 		return p7this
 	}
@@ -177,7 +179,7 @@ func (p7this *OrmSelect) BuildQuery() (*Query, error) {
 			if i > 0 {
 				p7this.sqlString.WriteByte(',')
 			}
-			err = p7this.buildColumn(t4ob.column)
+			err = p7this.buildColumn(t4ob.field)
 			if nil != err {
 				return nil, err
 			}
@@ -217,9 +219,9 @@ func (p7this *OrmSelect) buildSelect() error {
 			p7this.sqlString.WriteByte(',')
 		}
 		switch t4s.(type) {
-		case Column:
+		case Field:
 			// 处理列
-			t4c := t4s.(Column)
+			t4c := t4s.(Field)
 			err = p7this.buildColumn(t4c)
 			if nil != err {
 				return err
@@ -235,7 +237,7 @@ func (p7this *OrmSelect) buildSelect() error {
 			// 处理原生 sql
 			t4r := t4s.(Raw)
 			p7this.sqlString.WriteString(t4r.raw)
-			if 0 >= len(t4r.s5parameter) {
+			if 0 > len(t4r.s5parameter) {
 				p7this.addParameter(t4r.s5parameter...)
 			}
 		}
@@ -244,7 +246,7 @@ func (p7this *OrmSelect) buildSelect() error {
 }
 
 // buildColumn 处理列
-func (p7this *OrmSelect) buildColumn(c Column) error {
+func (p7this *OrmSelect) buildColumn(c Field) error {
 	p7this.sqlString.WriteByte('`')
 	p7this.sqlString.WriteString(c.name)
 	p7this.sqlString.WriteByte('`')
@@ -305,9 +307,9 @@ func (p7this *OrmSelect) buildExpression(e Expression) error {
 		if rIsP {
 			p7this.sqlString.WriteByte(')')
 		}
-	case Column:
+	case Field:
 		// 处理列名
-		t4c := e.(Column)
+		t4c := e.(Field)
 		err = p7this.buildColumn(t4c)
 		if nil != err {
 			return err
@@ -341,7 +343,7 @@ func (p7this *OrmSelect) buildExpression(e Expression) error {
 func (p7this *OrmSelect) buildAggregate(a Aggregate) error {
 	p7this.sqlString.WriteString(a.funcName)
 	p7this.sqlString.WriteString("(`")
-	p7this.sqlString.WriteString(a.column.name)
+	p7this.sqlString.WriteString(a.field.name)
 	p7this.sqlString.WriteString("`)")
 	return nil
 }

@@ -13,7 +13,7 @@ type TestModel struct {
 }
 
 func TestOrmSelect_BuildQuery(t *testing.T) {
-	testCases := []struct {
+	s5case := []struct {
 		name      string
 		i9qb      QueryBuilder
 		wantQuery *Query
@@ -27,14 +27,14 @@ func TestOrmSelect_BuildQuery(t *testing.T) {
 			},
 		},
 	}
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			p7query, err := tc.i9qb.BuildQuery()
-			assert.Equal(t, tc.wantErr, err)
+	for _, t4c := range s5case {
+		t.Run(t4c.name, func(t *testing.T) {
+			p7query, err := t4c.i9qb.BuildQuery()
+			assert.Equal(t, t4c.wantErr, err)
 			if err != nil {
 				return
 			}
-			assert.Equal(t, tc.wantQuery, p7query)
+			assert.Equal(t, t4c.wantQuery, p7query)
 		})
 	}
 }
@@ -49,7 +49,7 @@ func TestOrmSelect_Operator(t *testing.T) {
 		{
 			name: "where_eq",
 			i9qb: NewOrmSelect().
-				Where(ToColumn("Id").EQ(11)),
+				Where(NewField("Id").EQ(11)),
 			wantQuery: &Query{
 				SQLString:   "SELECT * FROM `table_name` WHERE `Id` = ?;",
 				S5parameter: []any{11},
@@ -58,7 +58,7 @@ func TestOrmSelect_Operator(t *testing.T) {
 		{
 			name: "where_gt",
 			i9qb: NewOrmSelect().
-				Where(ToColumn("Id").GT(11)),
+				Where(NewField("Id").GT(11)),
 			wantQuery: &Query{
 				SQLString:   "SELECT * FROM `table_name` WHERE `Id` > ?;",
 				S5parameter: []any{11},
@@ -67,21 +67,21 @@ func TestOrmSelect_Operator(t *testing.T) {
 		{
 			name: "where_lt",
 			i9qb: NewOrmSelect().
-				Where(ToColumn("Id").LT(11)),
+				Where(NewField("Id").LT(11)),
 			wantQuery: &Query{
 				SQLString:   "SELECT * FROM `table_name` WHERE `Id` < ?;",
 				S5parameter: []any{11},
 			},
 		},
 	}
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			p7query, err := tc.i9qb.BuildQuery()
-			assert.Equal(t, tc.wantErr, err)
+	for _, t4c := range testCases {
+		t.Run(t4c.name, func(t *testing.T) {
+			p7query, err := t4c.i9qb.BuildQuery()
+			assert.Equal(t, t4c.wantErr, err)
 			if err != nil {
 				return
 			}
-			assert.Equal(t, tc.wantQuery, p7query)
+			assert.Equal(t, t4c.wantQuery, p7query)
 		})
 	}
 }
@@ -104,7 +104,7 @@ func TestOrmSelect_Where(t *testing.T) {
 		{
 			name: "where_one",
 			i9qb: NewOrmSelect().
-				Where(ToColumn("Id").EQ(11)),
+				Where(NewField("Id").EQ(11)),
 			wantQuery: &Query{
 				SQLString:   "SELECT * FROM `table_name` WHERE `Id` = ?;",
 				S5parameter: []any{11},
@@ -113,8 +113,8 @@ func TestOrmSelect_Where(t *testing.T) {
 		{
 			name: "where_two",
 			i9qb: NewOrmSelect().
-				Where(ToColumn("Id").EQ(11)).
-				Where(ToColumn("Name").EQ("aa")),
+				Where(NewField("Id").EQ(11)).
+				Where(NewField("Name").EQ("aa")),
 			wantQuery: &Query{
 				SQLString:   "SELECT * FROM `table_name` WHERE (`Id` = ?) AND (`Name` = ?);",
 				S5parameter: []any{11, "aa"},
@@ -123,7 +123,7 @@ func TestOrmSelect_Where(t *testing.T) {
 		{
 			name: "where_one_and_one",
 			i9qb: NewOrmSelect().
-				Where(ToColumn("Id").EQ(11).And(ToColumn("Name").EQ("aa"))),
+				Where(NewField("Id").EQ(11).And(NewField("Name").EQ("aa"))),
 			wantQuery: &Query{
 				SQLString:   "SELECT * FROM `table_name` WHERE (`Id` = ?) AND (`Name` = ?);",
 				S5parameter: []any{11, "aa"},
@@ -132,7 +132,7 @@ func TestOrmSelect_Where(t *testing.T) {
 		{
 			name: "where_one_or_one",
 			i9qb: NewOrmSelect().
-				Where(ToColumn("Id").EQ(11).Or(ToColumn("Name").EQ("aa"))),
+				Where(NewField("Id").EQ(11).Or(NewField("Name").EQ("aa"))),
 			wantQuery: &Query{
 				SQLString:   "SELECT * FROM `table_name` WHERE (`Id` = ?) OR (`Name` = ?);",
 				S5parameter: []any{11, "aa"},
@@ -141,7 +141,7 @@ func TestOrmSelect_Where(t *testing.T) {
 		{
 			name: "where_not_one",
 			i9qb: NewOrmSelect().
-				Where(Not(ToColumn("Id").EQ(11))),
+				Where(Not(NewField("Id").EQ(11))),
 			wantQuery: &Query{
 				SQLString:   "SELECT * FROM `table_name` WHERE  NOT (`Id` = ?);",
 				S5parameter: []any{11},
@@ -150,7 +150,7 @@ func TestOrmSelect_Where(t *testing.T) {
 		{
 			name: "where_one_and_(one_and_one)",
 			i9qb: NewOrmSelect().
-				Where(ToColumn("Id").EQ(11).And(ToColumn("Name").EQ("aa").And(ToColumn("Age").EQ(22)))),
+				Where(NewField("Id").EQ(11).And(NewField("Name").EQ("aa").And(NewField("Age").EQ(22)))),
 			wantQuery: &Query{
 				SQLString:   "SELECT * FROM `table_name` WHERE (`Id` = ?) AND ((`Name` = ?) AND (`Age` = ?));",
 				S5parameter: []any{11, "aa", 22},
@@ -159,7 +159,7 @@ func TestOrmSelect_Where(t *testing.T) {
 		{
 			name: "where_one_or_(one_or_one)",
 			i9qb: NewOrmSelect().
-				Where(ToColumn("Id").EQ(11).And(ToColumn("Name").EQ("aa").Or(ToColumn("Age").EQ(22)))),
+				Where(NewField("Id").EQ(11).And(NewField("Name").EQ("aa").Or(NewField("Age").EQ(22)))),
 			wantQuery: &Query{
 				SQLString:   "SELECT * FROM `table_name` WHERE (`Id` = ?) AND ((`Name` = ?) OR (`Age` = ?));",
 				S5parameter: []any{11, "aa", 22},
@@ -168,21 +168,21 @@ func TestOrmSelect_Where(t *testing.T) {
 		{
 			name: "where_one_and_(not_one)",
 			i9qb: NewOrmSelect().
-				Where(ToColumn("Id").EQ(11).And(Not(ToColumn("Name").EQ("aa")))),
+				Where(NewField("Id").EQ(11).And(Not(NewField("Name").EQ("aa")))),
 			wantQuery: &Query{
 				SQLString:   "SELECT * FROM `table_name` WHERE (`Id` = ?) AND ( NOT (`Name` = ?));",
 				S5parameter: []any{11, "aa"},
 			},
 		},
 	}
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			p7query, err := tc.i9qb.BuildQuery()
-			assert.Equal(t, tc.wantErr, err)
+	for _, t4c := range testCases {
+		t.Run(t4c.name, func(t *testing.T) {
+			p7query, err := t4c.i9qb.BuildQuery()
+			assert.Equal(t, t4c.wantErr, err)
 			if err != nil {
 				return
 			}
-			assert.Equal(t, tc.wantQuery, p7query)
+			assert.Equal(t, t4c.wantQuery, p7query)
 		})
 	}
 }
@@ -205,7 +205,7 @@ func TestOrmSelect_GroupBy(t *testing.T) {
 		{
 			name: "group_by_one",
 			i9qb: NewOrmSelect().
-				GroupBy(ToColumn("Age")),
+				GroupBy(NewField("Age")),
 			wantQuery: &Query{
 				SQLString:   "SELECT * FROM `table_name` GROUP BY `Age`;",
 				S5parameter: nil,
@@ -214,21 +214,21 @@ func TestOrmSelect_GroupBy(t *testing.T) {
 		{
 			name: "group_by_two",
 			i9qb: NewOrmSelect().
-				GroupBy(ToColumn("Age")).GroupBy(ToColumn("Sex")),
+				GroupBy(NewField("Age")).GroupBy(NewField("Sex")),
 			wantQuery: &Query{
 				SQLString:   "SELECT * FROM `table_name` GROUP BY `Age`,`Sex`;",
 				S5parameter: nil,
 			},
 		},
 	}
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			p7query, err := tc.i9qb.BuildQuery()
-			assert.Equal(t, tc.wantErr, err)
+	for _, t4c := range testCases {
+		t.Run(t4c.name, func(t *testing.T) {
+			p7query, err := t4c.i9qb.BuildQuery()
+			assert.Equal(t, t4c.wantErr, err)
 			if err != nil {
 				return
 			}
-			assert.Equal(t, tc.wantQuery, p7query)
+			assert.Equal(t, t4c.wantQuery, p7query)
 		})
 	}
 }
@@ -251,7 +251,7 @@ func TestOrmSelect_Having(t *testing.T) {
 		{
 			name: "having_no_group_by",
 			i9qb: NewOrmSelect().
-				Having(ToColumn("Age").GT(22)),
+				Having(NewField("Age").GT(22)),
 			wantQuery: &Query{
 				SQLString:   "SELECT * FROM `table_name`;",
 				S5parameter: nil,
@@ -260,8 +260,8 @@ func TestOrmSelect_Having(t *testing.T) {
 		{
 			name: "having_one",
 			i9qb: NewOrmSelect().
-				GroupBy(ToColumn("Age")).
-				Having(ToColumn("Id").EQ(11)),
+				GroupBy(NewField("Age")).
+				Having(NewField("Id").EQ(11)),
 			wantQuery: &Query{
 				SQLString:   "SELECT * FROM `table_name` GROUP BY `Age` HAVING `Id` = ?;",
 				S5parameter: []any{11},
@@ -270,8 +270,8 @@ func TestOrmSelect_Having(t *testing.T) {
 		{
 			name: "group_by_two_having_one",
 			i9qb: NewOrmSelect().
-				GroupBy(ToColumn("Age")).GroupBy(ToColumn("Sex")).
-				Having(ToColumn("Id").EQ(11)),
+				GroupBy(NewField("Age")).GroupBy(NewField("Sex")).
+				Having(NewField("Id").EQ(11)),
 			wantQuery: &Query{
 				SQLString:   "SELECT * FROM `table_name` GROUP BY `Age`,`Sex` HAVING `Id` = ?;",
 				S5parameter: []any{11},
@@ -280,22 +280,22 @@ func TestOrmSelect_Having(t *testing.T) {
 		{
 			name: "group_by_two_having_two",
 			i9qb: NewOrmSelect().
-				GroupBy(ToColumn("Age")).GroupBy(ToColumn("Sex")).
-				Having(ToColumn("Id").EQ(11)).Having(ToColumn("Name").EQ("aa")),
+				GroupBy(NewField("Age")).GroupBy(NewField("Sex")).
+				Having(NewField("Id").EQ(11)).Having(NewField("Name").EQ("aa")),
 			wantQuery: &Query{
 				SQLString:   "SELECT * FROM `table_name` GROUP BY `Age`,`Sex` HAVING (`Id` = ?) AND (`Name` = ?);",
 				S5parameter: []any{11, "aa"},
 			},
 		},
 	}
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			p7query, err := tc.i9qb.BuildQuery()
-			assert.Equal(t, tc.wantErr, err)
+	for _, t4c := range testCases {
+		t.Run(t4c.name, func(t *testing.T) {
+			p7query, err := t4c.i9qb.BuildQuery()
+			assert.Equal(t, t4c.wantErr, err)
 			if err != nil {
 				return
 			}
-			assert.Equal(t, tc.wantQuery, p7query)
+			assert.Equal(t, t4c.wantQuery, p7query)
 		})
 	}
 }
@@ -343,14 +343,14 @@ func TestOrmSelect_OrderBy(t *testing.T) {
 			},
 		},
 	}
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			p7query, err := tc.i9qb.BuildQuery()
-			assert.Equal(t, tc.wantErr, err)
+	for _, t4c := range testCases {
+		t.Run(t4c.name, func(t *testing.T) {
+			p7query, err := t4c.i9qb.BuildQuery()
+			assert.Equal(t, t4c.wantErr, err)
 			if err != nil {
 				return
 			}
-			assert.Equal(t, tc.wantQuery, p7query)
+			assert.Equal(t, t4c.wantQuery, p7query)
 		})
 	}
 }
@@ -387,14 +387,14 @@ func TestOrmSelect_OffsetLimit(t *testing.T) {
 			},
 		},
 	}
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			p7query, err := tc.i9qb.BuildQuery()
-			assert.Equal(t, tc.wantErr, err)
+	for _, t4c := range testCases {
+		t.Run(t4c.name, func(t *testing.T) {
+			p7query, err := t4c.i9qb.BuildQuery()
+			assert.Equal(t, t4c.wantErr, err)
 			if err != nil {
 				return
 			}
-			assert.Equal(t, tc.wantQuery, p7query)
+			assert.Equal(t, t4c.wantQuery, p7query)
 		})
 	}
 }
@@ -409,7 +409,7 @@ func TestOrmSelect_Select(t *testing.T) {
 		{
 			name: "select_one_column",
 			i9qb: NewOrmSelect().
-				Select(ToColumn("Id")),
+				Select(NewField("Id")),
 			wantQuery: &Query{
 				SQLString:   "SELECT `Id` FROM `table_name`;",
 				S5parameter: nil,
@@ -418,21 +418,21 @@ func TestOrmSelect_Select(t *testing.T) {
 		{
 			name: "select_two_column",
 			i9qb: NewOrmSelect().
-				Select(ToColumn("Id")).Select(ToColumn("Name")),
+				Select(NewField("Id")).Select(NewField("Name")),
 			wantQuery: &Query{
 				SQLString:   "SELECT `Id`,`Name` FROM `table_name`;",
 				S5parameter: nil,
 			},
 		},
 	}
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			p7query, err := tc.i9qb.BuildQuery()
-			assert.Equal(t, tc.wantErr, err)
+	for _, t4c := range testCases {
+		t.Run(t4c.name, func(t *testing.T) {
+			p7query, err := t4c.i9qb.BuildQuery()
+			assert.Equal(t, t4c.wantErr, err)
 			if err != nil {
 				return
 			}
-			assert.Equal(t, tc.wantQuery, p7query)
+			assert.Equal(t, t4c.wantQuery, p7query)
 		})
 	}
 }
@@ -465,7 +465,7 @@ func TestOrmSelect_Aggregate(t *testing.T) {
 		{
 			name: "having_one_aggregate",
 			i9qb: NewOrmSelect().
-				GroupBy(ToColumn("Age")).
+				GroupBy(NewField("Age")).
 				Having(Count("Id").GT(5)),
 			wantQuery: &Query{
 				SQLString:   "SELECT * FROM `table_name` GROUP BY `Age` HAVING COUNT(`Id`) > ?;",
@@ -473,14 +473,14 @@ func TestOrmSelect_Aggregate(t *testing.T) {
 			},
 		},
 	}
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			p7query, err := tc.i9qb.BuildQuery()
-			assert.Equal(t, tc.wantErr, err)
+	for _, t4c := range testCases {
+		t.Run(t4c.name, func(t *testing.T) {
+			p7query, err := t4c.i9qb.BuildQuery()
+			assert.Equal(t, t4c.wantErr, err)
 			if err != nil {
 				return
 			}
-			assert.Equal(t, tc.wantQuery, p7query)
+			assert.Equal(t, t4c.wantQuery, p7query)
 		})
 	}
 }
@@ -495,16 +495,16 @@ func TestOrmSelect_Raw(t *testing.T) {
 		{
 			name: "select_raw",
 			i9qb: NewOrmSelect().
-				Select(ToRaw("DISTINCT(Id)")),
+				Select(NewRaw("DISTINCT(Id)")),
 			wantQuery: &Query{
-				SQLString:   "SELECT COUNT(`Id`) FROM `table_name`;",
+				SQLString:   "SELECT DISTINCT(Id) FROM `table_name`;",
 				S5parameter: nil,
 			},
 		},
 		{
 			name: "where_raw",
 			i9qb: NewOrmSelect().
-				Where(ToRaw("Id > ?", 11).toPredicate()),
+				Where(NewRaw("Id > ?", 11).toPredicate()),
 			wantQuery: &Query{
 				SQLString:   "SELECT * FROM `table_name` WHERE Id > ?;",
 				S5parameter: []any{11},
@@ -513,7 +513,7 @@ func TestOrmSelect_Raw(t *testing.T) {
 		{
 			name: "where_raw_and_one",
 			i9qb: NewOrmSelect().
-				Where(ToRaw("Id > ?", 11).toPredicate().And(ToColumn("Name").EQ("aa"))),
+				Where(NewRaw("Id > ?", 11).toPredicate().And(NewField("Name").EQ("aa"))),
 			wantQuery: &Query{
 				SQLString:   "SELECT * FROM `table_name` WHERE (Id > ?) AND (`Name` = ?);",
 				S5parameter: []any{11, "aa"},
@@ -522,22 +522,22 @@ func TestOrmSelect_Raw(t *testing.T) {
 		{
 			name: "having_raw",
 			i9qb: NewOrmSelect().
-				GroupBy(ToColumn("Age")).
-				Having(ToRaw("COUNT(Id) > ?", 5).toPredicate()),
+				GroupBy(NewField("Age")).
+				Having(NewRaw("COUNT(Id) > ?", 5).toPredicate()),
 			wantQuery: &Query{
 				SQLString:   "SELECT * FROM `table_name` GROUP BY `Age` HAVING COUNT(Id) > ?;",
 				S5parameter: []any{5},
 			},
 		},
 	}
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			p7query, err := tc.i9qb.BuildQuery()
-			assert.Equal(t, tc.wantErr, err)
+	for _, t4c := range testCases {
+		t.Run(t4c.name, func(t *testing.T) {
+			p7query, err := t4c.i9qb.BuildQuery()
+			assert.Equal(t, t4c.wantErr, err)
 			if err != nil {
 				return
 			}
-			assert.Equal(t, tc.wantQuery, p7query)
+			assert.Equal(t, t4c.wantQuery, p7query)
 		})
 	}
 }
