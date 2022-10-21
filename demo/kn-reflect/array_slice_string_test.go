@@ -1,4 +1,4 @@
-package reflect
+package kn_reflect
 
 import (
 	"github.com/stretchr/testify/assert"

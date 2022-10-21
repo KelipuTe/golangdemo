@@ -1,4 +1,4 @@
-package reflect
+package kn_reflect
 
 type User struct {
 	Name string

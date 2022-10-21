@@ -1,16 +1,4 @@
-package main
-
-//import (
-//	"fmt"
-//	"unsafe"
-//)
-//
-//func main() {
-//	f1 := func() { fmt.Println(1) }
-//	f2 := func() { fmt.Println(2) }
-//	*(*uintptr)(unsafe.Pointer(&f1)) = *(*uintptr)(unsafe.Pointer(&f2))
-//	f1()
-//}
+package kn_reflect
 
 import (
 	"errors"
@@ -19,21 +7,6 @@ import (
 	"strings"
 	"unicode"
 )
-
-func main() {
-	map1, _ := F4StructToMap(S6StructWithTag{Id: 1, Name: "aa", Age: 11, Sex: 1})
-	fmt.Println(map1)
-
-	map2, _ := F4StructToMap(&S6StructWithTag{Id: 2, Name: "bb", Age: 22, Sex: 2})
-	fmt.Println(map2)
-}
-
-type S6StructWithTag struct {
-	Id   int    `orm:"field=id"`
-	Name string `orm:"field=name"`
-	Age  int8   `orm:"field=age"`
-	Sex  int8   `orm:"field=sex"`
-}
 
 // orm 支持的结构体字段的 tag 上的 key 都放在这里
 const (

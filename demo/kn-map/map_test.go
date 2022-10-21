@@ -1,4 +1,4 @@
-package knmap
+package kn_map
 
 import (
 	"fmt"

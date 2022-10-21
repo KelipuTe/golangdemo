@@ -111,6 +111,7 @@ func (p7this *s6Registry) f4ParseModel(p7s6Model any) (*S6OrmModel, error) {
 // f4ParseTag 解析结构体字段的标签
 // 标签格式：`orm:"key1=value1,key2=value2"`
 func (p7this *s6Registry) f4ParseTag(s6tag reflect.StructTag) (map[string]string, error) {
+	// 从 tag 里面拿 orm 标签
 	orm := s6tag.Get("orm")
 	if "" == orm {
 		return map[string]string{}, nil
