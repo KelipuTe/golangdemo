@@ -15,16 +15,16 @@ type S6TestModel struct {
 
 func TestRegistry_Get(p7tt *testing.T) {
 	s5s6case := []struct {
-		name          string
-		p7s6Model     any
-		p7s6ModelWant *S6OrmModel
-		errWant       error
+		name    string
+		input   any
+		resWant *S6OrmModel
+		errWant error
 	}{
 		{
 			// 指针
-			name:      "pointer",
-			p7s6Model: &S6TestModel{},
-			p7s6ModelWant: &S6OrmModel{
+			name:  "pointer",
+			input: &S6TestModel{},
+			resWant: &S6OrmModel{
 				TableName: "test_model",
 				M3StructToField: map[string]*S6ModelField{
 					"Id": {
@@ -85,12 +85,12 @@ func TestRegistry_Get(p7tt *testing.T) {
 	i9registry := NewI9Registry()
 	for _, s6case := range s5s6case {
 		p7tt.Run(s6case.name, func(p7tt *testing.T) {
-			model, err := i9registry.F4Get(s6case.p7s6Model)
+			model, err := i9registry.F4Get(s6case.input)
 			assert.Equal(p7tt, s6case.errWant, err)
 			if err != nil {
 				return
 			}
-			assert.Equal(p7tt, s6case.p7s6ModelWant, model)
+			assert.Equal(p7tt, s6case.resWant, model)
 		})
 	}
 }

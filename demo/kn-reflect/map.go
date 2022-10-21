@@ -1,32 +1,38 @@
 package kn_reflect
 
-import "reflect"
+import (
+	"errors"
+	"reflect"
+)
 
-func IterateMapV1(input any) ([]any, []any, error) {
+var ErrMustMap = errors.New("input must be map")
+
+// IterateMap 通过反射遍历 map
+func IterateMap(input any) ([]any, []any, error) {
 	if nil == input {
 		return nil, nil, ErrMustMap
 	}
 
-	t1type := reflect.TypeOf(input)
-	t1val := reflect.ValueOf(input)
+	inputType := reflect.TypeOf(input)
+	inputValue := reflect.ValueOf(input)
 
-	if t1type.Kind() != reflect.Map {
+	if reflect.Map != inputType.Kind() {
 		return nil, nil, ErrMustMap
 	}
 
-	// 有几个元素
-	t1len := t1val.Len()
-	slikey := make([]any, 0, t1len)
-	slival := make([]any, 0, t1len)
+	// map 有几个元素
+	t4len := inputValue.Len()
+	s5resKey := make([]any, 0, t4len)
+	s5resValue := make([]any, 0, t4len)
 	// 遍历 key
-	for _, k := range t1val.MapKeys() {
-		slikey = append(slikey, k.Interface())
-		// 获取 key 对应的 val
-		v := t1val.MapIndex(k)
-		slival = append(slival, v.Interface())
+	for _, t4k := range inputValue.MapKeys() {
+		s5resKey = append(s5resKey, t4k.Interface())
+		// 获取 key 对应的 value
+		t4v := inputValue.MapIndex(t4k)
+		s5resValue = append(s5resValue, t4v.Interface())
 	}
 
-	return slikey, slival, nil
+	return s5resKey, s5resValue, nil
 }
 
 func IterateMapV2(input any) ([]any, []any, error) {
@@ -34,23 +40,23 @@ func IterateMapV2(input any) ([]any, []any, error) {
 		return nil, nil, ErrMustMap
 	}
 
-	t1type := reflect.TypeOf(input)
-	t1val := reflect.ValueOf(input)
+	inputType := reflect.TypeOf(input)
+	inputValue := reflect.ValueOf(input)
 
-	if t1type.Kind() != reflect.Map {
+	if reflect.Map != inputType.Kind() {
 		return nil, nil, ErrMustMap
 	}
 
-	// 有几个元素
-	t1len := t1val.Len()
-	slikey := make([]any, 0, t1len)
-	slival := make([]any, 0, t1len)
-	// 遍历 map
-	t1range := t1val.MapRange()
-	for t1range.Next() {
-		slikey = append(slikey, t1range.Key().Interface())
-		slival = append(slival, t1range.Value().Interface())
+	// map 有几个元素
+	t4len := inputValue.Len()
+	s5resKey := make([]any, 0, t4len)
+	s5resValue := make([]any, 0, t4len)
+	// 遍历 key
+	t4MapRange := inputValue.MapRange()
+	for t4MapRange.Next() {
+		s5resKey = append(s5resKey, t4MapRange.Key().Interface())
+		s5resValue = append(s5resValue, t4MapRange.Value().Interface())
 	}
 
-	return slikey, slival, nil
+	return s5resKey, s5resValue, nil
 }

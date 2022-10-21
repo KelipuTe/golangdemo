@@ -23,7 +23,7 @@ func TestIterateMap(t *testing.T) {
 		},
 		{
 			// 空 map
-			name:       "empty map",
+			name:       "empty_map",
 			input:      map[string]string{},
 			wantSliKey: []any{},
 			wantSliVal: []any{},
@@ -31,7 +31,7 @@ func TestIterateMap(t *testing.T) {
 		},
 		{
 			// 普通 map
-			name:       "normal map",
+			name:       "normal_map",
 			input:      map[string]string{"key1": "val1", "key2": "val2"},
 			wantSliKey: []any{"key1", "key2"},
 			wantSliVal: []any{"val1", "val2"},
@@ -41,7 +41,7 @@ func TestIterateMap(t *testing.T) {
 
 	for _, tc := range slicase {
 		t.Run(tc.name, func(t *testing.T) {
-			slikey, slival, err := IterateMapV1(tc.input)
+			slikey, slival, err := IterateMap(tc.input)
 			assert.Equal(t, tc.wantErr, err)
 			if err != nil {
 				return

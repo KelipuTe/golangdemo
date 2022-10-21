@@ -5,58 +5,44 @@ import (
 	"testing"
 )
 
-func TestIterateArraySliceString(t *testing.T) {
-	slicase := []struct {
+func TestIterateArray(p7tt *testing.T) {
+	s5case := []struct {
 		name    string
 		input   any
-		wantRes []any
-		wantErr error
+		resWant []any
+		errWant error
 	}{
 		{
 			// 非法输入 nil
 			name:    "nil",
 			input:   nil,
-			wantRes: nil,
-			wantErr: ErrMustArraySliceString,
+			resWant: nil,
+			errWant: ErrMustArray,
 		},
 		{
 			// 一维数组
 			name:    "array",
 			input:   [3]int{1, 2, 3},
-			wantRes: []any{1, 2, 3},
-			wantErr: nil,
+			resWant: []any{1, 2, 3},
+			errWant: nil,
 		},
 		{
 			// 二维数组
-			name:    "array multiple",
+			name:    "array_multiple",
 			input:   [2][2]int{{1, 2}, {3, 4}},
-			wantRes: []any{[2]int{1, 2}, [2]int{3, 4}},
-			wantErr: nil,
-		},
-		{
-			// 切片
-			name:    "slice",
-			input:   []int{1, 2, 3},
-			wantRes: []any{1, 2, 3},
-			wantErr: nil,
-		},
-		{
-			// 字符串
-			name:    "string",
-			input:   "123",
-			wantRes: []any{uint8('1'), uint8('2'), uint8('3')},
-			wantErr: nil,
+			resWant: []any{[2]int{1, 2}, [2]int{3, 4}},
+			errWant: nil,
 		},
 	}
 
-	for _, tc := range slicase {
-		t.Run(tc.name, func(t *testing.T) {
-			mapres, err := IterateArraySliceString(tc.input)
-			assert.Equal(t, tc.wantErr, err)
+	for _, t4case := range s5case {
+		p7tt.Run(t4case.name, func(p7tt *testing.T) {
+			res, err := IterateArray(t4case.input)
+			assert.Equal(p7tt, t4case.errWant, err)
 			if err != nil {
 				return
 			}
-			assert.Equal(t, tc.wantRes, mapres)
+			assert.Equal(p7tt, t4case.resWant, res)
 		})
 	}
 }

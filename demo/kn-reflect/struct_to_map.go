@@ -15,43 +15,53 @@ const (
 	tagKeyField string = "field"
 )
 
-func F4StructToMap(p7s6Ors6 any) (map[string]any, error) {
-	i9msType := reflect.TypeOf(p7s6Ors6)
-	s6msValue := reflect.ValueOf(p7s6Ors6)
-	// 只接受一级结构体指针或者结构体
-	if (reflect.Ptr == i9msType.Kind() && reflect.Struct != i9msType.Elem().Kind()) &&
-		reflect.Struct != i9msType.Kind() {
+func NewErrInputOnlyPointerOrStruct() error {
+	return errors.New("orm: 只支持一级结构体指针或者结构体作为输入\r\n")
+}
+
+func NewErrInvalidTagContent(tag string) error {
+	return fmt.Errorf("orm: 标签 [%s] 格式错误\r\n", tag)
+}
+
+func F4StructToMap(input any) (map[string]any, error) {
+	if nil == input {
 		return nil, NewErrInputOnlyPointerOrStruct()
 	}
-	if reflect.Ptr == i9msType.Kind() {
-		i9msType = i9msType.Elem()
-		s6msValue = s6msValue.Elem()
+
+	i9InputType := reflect.TypeOf(input)
+	s6InputValue := reflect.ValueOf(input)
+
+	// 只接受一级结构体指针或者结构体
+	if reflect.Ptr == i9InputType.Kind() {
+		i9InputType = i9InputType.Elem()
+		s6InputValue = s6InputValue.Elem()
+	}
+	if reflect.Struct != i9InputType.Kind() {
+		return nil, NewErrInputOnlyPointerOrStruct()
 	}
 
 	// 获取结构体字段数量
-	fieldNum := i9msType.NumField()
+	fieldNum := i9InputType.NumField()
 	m3field := make(map[string]any, fieldNum)
 	// 解析结构体的每个字段
 	for i := 0; i < fieldNum; i++ {
-		// 拿字段
-		s6fieldType := i9msType.Field(i)
-		s6fieldValue := s6msValue.Field(i)
-		// 拿字段的 tag
-		m3tag, err := f4ParseTag(s6fieldType.Tag)
+		s6FieldType := i9InputType.Field(i)
+		s6FieldValue := s6InputValue.Field(i)
+		m3FieldTag, err := f4ParseTag(s6FieldType.Tag)
 		if nil != err {
 			return nil, err
 		}
 		// 从标签里获取设置的数据库字段名
-		fieldName := m3tag[tagKeyField]
+		fieldName := m3FieldTag[tagKeyField]
 		// 如果没有设置数据库字段名，默认用转换成小驼峰的结构体字段名
 		if "" == fieldName {
-			fieldName = f4CamelCaseToSnakeCase(s6fieldType.Name)
+			fieldName = f4CamelCaseToSnakeCase(s6FieldType.Name)
 		}
-		// 私有字段这里是拿不到值的
-		if s6fieldType.IsExported() {
-			m3field[fieldName] = s6fieldValue.Interface()
+		// 私有字段这里是拿不到值的，默认赋 0 值
+		if s6FieldType.IsExported() {
+			m3field[fieldName] = s6FieldValue.Interface()
 		} else {
-			m3field[fieldName] = reflect.Zero(s6fieldType.Type).Interface()
+			m3field[fieldName] = reflect.Zero(s6FieldType.Type).Interface()
 		}
 	}
 	return m3field, nil
@@ -95,12 +105,4 @@ func f4CamelCaseToSnakeCase(oldString string) string {
 		}
 	}
 	return string(s5NewString)
-}
-
-func NewErrInputOnlyPointerOrStruct() error {
-	return errors.New("orm: 只支持一级结构体指针或者结构体作为输入\r\n")
-}
-
-func NewErrInvalidTagContent(tag string) error {
-	return fmt.Errorf("orm: 标签 [%s] 格式错误\r\n", tag)
 }

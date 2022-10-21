@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestIterateArray(p7tt *testing.T) {
+func TestIterateString(p7tt *testing.T) {
 	s5case := []struct {
 		name    string
 		input   any
@@ -17,28 +17,7 @@ func TestIterateArray(p7tt *testing.T) {
 			name:    "nil",
 			input:   nil,
 			resWant: nil,
-			errWant: ErrMustArray,
-		},
-		{
-			// 一维数组
-			name:    "array",
-			input:   [3]int{1, 2, 3},
-			resWant: []any{1, 2, 3},
-			errWant: nil,
-		},
-		{
-			// 二维数组
-			name:    "array multiple",
-			input:   [2][2]int{{1, 2}, {3, 4}},
-			resWant: []any{[2]int{1, 2}, [2]int{3, 4}},
-			errWant: nil,
-		},
-		{
-			// 切片
-			name:    "slice",
-			input:   []int{1, 2, 3},
-			resWant: []any{1, 2, 3},
-			errWant: nil,
+			errWant: ErrMustString,
 		},
 		{
 			// 字符串
@@ -51,7 +30,7 @@ func TestIterateArray(p7tt *testing.T) {
 
 	for _, t4case := range s5case {
 		p7tt.Run(t4case.name, func(p7tt *testing.T) {
-			res, err := IterateArray(t4case.input)
+			res, err := IterateString(t4case.input)
 			assert.Equal(p7tt, t4case.errWant, err)
 			if err != nil {
 				return

@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestIterateArray(p7tt *testing.T) {
+func TestIterateSlice(p7tt *testing.T) {
 	s5case := []struct {
 		name    string
 		input   any
@@ -17,21 +17,7 @@ func TestIterateArray(p7tt *testing.T) {
 			name:    "nil",
 			input:   nil,
 			resWant: nil,
-			errWant: ErrMustArray,
-		},
-		{
-			// 一维数组
-			name:    "array",
-			input:   [3]int{1, 2, 3},
-			resWant: []any{1, 2, 3},
-			errWant: nil,
-		},
-		{
-			// 二维数组
-			name:    "array multiple",
-			input:   [2][2]int{{1, 2}, {3, 4}},
-			resWant: []any{[2]int{1, 2}, [2]int{3, 4}},
-			errWant: nil,
+			errWant: ErrMustSlice,
 		},
 		{
 			// 切片
@@ -41,17 +27,17 @@ func TestIterateArray(p7tt *testing.T) {
 			errWant: nil,
 		},
 		{
-			// 字符串
-			name:    "string",
-			input:   "123",
-			resWant: []any{uint8('1'), uint8('2'), uint8('3')},
+			// 二维切片
+			name:    "slice_multiple",
+			input:   [][]int{{1}, {11, 22}, {111, 222, 333}},
+			resWant: []any{[]int{1}, []int{11, 22}, []int{111, 222, 333}},
 			errWant: nil,
 		},
 	}
 
 	for _, t4case := range s5case {
 		p7tt.Run(t4case.name, func(p7tt *testing.T) {
-			res, err := IterateArray(t4case.input)
+			res, err := IterateSlice(t4case.input)
 			assert.Equal(p7tt, t4case.errWant, err)
 			if err != nil {
 				return
