@@ -2,6 +2,10 @@ package kn_map
 
 import "fmt"
 
+type User struct {
+	Name string
+}
+
 func MapStruct() map[string]User {
 	t4map := make(map[string]User, 4)
 	t4map["user2"] = User{Name: "user2"}
@@ -11,6 +15,7 @@ func MapStruct() map[string]User {
 	fmt.Printf("map,%p\r\n", t4map)
 	return t4map
 }
+
 func MapStructPointer() map[string]*User {
 	t4map := make(map[string]*User, 4)
 	t4map["user2"] = &User{Name: "user2"}
