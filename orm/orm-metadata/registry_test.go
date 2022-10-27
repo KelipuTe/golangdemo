@@ -13,7 +13,7 @@ type S6TestModel struct {
 	Sex  int8
 }
 
-func TestRegistry_Get(p7tt *testing.T) {
+func TestI9RegistryF8Get(p7tt *testing.T) {
 	s5s6case := []struct {
 		name    string
 		input   any
@@ -25,7 +25,7 @@ func TestRegistry_Get(p7tt *testing.T) {
 			name:  "pointer",
 			input: &S6TestModel{},
 			resWant: &S6OrmModel{
-				TableName: "test_model",
+				TableName: "s6_test_model",
 				M3StructToField: map[string]*S6ModelField{
 					"Id": {
 						StructName: "Id",
@@ -33,11 +33,11 @@ func TestRegistry_Get(p7tt *testing.T) {
 						Offset:     0,
 						FieldName:  "id",
 					},
-					"FirstName": {
-						StructName: "FirstName",
+					"Name": {
+						StructName: "Name",
 						I9Type:     reflect.TypeOf(""),
 						Offset:     8,
-						FieldName:  "first_name",
+						FieldName:  "name",
 					},
 					"Age": {
 						StructName: "Age",
@@ -45,11 +45,11 @@ func TestRegistry_Get(p7tt *testing.T) {
 						Offset:     24,
 						FieldName:  "age",
 					},
-					"LastName": {
-						StructName: "LastName",
+					"Sex": {
+						StructName: "Sex",
 						I9Type:     reflect.TypeOf(int8(0)),
-						Offset:     32,
-						FieldName:  "last_name",
+						Offset:     25,
+						FieldName:  "sex",
 					},
 				},
 				M3FieldToStruct: map[string]*S6ModelField{
@@ -59,11 +59,11 @@ func TestRegistry_Get(p7tt *testing.T) {
 						Offset:     0,
 						FieldName:  "id",
 					},
-					"first_name": {
-						StructName: "FirstName",
+					"name": {
+						StructName: "Name",
 						I9Type:     reflect.TypeOf(""),
 						Offset:     8,
-						FieldName:  "first_name",
+						FieldName:  "name",
 					},
 					"age": {
 						StructName: "Age",
@@ -71,21 +71,21 @@ func TestRegistry_Get(p7tt *testing.T) {
 						Offset:     24,
 						FieldName:  "age",
 					},
-					"last_name": {
-						StructName: "LastName",
+					"sex": {
+						StructName: "Sex",
 						I9Type:     reflect.TypeOf(int8(0)),
-						FieldName:  "last_name",
-						Offset:     32,
+						Offset:     25,
+						FieldName:  "sex",
 					},
 				},
 			},
 		},
 	}
 
-	i9registry := NewI9Registry()
+	i9registry := F8NewI9Registry()
 	for _, s6case := range s5s6case {
 		p7tt.Run(s6case.name, func(p7tt *testing.T) {
-			model, err := i9registry.F4Get(s6case.input)
+			model, err := i9registry.F8Get(s6case.input)
 			assert.Equal(p7tt, s6case.errWant, err)
 			if err != nil {
 				return

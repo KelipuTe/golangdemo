@@ -6,46 +6,58 @@ import (
 	"reflect"
 )
 
-// 用反射实现
-type resultUseReflect struct {
-	//
-	s6value      reflect.Value
+// s6ResultUseReflect 用反射实现 I9Result
+type s6ResultUseReflect struct {
+	// s6value 存储数据库返回的查询结果的结构体
+	s6value reflect.Value
+	// p7s6OrmModel orm 映射模型
 	p7s6OrmModel *orm_metadata.S6OrmModel
 }
 
-func (p7this resultUseReflect) F8SetColumn(rows *sql.Rows) error {
-	cs, err := rows.Columns()
-	if err != nil {
+func (p7this s6ResultUseReflect) F8SetColumn(rows *sql.Rows) error {
+	// 返回数据库字段
+	s5ColumnName, err := rows.Columns()
+	if nil != err {
 		return err
+	}
+	if len(s5ColumnName) > len(p7this.p7s6OrmModel.M3FieldToStruct) {
+		return ErrTooManyReturnedColumns
 	}
 
-	// colValues 和 colEleValues 实质上最终都指向同一个对象
-	colValues := make([]interface{}, len(cs))
-	colEleValues := make([]reflect.Value, len(cs))
-	for i, c := range cs {
-		cm, ok := p7this.p7s6OrmModel.M3FieldToStruct[c]
+	// s5ColumnValue 和 s5ColumnValueElem 最终都指向同一个对象
+	s5ColumnValue := make([]interface{}, len(s5ColumnName))
+	s5ColumnValueElem := make([]reflect.Value, len(s5ColumnName))
+	for i, t4ColumnName := range s5ColumnName {
+		// 通过数据库字段找到对应的结构体字段
+		p7s6ModelField, ok := p7this.p7s6OrmModel.M3FieldToStruct[t4ColumnName]
 		if !ok {
-			return NewErrUnknownColumn(c)
+			return F8NewErrUnknownColumn(t4ColumnName)
 		}
-		val := reflect.New(cm.I9Type)
-		colValues[i] = val.Interface()
-		colEleValues[i] = val.Elem()
+		// 构造结构体字段
+		t4value := reflect.New(p7s6ModelField.I9Type)
+		s5ColumnValue[i] = t4value.Interface()
+		s5ColumnValueElem[i] = t4value.Elem()
 	}
-	if err = rows.Scan(colValues...); err != nil {
+	// 从数据库返回的查询结果里取数据
+	if err = rows.Scan(s5ColumnValue...); err != nil {
 		return err
 	}
-	for i, c := range cs {
-		cm := p7this.p7s6OrmModel.M3FieldToStruct[c]
-		fd := p7this.s6value.FieldByName(cm.StructName)
-		fd.Set(colEleValues[i])
+	for i, t4ColumnName := range s5ColumnName {
+		// 通过数据库字段找到对应的结构体字段
+		p7s6ModelField := p7this.p7s6OrmModel.M3FieldToStruct[t4ColumnName]
+		t4value := p7this.s6value.FieldByName(p7s6ModelField.StructName)
+		// 把取到的数据放到结构体字段上
+		t4value.Set(s5ColumnValueElem[i])
 	}
 	return nil
 }
 
-var _ F8NewI9Result = F8NewResultUseReflect
+// 确保 F8NewS6ResultUseReflect 实现的是 F8NewI9Result
+var _ F8NewI9Result = F8NewS6ResultUseReflect
 
-func F8NewResultUseReflect(value interface{}, p7s5OrmModel *orm_metadata.S6OrmModel) I9Result {
-	return &resultUseReflect{
+// F8NewS6ResultUseReflect s6ResultUseReflect 的构造方法
+func F8NewS6ResultUseReflect(value interface{}, p7s5OrmModel *orm_metadata.S6OrmModel) I9Result {
+	return &s6ResultUseReflect{
 		s6value:      reflect.ValueOf(value).Elem(),
 		p7s6OrmModel: p7s5OrmModel,
 	}
