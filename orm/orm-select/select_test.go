@@ -27,20 +27,20 @@ func TestOrmSelect_BuildQuery(t *testing.T) {
 			},
 		},
 	}
-	for _, t4c := range s5case {
-		t.Run(t4c.name, func(t *testing.T) {
-			p7query, err := t4c.i9qb.BuildQuery()
-			assert.Equal(t, t4c.wantErr, err)
+	for _, t4case := range s5case {
+		t.Run(t4case.name, func(t *testing.T) {
+			p7query, err := t4case.i9qb.BuildQuery()
+			assert.Equal(t, t4case.wantErr, err)
 			if err != nil {
 				return
 			}
-			assert.Equal(t, t4c.wantQuery, p7query)
+			assert.Equal(t, t4case.wantQuery, p7query)
 		})
 	}
 }
 
 func TestOrmSelect_Operator(t *testing.T) {
-	testCases := []struct {
+	s5case := []struct {
 		name      string
 		i9qb      QueryBuilder
 		wantQuery *Query
@@ -74,20 +74,20 @@ func TestOrmSelect_Operator(t *testing.T) {
 			},
 		},
 	}
-	for _, t4c := range testCases {
-		t.Run(t4c.name, func(t *testing.T) {
-			p7query, err := t4c.i9qb.BuildQuery()
-			assert.Equal(t, t4c.wantErr, err)
+	for _, t4case := range s5case {
+		t.Run(t4case.name, func(t *testing.T) {
+			p7query, err := t4case.i9qb.BuildQuery()
+			assert.Equal(t, t4case.wantErr, err)
 			if err != nil {
 				return
 			}
-			assert.Equal(t, t4c.wantQuery, p7query)
+			assert.Equal(t, t4case.wantQuery, p7query)
 		})
 	}
 }
 
 func TestOrmSelect_Where(t *testing.T) {
-	testCases := []struct {
+	s5case := []struct {
 		name      string
 		i9qb      QueryBuilder
 		wantQuery *Query
@@ -175,20 +175,20 @@ func TestOrmSelect_Where(t *testing.T) {
 			},
 		},
 	}
-	for _, t4c := range testCases {
-		t.Run(t4c.name, func(t *testing.T) {
-			p7query, err := t4c.i9qb.BuildQuery()
-			assert.Equal(t, t4c.wantErr, err)
+	for _, t4case := range s5case {
+		t.Run(t4case.name, func(t *testing.T) {
+			p7query, err := t4case.i9qb.BuildQuery()
+			assert.Equal(t, t4case.wantErr, err)
 			if err != nil {
 				return
 			}
-			assert.Equal(t, t4c.wantQuery, p7query)
+			assert.Equal(t, t4case.wantQuery, p7query)
 		})
 	}
 }
 
 func TestOrmSelect_GroupBy(t *testing.T) {
-	testCases := []struct {
+	s5case := []struct {
 		name      string
 		i9qb      QueryBuilder
 		wantQuery *Query
@@ -221,20 +221,20 @@ func TestOrmSelect_GroupBy(t *testing.T) {
 			},
 		},
 	}
-	for _, t4c := range testCases {
-		t.Run(t4c.name, func(t *testing.T) {
-			p7query, err := t4c.i9qb.BuildQuery()
-			assert.Equal(t, t4c.wantErr, err)
+	for _, t4case := range s5case {
+		t.Run(t4case.name, func(t *testing.T) {
+			p7query, err := t4case.i9qb.BuildQuery()
+			assert.Equal(t, t4case.wantErr, err)
 			if err != nil {
 				return
 			}
-			assert.Equal(t, t4c.wantQuery, p7query)
+			assert.Equal(t, t4case.wantQuery, p7query)
 		})
 	}
 }
 
 func TestOrmSelect_Having(t *testing.T) {
-	testCases := []struct {
+	s5case := []struct {
 		name      string
 		i9qb      QueryBuilder
 		wantQuery *Query
@@ -288,20 +288,20 @@ func TestOrmSelect_Having(t *testing.T) {
 			},
 		},
 	}
-	for _, t4c := range testCases {
-		t.Run(t4c.name, func(t *testing.T) {
-			p7query, err := t4c.i9qb.BuildQuery()
-			assert.Equal(t, t4c.wantErr, err)
+	for _, t4case := range s5case {
+		t.Run(t4case.name, func(t *testing.T) {
+			p7query, err := t4case.i9qb.BuildQuery()
+			assert.Equal(t, t4case.wantErr, err)
 			if err != nil {
 				return
 			}
-			assert.Equal(t, t4c.wantQuery, p7query)
+			assert.Equal(t, t4case.wantQuery, p7query)
 		})
 	}
 }
 
 func TestOrmSelect_OrderBy(t *testing.T) {
-	testCases := []struct {
+	s5case := []struct {
 		name      string
 		i9qb      QueryBuilder
 		wantQuery *Query
@@ -343,20 +343,20 @@ func TestOrmSelect_OrderBy(t *testing.T) {
 			},
 		},
 	}
-	for _, t4c := range testCases {
-		t.Run(t4c.name, func(t *testing.T) {
-			p7query, err := t4c.i9qb.BuildQuery()
-			assert.Equal(t, t4c.wantErr, err)
+	for _, t4case := range s5case {
+		t.Run(t4case.name, func(t *testing.T) {
+			p7query, err := t4case.i9qb.BuildQuery()
+			assert.Equal(t, t4case.wantErr, err)
 			if err != nil {
 				return
 			}
-			assert.Equal(t, t4c.wantQuery, p7query)
+			assert.Equal(t, t4case.wantQuery, p7query)
 		})
 	}
 }
 
 func TestOrmSelect_OffsetLimit(t *testing.T) {
-	testCases := []struct {
+	s5case := []struct {
 		name      string
 		i9qb      QueryBuilder
 		wantQuery *Query
@@ -387,20 +387,20 @@ func TestOrmSelect_OffsetLimit(t *testing.T) {
 			},
 		},
 	}
-	for _, t4c := range testCases {
-		t.Run(t4c.name, func(t *testing.T) {
-			p7query, err := t4c.i9qb.BuildQuery()
-			assert.Equal(t, t4c.wantErr, err)
+	for _, t4case := range s5case {
+		t.Run(t4case.name, func(t *testing.T) {
+			p7query, err := t4case.i9qb.BuildQuery()
+			assert.Equal(t, t4case.wantErr, err)
 			if err != nil {
 				return
 			}
-			assert.Equal(t, t4c.wantQuery, p7query)
+			assert.Equal(t, t4case.wantQuery, p7query)
 		})
 	}
 }
 
 func TestOrmSelect_Select(t *testing.T) {
-	testCases := []struct {
+	s5case := []struct {
 		name      string
 		i9qb      QueryBuilder
 		wantQuery *Query
@@ -425,20 +425,20 @@ func TestOrmSelect_Select(t *testing.T) {
 			},
 		},
 	}
-	for _, t4c := range testCases {
-		t.Run(t4c.name, func(t *testing.T) {
-			p7query, err := t4c.i9qb.BuildQuery()
-			assert.Equal(t, t4c.wantErr, err)
+	for _, t4case := range s5case {
+		t.Run(t4case.name, func(t *testing.T) {
+			p7query, err := t4case.i9qb.BuildQuery()
+			assert.Equal(t, t4case.wantErr, err)
 			if err != nil {
 				return
 			}
-			assert.Equal(t, t4c.wantQuery, p7query)
+			assert.Equal(t, t4case.wantQuery, p7query)
 		})
 	}
 }
 
 func TestOrmSelect_Aggregate(t *testing.T) {
-	testCases := []struct {
+	s5case := []struct {
 		name      string
 		i9qb      QueryBuilder
 		wantQuery *Query
@@ -473,20 +473,20 @@ func TestOrmSelect_Aggregate(t *testing.T) {
 			},
 		},
 	}
-	for _, t4c := range testCases {
-		t.Run(t4c.name, func(t *testing.T) {
-			p7query, err := t4c.i9qb.BuildQuery()
-			assert.Equal(t, t4c.wantErr, err)
+	for _, t4case := range s5case {
+		t.Run(t4case.name, func(t *testing.T) {
+			p7query, err := t4case.i9qb.BuildQuery()
+			assert.Equal(t, t4case.wantErr, err)
 			if err != nil {
 				return
 			}
-			assert.Equal(t, t4c.wantQuery, p7query)
+			assert.Equal(t, t4case.wantQuery, p7query)
 		})
 	}
 }
 
 func TestOrmSelect_Raw(t *testing.T) {
-	testCases := []struct {
+	s5case := []struct {
 		name      string
 		i9qb      QueryBuilder
 		wantQuery *Query
@@ -530,14 +530,14 @@ func TestOrmSelect_Raw(t *testing.T) {
 			},
 		},
 	}
-	for _, t4c := range testCases {
-		t.Run(t4c.name, func(t *testing.T) {
-			p7query, err := t4c.i9qb.BuildQuery()
-			assert.Equal(t, t4c.wantErr, err)
+	for _, t4case := range s5case {
+		t.Run(t4case.name, func(t *testing.T) {
+			p7query, err := t4case.i9qb.BuildQuery()
+			assert.Equal(t, t4case.wantErr, err)
 			if err != nil {
 				return
 			}
-			assert.Equal(t, t4c.wantQuery, p7query)
+			assert.Equal(t, t4case.wantQuery, p7query)
 		})
 	}
 }

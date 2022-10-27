@@ -19,11 +19,13 @@ type OrmSelect struct {
 	s5having []Predicate
 	// s5orderBy order by 语句
 	s5orderBy []OrderBy
-	limit     int
-	offset    int
-	// 构造出来的 SQL
+	// limit limit 子句
+	limit int
+	// offset offset 子句
+	offset int
+	// sqlString 构造出来的 SQL
 	sqlString strings.Builder
-	// SQL 中占位符对应的数据
+	// s5parameter SQL 中占位符对应的数据
 	s5parameter []any
 }
 
