@@ -2,26 +2,26 @@ package mapkn
 
 import "fmt"
 
-type User struct {
+type s6User struct {
 	Name string
 }
 
-func MapStruct() map[string]User {
-	t4map := make(map[string]User, 4)
-	t4map["user2"] = User{Name: "user2"}
-	t4map["user4"] = User{Name: "user4"}
-	t4map["user6"] = User{Name: "user6"}
-	t4map["user8"] = User{Name: "user8"}
-	fmt.Printf("map,%p\r\n", t4map)
-	return t4map
+func f8MapStruct() map[string]s6User {
+	m3s6User := make(map[string]s6User, 4)
+	m3s6User["user2"] = s6User{Name: "user2"}
+	m3s6User["user4"] = s6User{Name: "user4"}
+	m3s6User["user6"] = s6User{Name: "user6"}
+	m3s6User["user8"] = s6User{Name: "user8"}
+	fmt.Printf("map,%p\r\n", m3s6User)
+	return m3s6User
 }
 
-func MapStructPointer() map[string]*User {
-	t4map := make(map[string]*User, 4)
-	t4map["user2"] = &User{Name: "user2"}
-	t4map["user4"] = &User{Name: "user4"}
-	t4map["user6"] = &User{Name: "user6"}
-	t4map["user8"] = &User{Name: "user8"}
-	fmt.Printf("map,%p\r\n", t4map)
-	return t4map
+func f8MapStructPointer() map[string]*s6User {
+	m3p7s6User := make(map[string]*s6User, 4)
+	m3p7s6User["user2"] = &s6User{Name: "user2"}
+	m3p7s6User["user4"] = &s6User{Name: "user4"}
+	m3p7s6User["user6"] = &s6User{Name: "user6"}
+	m3p7s6User["user8"] = &s6User{Name: "user8"}
+	fmt.Printf("map,%p\r\n", m3p7s6User)
+	return m3p7s6User
 }

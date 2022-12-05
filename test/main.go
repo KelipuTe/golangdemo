@@ -1,6 +1,13 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
+
+func main() {
+	name := 1
+	fmt.Println(name)
+}
 
 //import (
 //	"fmt"
@@ -134,8 +141,11 @@ import "fmt"
 //	return fmt.Errorf("orm: 标签 [%s] 格式错误\r\n", tag)
 //}
 
-func main() {
-	var a interface{} = 1
-	b, ok := a.(string)
-	fmt.Println(a, b, ok)
-}
+//func main() {
+//	//var a interface{} = 1
+//	//b, ok := a.(string)
+//	//fmt.Println(a, b, ok)
+//
+//	var a time.Time
+//	fmt.Println(a.IsZero())
+//}

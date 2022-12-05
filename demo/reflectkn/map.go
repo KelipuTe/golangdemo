@@ -1,11 +1,8 @@
 package reflectkn
 
 import (
-	"errors"
 	"reflect"
 )
-
-var ErrMustMap = errors.New("input must be map")
 
 // IterateMap 通过反射遍历 map
 func IterateMap(input any) ([]any, []any, error) {

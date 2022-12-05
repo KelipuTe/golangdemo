@@ -1,34 +1,8 @@
 package reflectkn
 
 import (
-	"errors"
 	"reflect"
 )
-
-var ErrMustStructPointer = errors.New("input must be struct pointer")
-var ErrMustStructOrStructPointer = errors.New("input must be struct or struct pointer")
-
-var ErrFieldNotFound = errors.New("field not found")
-var ErrFieldCannotSet = errors.New("field cannot set")
-
-type User struct {
-	Name string
-	Sex  int
-	age  int
-}
-
-func (this User) GetName() string {
-	return this.Name
-}
-
-func (p7this *User) SetSex(sex int) int {
-	p7this.Sex = sex
-	return sex
-}
-
-func (p7this *User) resetAge() {
-	p7this.age = 18
-}
 
 // IterateStructField 通过反射遍历结构体的字段
 func IterateStructField(input any) (map[string]any, error) {

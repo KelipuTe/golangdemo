@@ -1,11 +1,8 @@
 package reflectkn
 
 import (
-	"errors"
 	"reflect"
 )
-
-var ErrMustSlice = errors.New("input must be slice")
 
 // IterateSlice 通过反射遍历切片
 func IterateSlice(input any) ([]any, error) {

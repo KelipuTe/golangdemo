@@ -1,11 +1,8 @@
 package reflectkn
 
 import (
-	"errors"
 	"reflect"
 )
-
-var ErrMustArray = errors.New("input must be array")
 
 // IterateArray 通过反射遍历数组
 func IterateArray(input any) ([]any, error) {

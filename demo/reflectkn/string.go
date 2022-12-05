@@ -1,11 +1,8 @@
 package reflectkn
 
 import (
-	"errors"
 	"reflect"
 )
-
-var ErrMustString = errors.New("input must be string")
 
 // IterateString 通过反射遍历切片
 func IterateString(input any) ([]any, error) {
