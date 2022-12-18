@@ -2,11 +2,27 @@ package main
 
 import (
 	"fmt"
+	"time"
 )
 
 func main() {
-	name := 1
-	fmt.Println(name)
+	go func() {
+		for {
+			fmt.Println("start")
+			test()
+			time.Sleep(1)
+		}
+	}()
+	time.Sleep(5)
+}
+
+func test() {
+	defer func() {
+		err := recover()
+		fmt.Println(err)
+	}()
+	a := []string{"aaa"}
+	fmt.Println(a[2])
 }
 
 //import (
