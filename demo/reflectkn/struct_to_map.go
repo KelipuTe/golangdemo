@@ -16,11 +16,11 @@ const (
 )
 
 func NewErrInputOnlyPointerOrStruct() error {
-	return errors.New("orm: 只支持一级结构体指针或者结构体作为输入\r\n")
+	return errors.New("orm: 只支持一级结构体指针或者结构体作为输入\n")
 }
 
 func NewErrInvalidTagContent(tag string) error {
-	return fmt.Errorf("orm: 标签 [%s] 格式错误\r\n", tag)
+	return fmt.Errorf("orm: 标签 [%s] 格式错误\n", tag)
 }
 
 func F4StructToMap(input any) (map[string]any, error) {

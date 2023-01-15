@@ -132,14 +132,14 @@ func TestStructIntFieldAccessorSetAnyField(t *testing.T) {
 	}{
 		{
 			name:    "normal case string",
-			entity:  &User{Name:"aaa"},
+			entity:  &User{Name: "aaa"},
 			field:   "Name",
 			newVal:  "bbb",
 			wantErr: nil,
 		},
 		{
 			name:    "normal case int",
-			entity:  &User{Sex:0},
+			entity:  &User{Sex: 0},
 			field:   "Sex",
 			newVal:  1,
 			wantErr: nil,

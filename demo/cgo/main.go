@@ -4,5 +4,5 @@ package main
 import "C"
 
 func main() {
-  C.printf("hello, world\r\n")
+	C.printf("hello, world\n")
 }
