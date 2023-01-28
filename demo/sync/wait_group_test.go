@@ -15,21 +15,19 @@ func TestWaitGroupWithLimit(p7s6t *testing.T) {
 	for i := 0; i < tokenNum; i++ {
 		c7token <- struct{}{}
 	}
-
 	// 设置随机数，用于模拟请求耗时
 	rand.Seed(time.Now().UnixNano())
 	p7s6wg := &sync.WaitGroup{}
 	for i := 0; i < 10; i++ {
 		<-c7token
 		log.Printf("index=%2d, get token", i)
-
 		p7s6wg.Add(1)
 		go f8DoFunc(p7s6wg, c7token, i)
 	}
 }
 
-func f8DoFunc(s6wg *sync.WaitGroup, c7token chan struct{}, i int) {
-	defer s6wg.Done()
+func f8DoFunc(p7s6wg *sync.WaitGroup, c7token chan struct{}, i int) {
+	defer p7s6wg.Done()
 	defer func(i int) {
 		c7token <- struct{}{}
 		log.Printf("index=%2d, reset token", i)

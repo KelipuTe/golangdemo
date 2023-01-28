@@ -8,7 +8,7 @@ import (
 )
 
 type S6MailBox struct {
-	// 信箱状态，true=有信，false=没有信
+	// 信箱状态，true=有信，false=没有信。假设信箱容量为 1。
 	boxTag bool
 	// 读写锁，保护 boxTag
 	p7s6BoxRWLock *sync.RWMutex
@@ -30,7 +30,11 @@ func f8NewS6MailBox() *S6MailBox {
 
 func (p7this *S6MailBox) f8SendMail(i int) {
 	time.Sleep(time.Millisecond * 500)
+	// 加写锁
 	p7this.p7s6BoxRWLock.Lock()
+	// 这里的判空操作一定是 for 而不是 if。
+	// 设计上如果信箱已经满了，代码跑到这里应该一直等，直到信箱为空。所以判空失败的话，应该是继续循环。
+	// 如果是 if，那么无论信箱满没满，代码跑完判空逻辑，都会继续往下跑。不能达到"一直等，直到信箱为空"的目的。
 	for p7this.boxTag {
 		p7this.p7s6SendCond.Wait()
 	}
@@ -38,12 +42,13 @@ func (p7this *S6MailBox) f8SendMail(i int) {
 	p7this.boxTag = true
 	fmt.Printf("send-%d:send mail\n", i)
 	p7this.p7s6BoxRWLock.Unlock()
-	// 唤醒一个收信的
-	p7this.p7s6ReceiveCond.Signal()
+	// 唤醒所有收信的
+	p7this.p7s6ReceiveCond.Broadcast()
 }
 
 func (p7this *S6MailBox) f8ReceiveMail(i int) {
 	time.Sleep(time.Millisecond * 500)
+	// 加读锁
 	p7this.p7s6BoxRWLock.RLock()
 	for !p7this.boxTag {
 		p7this.p7s6ReceiveCond.Wait()
@@ -65,5 +70,5 @@ func TestSyncCond(p7s6t *testing.T) {
 	for i := 1; i <= testTime; i++ {
 		go p7s6MailBox.f8SendMail(i)
 	}
-	time.Sleep(5 * time.Second)
+	time.Sleep(4 * time.Second)
 }
