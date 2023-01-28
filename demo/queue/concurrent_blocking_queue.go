@@ -5,7 +5,7 @@ import (
 	"sync"
 )
 
-// S6ConcurrentBlockingQueue 同步阻塞队列，环形队列
+// S6ConcurrentBlockingQueue 同步阻塞队列，环形数组+锁
 type S6ConcurrentBlockingQueue[T any] struct {
 	// 队列数据
 	s5Data []T

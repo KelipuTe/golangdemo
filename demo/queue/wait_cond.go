@@ -36,7 +36,7 @@ func (p7this *s6WaitCond) f8Wait() {
 	p7this.i9Locker.Unlock()
 	// 阻塞，等通知
 	<-p7c7n
-	// 等到通知了，需要把锁加回来。
+	// 等到通知了，把锁加回来。
 	p7this.i9Locker.Lock()
 }
 
