@@ -46,7 +46,7 @@ func (p7this *S6ConcurrentBlockingQueue[T]) isEmpty() bool {
 	return 0 == p7this.nowSize
 }
 
-func (p7this *S6ConcurrentBlockingQueue[T]) F8EnQueue(i9ctx context.Context, data T) error {
+func (p7this *S6ConcurrentBlockingQueue[T]) F8Enqueue(i9ctx context.Context, data T) error {
 	if nil != i9ctx.Err() {
 		return i9ctx.Err()
 	}
@@ -75,7 +75,7 @@ func (p7this *S6ConcurrentBlockingQueue[T]) F8EnQueue(i9ctx context.Context, dat
 	return nil
 }
 
-func (p7this *S6ConcurrentBlockingQueue[T]) F8DeQueue(i9ctx context.Context) (T, error) {
+func (p7this *S6ConcurrentBlockingQueue[T]) F8Dequeue(i9ctx context.Context) (T, error) {
 	var zeroData T
 	if nil != i9ctx.Err() {
 		return zeroData, i9ctx.Err()
