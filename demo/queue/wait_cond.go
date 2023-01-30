@@ -9,27 +9,27 @@ import (
 
 // 类似 sync.Cond 的东西。实现了可以控制超时的 Wait()。
 // 可以实现 Broadcast()，但是实现不了 Signal()。
-type s6WaitCond struct {
+type s6WaitCondV2 struct {
 	// 锁，和 Cond 一样，需要传一个锁进来
 	i9Locker sync.Locker
 	// 指向 channel 的指针，用于实现可以控制超时的 Wait()
 	p7c7Notify unsafe.Pointer
 }
 
-func F8NewS6WaitCond(i9l sync.Locker) *s6WaitCond {
-	p7s6wc := &s6WaitCond{i9Locker: i9l}
+func F8NewS6WaitCond(i9l sync.Locker) *s6WaitCondV2 {
+	p7s6wc := &s6WaitCondV2{i9Locker: i9l}
 	p7c7n := make(chan struct{})
 	p7s6wc.p7c7Notify = unsafe.Pointer(&p7c7n)
 	return p7s6wc
 }
 
-func (p7this *s6WaitCond) f8GetNotify() <-chan struct{} {
+func (p7this *s6WaitCondV2) f8GetNotify() <-chan struct{} {
 	p7s6n := atomic.LoadPointer(&p7this.p7c7Notify)
 	return *(*chan struct{})(p7s6n)
 }
 
 // 这个就和 Wait() 差不多。
-func (p7this *s6WaitCond) f8Wait() {
+func (p7this *s6WaitCondV2) f8Wait() {
 	// 获取一个用于等通知的结构
 	p7c7n := p7this.f8GetNotify()
 	// 把拿着的锁放掉
@@ -41,7 +41,7 @@ func (p7this *s6WaitCond) f8Wait() {
 }
 
 // 这个是可以控制超时的 Wait()。
-func (p7this *s6WaitCond) f8WaitWithTimeout(i9ctx context.Context) error {
+func (p7this *s6WaitCondV2) f8WaitWithTimeout(i9ctx context.Context) error {
 	p7c7n := p7this.f8GetNotify()
 	p7this.i9Locker.Unlock()
 	select {
@@ -57,7 +57,7 @@ func (p7this *s6WaitCond) f8WaitWithTimeout(i9ctx context.Context) error {
 }
 
 // 这个就和 Broadcast() 差不多。
-func (p7this *s6WaitCond) f8Broadcast() {
+func (p7this *s6WaitCondV2) f8Broadcast() {
 	// 创建一个新的 channel
 	p7c7NNew := make(chan struct{})
 	// 用新的 channel 替换旧的 channel，注意要用原子操作。
