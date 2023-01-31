@@ -22,9 +22,9 @@ type S6ConcurrentBlockingQueue[T any] struct {
 	// 锁，用于保护 s5Data
 	p7s6mutex *sync.Mutex
 	// 条件变量，用于控制入队
-	p7s6NotFullWaitCond *s6WaitCondV2
+	p7s6NotFullWaitCond *s6WaitCond
 	// 条件变量，用于控制出队
-	p7s6NotEmptyWaitCond *s6WaitCondV2
+	p7s6NotEmptyWaitCond *s6WaitCond
 }
 
 func F8NewS6ConcurrentBlockingQueue[T any](maxSize int) *S6ConcurrentBlockingQueue[T] {

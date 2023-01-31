@@ -38,8 +38,10 @@ func TestS6PriorityQueueDequeue(p7s6t *testing.T) {
 		log.Printf("%v\n", t4value.execTime)
 	}
 
-	data, err := p7queue.F8Dequeue()
-	log.Printf("dequeue:%v, err=%v\n", data.execTime, err)
+	for j := 0; j < testTime; j++ {
+		data, err := p7queue.F8Dequeue()
+		log.Printf("dequeue:%v, err=%v\n", data.execTime, err)
+	}
 
 	for _, t4value := range p7queue.s5data {
 		log.Printf("%v\n", t4value.execTime)
