@@ -16,7 +16,7 @@ type s6WaitCondV2 struct {
 	c7Notify chan struct{}
 }
 
-func F8News6WaitCondV2(i9l sync.Locker) *s6WaitCondV2 {
+func f8NewS6WaitCondV2(i9l sync.Locker) *s6WaitCondV2 {
 	return &s6WaitCondV2{
 		i9Locker: i9l,
 		c7Notify: make(chan struct{}),
@@ -33,6 +33,7 @@ func (p7this *s6WaitCondV2) f8GetNotify() <-chan struct{} {
 }
 
 // 这个就和 Wait() 差不多。一定是加锁之后调用。
+// 这里写出来只是为了和 s6WaitCond 的进行比较，并不会使用
 func (p7this *s6WaitCondV2) f8Wait() {
 	p7c7n := p7this.f8GetNotify()
 	<-p7c7n
@@ -40,13 +41,14 @@ func (p7this *s6WaitCondV2) f8Wait() {
 }
 
 // 这个是可以控制超时的 Wait()。一定是加锁之后调用。
+// 这里写出来只是为了和 s6WaitCond 的比较，并不会使用
 func (p7this *s6WaitCondV2) f8WaitWithTimeout(i9ctx context.Context) error {
 	c7n := p7this.f8GetNotify()
 	select {
-	case <-c7n:
-		p7this.i9Locker.Lock()
 	case <-i9ctx.Done():
 		return i9ctx.Err()
+	case <-c7n:
+		p7this.i9Locker.Lock()
 	}
 	return nil
 }

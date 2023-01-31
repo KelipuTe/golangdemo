@@ -11,7 +11,7 @@ type s6QueueNodeV2[T any] struct {
 	p7s6next unsafe.Pointer
 }
 
-// S6ConcurrentNonBlockingQueue 同步非阻塞队列，链表+CAS
+// S6ConcurrentNonBlockingQueue 并发安全的同步非阻塞队列，链表+CAS
 type S6ConcurrentNonBlockingQueueV2[T any] struct {
 	p7s6head unsafe.Pointer
 	p7s6tail unsafe.Pointer

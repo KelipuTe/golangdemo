@@ -31,7 +31,7 @@ func (p7this *s6PriorityQueue[T]) f8IsEmpty() bool {
 	return 1 >= p7this.nowSize
 }
 
-func (p7this *s6PriorityQueue[T]) F8Enqueue(data T) error {
+func (p7this *s6PriorityQueue[T]) f8Enqueue(data T) error {
 	if p7this.f8IsFull() {
 		return ErrQueueIsFull
 	}
@@ -50,7 +50,7 @@ func (p7this *s6PriorityQueue[T]) F8Enqueue(data T) error {
 	return nil
 }
 
-func (p7this *s6PriorityQueue[T]) F8Dequeue() (T, error) {
+func (p7this *s6PriorityQueue[T]) f8Dequeue() (T, error) {
 	if p7this.f8IsEmpty() {
 		var data T
 		return data, ErrQueueIsEmpty
@@ -80,4 +80,12 @@ func (p7this *s6PriorityQueue[T]) F8Dequeue() (T, error) {
 		parentIndex = minIndex
 	}
 	return data, nil
+}
+
+func (p7this *s6PriorityQueue[T]) f8GetTop() (T, error) {
+	if p7this.f8IsEmpty() {
+		var data T
+		return data, ErrQueueIsEmpty
+	}
+	return p7this.s5data[1], nil
 }

@@ -5,7 +5,7 @@ import (
 	"sync"
 )
 
-// S6ConcurrentBlockingQueue 同步阻塞队列，环形数组+锁
+// S6ConcurrentBlockingQueue 并发安全的同步阻塞队列，环形数组+锁
 type S6ConcurrentBlockingQueue[T any] struct {
 	// 队列数据
 	s5Data []T
@@ -33,8 +33,8 @@ func F8NewS6ConcurrentBlockingQueue[T any](maxSize int) *S6ConcurrentBlockingQue
 		s5Data:               make([]T, maxSize),
 		maxSize:              maxSize,
 		p7s6mutex:            p7s6mutex,
-		p7s6NotFullWaitCond:  F8NewS6WaitCond(p7s6mutex),
-		p7s6NotEmptyWaitCond: F8NewS6WaitCond(p7s6mutex),
+		p7s6NotFullWaitCond:  f8NewS6WaitCond(p7s6mutex),
+		p7s6NotEmptyWaitCond: f8NewS6WaitCond(p7s6mutex),
 	}
 }
 
@@ -55,6 +55,7 @@ func (p7this *S6ConcurrentBlockingQueue[T]) F8Enqueue(i9ctx context.Context, dat
 	// 设计上如果队列已经满了，代码跑到这里应该一直等，直到队列里面有空位。所以判空失败的话，应该是继续循环。
 	// 如果是 if，那么无论队列满没满，代码跑完判空逻辑，都会继续往下跑。不能达到"一直等，直到队列里面有空位"的目的。
 	for p7this.f8IsFull() {
+		// 等待队列未满的信号，或者超时的信号
 		err := p7this.p7s6NotFullWaitCond.f8WaitWithTimeout(i9ctx)
 		if nil != err {
 			return err
@@ -82,6 +83,7 @@ func (p7this *S6ConcurrentBlockingQueue[T]) F8Dequeue(i9ctx context.Context) (T,
 	}
 	p7this.p7s6mutex.Lock()
 	for p7this.f8IsEmpty() {
+		// 等待队列不空的信号，或者超时的信号
 		err := p7this.p7s6NotEmptyWaitCond.f8WaitWithTimeout(i9ctx)
 		if nil != err {
 			return zeroData, err
