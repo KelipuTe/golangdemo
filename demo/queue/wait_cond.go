@@ -51,7 +51,7 @@ func (p7this *s6WaitCond) f8WaitWithTimeout(i9ctx context.Context) error {
 		// 超时，这里就不用把锁加回来了。外层应该拿到这里的异常，然后执行异常处理逻辑。
 		return i9ctx.Err()
 	case <-p7c7n:
-		// 这里被唤醒说明有 gorouting 调用了 Broadcast() 关闭了 channel。
+		// 等到通知了，说明有 gorouting 调用了 Broadcast() 关闭了 channel，把锁加回来。
 		// 这个地方并没有完全解决超时的问题，因为这里加锁的逻辑还是有可能被阻塞的。
 		p7this.i9Locker.Lock()
 	}

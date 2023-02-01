@@ -11,11 +11,14 @@ type s6QueueNodeV2[T any] struct {
 	p7s6next unsafe.Pointer
 }
 
-// S6ConcurrentNonBlockingQueue 并发安全的同步非阻塞队列，链表+CAS
+// S6ConcurrentNonBlockingQueue 并发安全的无最大容量的队列，链表+CAS
 type S6ConcurrentNonBlockingQueueV2[T any] struct {
+	// 队头指针
 	p7s6head unsafe.Pointer
+	// 队尾指针
 	p7s6tail unsafe.Pointer
-	nowSize  int32
+	// 队列当前长度
+	nowSize int32
 }
 
 func F8NewS6ConcurrentNonBlockingQueueV2[T any]() *S6ConcurrentNonBlockingQueueV2[T] {

@@ -5,7 +5,7 @@ import (
 	"sync"
 )
 
-// S6ConcurrentBlockingQueue 并发安全的同步阻塞队列，环形数组+锁
+// S6ConcurrentBlockingQueue 并发安全的有最大容量的队列，环形数组+锁
 type S6ConcurrentBlockingQueue[T any] struct {
 	// 队列数据
 	s5Data []T
@@ -38,14 +38,17 @@ func F8NewS6ConcurrentBlockingQueue[T any](maxSize int) *S6ConcurrentBlockingQue
 	}
 }
 
+// 判断队列是否队列已满。true=满
 func (p7this *S6ConcurrentBlockingQueue[T]) f8IsFull() bool {
 	return p7this.nowSize == p7this.maxSize
 }
 
+// 判断队列是否为空。true=空
 func (p7this *S6ConcurrentBlockingQueue[T]) f8IsEmpty() bool {
 	return 0 == p7this.nowSize
 }
 
+// 入队
 func (p7this *S6ConcurrentBlockingQueue[T]) F8Enqueue(i9ctx context.Context, data T) error {
 	if nil != i9ctx.Err() {
 		return i9ctx.Err()
@@ -76,6 +79,7 @@ func (p7this *S6ConcurrentBlockingQueue[T]) F8Enqueue(i9ctx context.Context, dat
 	return nil
 }
 
+// 出队
 func (p7this *S6ConcurrentBlockingQueue[T]) F8Dequeue(i9ctx context.Context) (T, error) {
 	var zeroData T
 	if nil != i9ctx.Err() {
