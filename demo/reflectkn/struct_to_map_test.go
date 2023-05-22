@@ -6,10 +6,10 @@ import (
 )
 
 type S6StructWithTag struct {
-	Id   int    `orm:"field=id"`
-	Name string `orm:"field=name"`
-	Age  int8   `orm:"field=age"`
-	Sex  int8   `orm:"field=sex"`
+	Id   int    `orm:"fieldWant=id"`
+	Name string `orm:"fieldWant=testName"`
+	Age  int8   `orm:"fieldWant=age"`
+	Sex  int8   `orm:"fieldWant=sex"`
 }
 
 func TestStructToMap(p7tt *testing.T) {
@@ -28,10 +28,10 @@ func TestStructToMap(p7tt *testing.T) {
 				Sex:  1,
 			},
 			mapWant: map[string]any{
-				"id":   1,
-				"name": "aa",
-				"age":  int8(11),
-				"sex":  int8(1),
+				"id":       1,
+				"testName": "aa",
+				"age":      int8(11),
+				"sex":      int8(1),
 			},
 			errWant: nil,
 		},
@@ -44,10 +44,10 @@ func TestStructToMap(p7tt *testing.T) {
 				Sex:  1,
 			},
 			mapWant: map[string]any{
-				"id":   1,
-				"name": "aa",
-				"age":  int8(11),
-				"sex":  int8(1),
+				"id":       1,
+				"testName": "aa",
+				"age":      int8(11),
+				"sex":      int8(1),
 			},
 			errWant: nil,
 		},

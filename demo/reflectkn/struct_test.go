@@ -6,116 +6,116 @@ import (
 	"testing"
 )
 
-func TestIterateStructField(p7tt *testing.T) {
-	s5case := []struct {
-		name    string
-		input   any
-		resWant map[string]any
-		errWant error
+func Test_f8IterateStructField(p7test *testing.T) {
+	s5s6case := []struct {
+		testName   string
+		input      any
+		resultWant map[string]any
+		errWant    error
 	}{
 		{
-			// 非法输入，nil
-			name:    "nil",
-			input:   nil,
-			resWant: nil,
-			errWant: ErrMustStructOrStructPointer,
+			// 非法输入 nil
+			testName:   "nil",
+			input:      nil,
+			resultWant: nil,
+			errWant:    ErrMustStructOrStructPointer,
 		},
 		{
-			// 非法输入，int 指针
-			name: "int pointer",
+			// 非法输入 int 指针
+			testName: "int pointer",
 			input: func() *int {
 				i := 1
 				return &i
 			}(),
-			resWant: nil,
-			errWant: ErrMustStructOrStructPointer,
+			resultWant: nil,
+			errWant:    ErrMustStructOrStructPointer,
 		},
 		{
 			// 普通结构体
-			name:    "normal struct",
-			input:   User{Name: "aaa", Sex: 1, age: 18},
-			resWant: map[string]any{"Name": "aaa", "Sex": 1, "age": 0},
-			errWant: nil,
+			testName:   "normal struct",
+			input:      User{Name: "aaa", Sex: 1, age: 18},
+			resultWant: map[string]any{"Name": "aaa", "Sex": 1, "age": 0},
+			errWant:    nil,
 		},
 		{
 			// 一级结构体指针
-			name:    "struct pointer",
-			input:   &User{Name: "aaa", Sex: 1, age: 18},
-			resWant: map[string]any{"Name": "aaa", "Sex": 1, "age": 0},
-			errWant: nil,
+			testName:   "struct pointer",
+			input:      &User{Name: "aaa", Sex: 1, age: 18},
+			resultWant: map[string]any{"Name": "aaa", "Sex": 1, "age": 0},
+			errWant:    nil,
 		},
 		{
 			// 二级结构体指针
-			name: "struct pointer multiple",
+			testName: "struct pointer multiple",
 			input: func() **User {
 				p1u := &User{Name: "aaa", Sex: 1, age: 18}
 				return &p1u
 			}(),
-			resWant: map[string]any{"Name": "aaa", "Sex": 1, "age": 0},
-			errWant: nil,
+			resultWant: map[string]any{"Name": "aaa", "Sex": 1, "age": 0},
+			errWant:    nil,
 		},
 	}
-	for _, t4case := range s5case {
-		p7tt.Run(t4case.name, func(p7tt *testing.T) {
-			res, err := IterateStructField(t4case.input)
-			assert.Equal(p7tt, t4case.errWant, err)
+	for _, t4case := range s5s6case {
+		p7test.Run(t4case.testName, func(p7test *testing.T) {
+			res, err := f8IterateStructField(t4case.input)
+			assert.Equal(p7test, t4case.errWant, err)
 			if err != nil {
 				return
 			}
-			assert.Equal(p7tt, t4case.resWant, res)
+			assert.Equal(p7test, t4case.resultWant, res)
 		})
 	}
 }
 
-func TestSetStructField(p7tt *testing.T) {
-	s5case := []struct {
-		name    string
-		input   any
-		field   string
-		value   any
-		errWant error
+func Test_f8SetStructField(p7test *testing.T) {
+	s5s6case := []struct {
+		testName  string
+		input     any
+		fieldWant string
+		valueWant any
+		errWant   error
 	}{
 		{
-			// 非法输入，nil
-			name:    "nil",
-			input:   nil,
-			field:   "Name",
-			value:   "bbb",
-			errWant: ErrMustStructPointer,
+			// 非法输入 nil
+			testName:  "nil",
+			input:     nil,
+			fieldWant: "Name",
+			valueWant: "bbb",
+			errWant:   ErrMustStructPointer,
 		},
 		{
-			// 非法输入，普通结构体
-			name:    "struct",
-			input:   User{Name: "aaa", Sex: 1, age: 18},
-			field:   "Name",
-			value:   "bbb",
-			errWant: ErrMustStructPointer,
+			// 非法输入 普通结构体
+			testName:  "struct",
+			input:     User{Name: "aaa", Sex: 1, age: 18},
+			fieldWant: "Name",
+			valueWant: "bbb",
+			errWant:   ErrMustStructPointer,
 		},
 		{
-			// 非法输入，二级结构体指针
-			name: "struct_pointer_multiple",
+			// 非法输入 二级结构体指针
+			testName: "struct_pointer_multiple",
 			input: func() **User {
 				p1u := &User{Name: "aaa", Sex: 1, age: 18}
 				return &p1u
 			}(),
-			field:   "Name",
-			value:   "bbb",
-			errWant: ErrMustStructPointer,
+			fieldWant: "Name",
+			valueWant: "bbb",
+			errWant:   ErrMustStructPointer,
 		},
 		{
 			// 一级结构体指针
-			name:    "struct_pointer",
-			input:   &User{Name: "aaa", Sex: 1, age: 18},
-			field:   "Name",
-			value:   "bbb",
-			errWant: nil,
+			testName:  "struct_pointer",
+			input:     &User{Name: "aaa", Sex: 1, age: 18},
+			fieldWant: "Name",
+			valueWant: "bbb",
+			errWant:   nil,
 		},
 	}
 
-	for _, t4case := range s5case {
-		p7tt.Run(t4case.name, func(p7tt *testing.T) {
-			err := SetStructField(t4case.input, t4case.field, t4case.value)
-			assert.Equal(p7tt, t4case.errWant, err)
+	for _, t4case := range s5s6case {
+		p7test.Run(t4case.testName, func(p7test *testing.T) {
+			err := f8SetStructField(t4case.input, t4case.fieldWant, t4case.valueWant)
+			assert.Equal(p7test, t4case.errWant, err)
 			if err != nil {
 				return
 			}
@@ -123,64 +123,64 @@ func TestSetStructField(p7tt *testing.T) {
 	}
 }
 
-func TestIterateStructFunc(p7tt *testing.T) {
-	testCases := []struct {
-		name    string
-		input   any
-		resWant map[string]*S6FuncInfo
-		errWant error
+func Test_f8IterateStructFunc(p7test *testing.T) {
+	s5s6case := []struct {
+		testName   string
+		input      any
+		resultWant map[string]*S6FuncInfo
+		errWant    error
 	}{
 		{
 			// 非法输入，nil
-			name:    "nil",
-			input:   nil,
-			resWant: nil,
-			errWant: ErrMustStructOrStructPointer,
+			testName:   "nil",
+			input:      nil,
+			resultWant: nil,
+			errWant:    ErrMustStructOrStructPointer,
 		},
 		{
 			// 普通结构体
-			name:  "normal struct",
-			input: User{Name: "aaa", Sex: 1, age: 18},
-			resWant: map[string]*S6FuncInfo{
+			testName: "normal struct",
+			input:    User{Name: "aaa", Sex: 1, age: 18},
+			resultWant: map[string]*S6FuncInfo{
 				"GetName": {
-					Name:     "GetName",
-					S5Input:  []reflect.Type{reflect.TypeOf(User{})},
-					S5Output: []reflect.Type{reflect.TypeOf("aaa")},
-					S5Res:    []any{"aaa"},
+					Name:          "GetName",
+					S5InputType:   []reflect.Type{reflect.TypeOf(User{})},
+					S5OutputType:  []reflect.Type{reflect.TypeOf("aaa")},
+					S5OutputValue: []any{"aaa"},
 				},
 			},
 			errWant: nil,
 		},
 		{
 			// 一级结构体指针
-			name:  "struct pointer",
-			input: &User{Name: "aaa", Sex: 1, age: 18},
-			resWant: map[string]*S6FuncInfo{
+			testName: "struct pointer",
+			input:    &User{Name: "aaa", Sex: 1, age: 18},
+			resultWant: map[string]*S6FuncInfo{
 				"GetName": {
-					Name:     "GetName",
-					S5Input:  []reflect.Type{reflect.TypeOf(&User{})},
-					S5Output: []reflect.Type{reflect.TypeOf("aaa")},
-					S5Res:    []any{"aaa"},
+					Name:          "GetName",
+					S5InputType:   []reflect.Type{reflect.TypeOf(&User{})},
+					S5OutputType:  []reflect.Type{reflect.TypeOf("aaa")},
+					S5OutputValue: []any{"aaa"},
 				},
 				"SetSex": {
-					Name:     "SetSex",
-					S5Input:  []reflect.Type{reflect.TypeOf(&User{}), reflect.TypeOf(1)},
-					S5Output: []reflect.Type{reflect.TypeOf(0)},
-					S5Res:    []any{0},
+					Name:          "SetSex",
+					S5InputType:   []reflect.Type{reflect.TypeOf(&User{}), reflect.TypeOf(1)},
+					S5OutputType:  []reflect.Type{reflect.TypeOf(0)},
+					S5OutputValue: []any{0},
 				},
 			},
 			errWant: nil,
 		},
 	}
 
-	for _, t4case := range testCases {
-		p7tt.Run(t4case.name, func(p7tt *testing.T) {
-			res, err := IterateStructFunc(t4case.input)
-			assert.Equal(p7tt, t4case.errWant, err)
+	for _, t4case := range s5s6case {
+		p7test.Run(t4case.testName, func(p7test *testing.T) {
+			res, err := f8IterateStructFunc(t4case.input)
+			assert.Equal(p7test, t4case.errWant, err)
 			if err != nil {
 				return
 			}
-			assert.Equal(p7tt, t4case.resWant, res)
+			assert.Equal(p7test, t4case.resultWant, res)
 		})
 	}
 }

@@ -12,7 +12,7 @@ import (
 const (
 	// 支持的 key 的数量
 	tagNum      int    = 1
-	tagKeyField string = "field"
+	tagKeyField string = "fieldWant"
 )
 
 func NewErrInputOnlyPointerOrStruct() error {

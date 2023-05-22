@@ -4,8 +4,8 @@ import (
 	"reflect"
 )
 
-// IterateStructField 通过反射遍历结构体的字段
-func IterateStructField(input any) (map[string]any, error) {
+// f8IterateStructField 通过反射遍历结构体的字段
+func f8IterateStructField(input any) (map[string]any, error) {
 	if nil == input {
 		return nil, ErrMustStructOrStructPointer
 	}
@@ -24,24 +24,24 @@ func IterateStructField(input any) (map[string]any, error) {
 
 	// 结构体字段数量
 	fieldNum := i9InputType.NumField()
-	m3res := make(map[string]any, fieldNum)
+	m3result := make(map[string]any, fieldNum)
 	// 解析结构体的每个字段
 	for i := 0; i < fieldNum; i++ {
 		s6FieldType := i9InputType.Field(i)
 		s6FieldValue := s6InputValue.Field(i)
-		// 私有字段这里是拿不到值的，默认赋 0 值
+		// 私有字段这里是拿不到值的，默认赋零值
 		if s6FieldType.IsExported() {
-			m3res[s6FieldType.Name] = s6FieldValue.Interface()
+			m3result[s6FieldType.Name] = s6FieldValue.Interface()
 		} else {
-			m3res[s6FieldType.Name] = reflect.Zero(s6FieldType.Type).Interface()
+			m3result[s6FieldType.Name] = reflect.Zero(s6FieldType.Type).Interface()
 		}
 	}
 
-	return m3res, nil
+	return m3result, nil
 }
 
-// SetStructField 通过反射修改结构体的字段
-func SetStructField(input any, field string, value any) error {
+// f8SetStructField 通过反射修改结构体的字段
+func f8SetStructField(input any, field string, value any) error {
 	// 因为需要修改结构体，所以必须是一级结构体指针
 	if nil == input {
 		return ErrMustStructPointer
@@ -61,12 +61,12 @@ func SetStructField(input any, field string, value any) error {
 
 	// 判断字段存不存在
 	if _, ok := i9InputType.FieldByName(field); !ok {
-		return ErrFieldNotFound
+		return ErrStructFieldNotFound
 	}
 	s6FieldValue := s6InputValue.FieldByName(field)
 	// 判断字段能不能赋值
 	if !s6FieldValue.CanSet() {
-		return ErrFieldCannotSet
+		return ErrStructFieldCannotSet
 	}
 	s6FieldValue.Set(reflect.ValueOf(value))
 
@@ -77,15 +77,15 @@ type S6FuncInfo struct {
 	// 方法名
 	Name string
 	// 方法的入参的类型
-	S5Input []reflect.Type
+	S5InputType []reflect.Type
 	// 方法的出参的类型
-	S5Output []reflect.Type
+	S5OutputType []reflect.Type
 	// 方法的出参的值
-	S5Res []any
+	S5OutputValue []any
 }
 
-// IterateStructFunc 通过反射遍历结构体的方法
-func IterateStructFunc(input any) (map[string]*S6FuncInfo, error) {
+// f8IterateStructFunc 通过反射遍历结构体的方法
+func f8IterateStructFunc(input any) (map[string]*S6FuncInfo, error) {
 	if nil == input {
 		return nil, ErrMustStructOrStructPointer
 	}
@@ -102,7 +102,7 @@ func IterateStructFunc(input any) (map[string]*S6FuncInfo, error) {
 
 	// 结构体方法数量
 	funcNum := i9InputType.NumMethod()
-	m3res := make(map[string]*S6FuncInfo, funcNum)
+	m3result := make(map[string]*S6FuncInfo, funcNum)
 	// 解析结构体的每个方法
 	for i := 0; i < funcNum; i++ {
 		t4func := i9InputType.Method(i)
@@ -141,13 +141,13 @@ func IterateStructFunc(input any) (map[string]*S6FuncInfo, error) {
 			s5res = append(s5res, s5FuncCallOutput[j].Interface())
 		}
 
-		m3res[t4func.Name] = &S6FuncInfo{
-			Name:     t4func.Name,
-			S5Input:  s5FuncInput,
-			S5Output: s5FuncOutput,
-			S5Res:    s5res,
+		m3result[t4func.Name] = &S6FuncInfo{
+			Name:          t4func.Name,
+			S5InputType:   s5FuncInput,
+			S5OutputType:  s5FuncOutput,
+			S5OutputValue: s5res,
 		}
 	}
 
-	return m3res, nil
+	return m3result, nil
 }
