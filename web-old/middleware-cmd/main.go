@@ -1,8 +1,8 @@
 package main
 
 import (
-	web "demo-golang/web/middleware"
-	"demo-golang/web/middleware/middleware"
+	web "demo-golang/web-old/middleware"
+	"demo-golang/web-old/middleware/middleware"
 	"fmt"
 )
 

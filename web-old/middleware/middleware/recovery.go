@@ -1,6 +1,6 @@
 package middleware
 
-import "demo-golang/web/middleware"
+import "demo-golang/web-old/middleware"
 
 func RecoveryMiddleware() middleware.HTTPMiddleware {
 	return func(next middleware.HTTPHandleFunc) middleware.HTTPHandleFunc {

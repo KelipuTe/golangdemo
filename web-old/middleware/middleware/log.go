@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"demo-golang/web/middleware"
+	"demo-golang/web-old/middleware"
 	"fmt"
 )
 

@@ -1,7 +1,7 @@
 package main
 
 import (
-	web "demo-golang/web/router"
+	web "demo-golang/web-old/router"
 	"fmt"
 )
 

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"demo-golang/web/http"
+	"demo-golang/web-old/http"
 )
 
 func main() {
