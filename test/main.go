@@ -22,7 +22,7 @@ func test() {
 		fmt.Println(err)
 	}()
 	a := []string{"aaa"}
-	fmt.Println(a[2])
+	fmt.Println(a[0])
 }
 
 //import (
