@@ -1649,7 +1649,7 @@ func (mr *MockCmdableMockRecorder) GeoSearchStore(arg0, arg1, arg2, arg3 interfa
 // Get mocks base method.
 func (m *MockCmdable) Get(arg0 context.Context, arg1 string) *redis.StringCmd {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Get", arg0, arg1)
+	ret := m.ctrl.Call(m, "F8Get", arg0, arg1)
 	ret0, _ := ret[0].(*redis.StringCmd)
 	return ret0
 }
@@ -1657,7 +1657,7 @@ func (m *MockCmdable) Get(arg0 context.Context, arg1 string) *redis.StringCmd {
 // Get indicates an expected call of Get.
 func (mr *MockCmdableMockRecorder) Get(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockCmdable)(nil).Get), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "F8Get", reflect.TypeOf((*MockCmdable)(nil).Get), arg0, arg1)
 }
 
 // GetBit mocks base method.
@@ -3480,7 +3480,7 @@ func (mr *MockCmdableMockRecorder) SetXX(arg0, arg1, arg2, arg3 interface{}) *go
 // Shutdown mocks base method.
 func (m *MockCmdable) Shutdown(arg0 context.Context) *redis.StatusCmd {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Shutdown", arg0)
+	ret := m.ctrl.Call(m, "F8Shutdown", arg0)
 	ret0, _ := ret[0].(*redis.StatusCmd)
 	return ret0
 }
@@ -3488,7 +3488,7 @@ func (m *MockCmdable) Shutdown(arg0 context.Context) *redis.StatusCmd {
 // Shutdown indicates an expected call of Shutdown.
 func (mr *MockCmdableMockRecorder) Shutdown(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Shutdown", reflect.TypeOf((*MockCmdable)(nil).Shutdown), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "F8Shutdown", reflect.TypeOf((*MockCmdable)(nil).Shutdown), arg0)
 }
 
 // ShutdownNoSave mocks base method.

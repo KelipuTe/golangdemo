@@ -3,16 +3,16 @@ package main
 import "fmt"
 
 func main() {
-  obj := Constructor(2)
-  obj.Put(1, 1)
-  obj.Put(2, 2)
-  fmt.Println(obj.Get(1))
-  obj.Put(3, 3)
-  fmt.Println(obj.Get(2))
-  obj.Put(4, 4)
-  fmt.Println(obj.Get(1))
-  fmt.Println(obj.Get(3))
-  fmt.Println(obj.Get(4))
+	obj := Constructor(2)
+	obj.Put(1, 1)
+	obj.Put(2, 2)
+	fmt.Println(obj.Get(1))
+	obj.Put(3, 3)
+	fmt.Println(obj.Get(2))
+	obj.Put(4, 4)
+	fmt.Println(obj.Get(1))
+	fmt.Println(obj.Get(3))
+	fmt.Println(obj.Get(4))
 }
 
 //运用你所掌握的数据结构，设计和实现一个LRU(最近最少使用)缓存机制。
@@ -26,7 +26,7 @@ func main() {
 /**
  * Your LRUCache object will be instantiated and called as such:
  * obj := Constructor(capacity);
- * param_1 := obj.Get(key);
+ * param_1 := obj.F8Get(key);
  * obj.Put(key,value);
  */
 
@@ -38,78 +38,78 @@ func main() {
 //146-LRU缓存机制
 
 type ListNode struct {
-  iKey, iValue int       //键，值
-  plnP, plnN   *ListNode //前，后结点指针
+	iKey, iValue int       //键，值
+	plnP, plnN   *ListNode //前，后结点指针
 } //缓存结点
 
 type LRUCache struct {
-  iNowSize, iMaxSize int               //缓存已用大小和最大大小
-  mapCache           map[int]*ListNode //哈希表，指向每个缓存结点
-  plnTou2, plnWei3   *ListNode         //双向链表头尾伪结点，方便插入和删除操作
+	iNowSize, iMaxSize int               //缓存已用大小和最大大小
+	mapCache           map[int]*ListNode //哈希表，指向每个缓存结点
+	plnTou2, plnWei3   *ListNode         //双向链表头尾伪结点，方便插入和删除操作
 }
 
 func Constructor(capacity int) LRUCache {
-  var lruCacne LRUCache = LRUCache{
-    iNowSize: 0,
-    iMaxSize: capacity,
-    mapCache: map[int]*ListNode{},
-    plnTou2:  &ListNode{iKey: 0, iValue: 0},
-    plnWei3:  &ListNode{iKey: 0, iValue: 0},
-  }
-  lruCacne.plnTou2.plnN = lruCacne.plnWei3
-  lruCacne.plnWei3.plnP = lruCacne.plnTou2
+	var lruCacne LRUCache = LRUCache{
+		iNowSize: 0,
+		iMaxSize: capacity,
+		mapCache: map[int]*ListNode{},
+		plnTou2:  &ListNode{iKey: 0, iValue: 0},
+		plnWei3:  &ListNode{iKey: 0, iValue: 0},
+	}
+	lruCacne.plnTou2.plnN = lruCacne.plnWei3
+	lruCacne.plnWei3.plnP = lruCacne.plnTou2
 
-  return lruCacne
+	return lruCacne
 }
 
 func (this *LRUCache) Get(key int) int {
-  if _, bExist := this.mapCache[key]; bExist {
-    tpln := this.mapCache[key]
-    //从链表中移除这个结点
-    tpln.plnP.plnN = tpln.plnN
-    tpln.plnN.plnP = tpln.plnP
-    //移动这个结点到头部
-    tpln.plnN = this.plnTou2.plnN
-    tpln.plnP = this.plnTou2
-    this.plnTou2.plnN.plnP = tpln
-    this.plnTou2.plnN = tpln
+	if _, bExist := this.mapCache[key]; bExist {
+		tpln := this.mapCache[key]
+		//从链表中移除这个结点
+		tpln.plnP.plnN = tpln.plnN
+		tpln.plnN.plnP = tpln.plnP
+		//移动这个结点到头部
+		tpln.plnN = this.plnTou2.plnN
+		tpln.plnP = this.plnTou2
+		this.plnTou2.plnN.plnP = tpln
+		this.plnTou2.plnN = tpln
 
-    return tpln.iValue
-  }
-  return -1
+		return tpln.iValue
+	}
+	return -1
 }
 
 func (this *LRUCache) Put(key int, value int) {
-  if _, bExist := this.mapCache[key]; bExist {
-    //键存在
-    tpln := this.mapCache[key]
-    tpln.iValue = value //重新赋值
-    //从链表中移除这个结点
-    tpln.plnP.plnN = tpln.plnN
-    tpln.plnN.plnP = tpln.plnP
-    //移动这个结点到头部
-    tpln.plnN = this.plnTou2.plnN
-    tpln.plnP = this.plnTou2
-    this.plnTou2.plnN.plnP = tpln
-    this.plnTou2.plnN = tpln
-  } else {
-    //键不存在
-    tpln := &ListNode{iKey: key, iValue: value}
-    //移动这个结点到头部
-    tpln.plnN = this.plnTou2.plnN
-    tpln.plnP = this.plnTou2
-    this.plnTou2.plnN.plnP = tpln
-    this.plnTou2.plnN = tpln
-    this.mapCache[key] = tpln //哈希表添加结点
-    this.iNowSize++           //计数增加
-    if this.iNowSize > this.iMaxSize {
-      //触发淘汰机制
-      tplnDel := this.plnWei3.plnP //要淘汰的节点
-      //从链表中移除这个结点
-      tplnDel.plnP.plnN = tplnDel.plnN
-      tplnDel.plnN.plnP = tplnDel.plnP
-      delete(this.mapCache, tplnDel.iKey) //哈希表移除结点
-      this.iNowSize--                     //计数减少
-    }
-  }
+	if _, bExist := this.mapCache[key]; bExist {
+		//键存在
+		tpln := this.mapCache[key]
+		tpln.iValue = value //重新赋值
+		//从链表中移除这个结点
+		tpln.plnP.plnN = tpln.plnN
+		tpln.plnN.plnP = tpln.plnP
+		//移动这个结点到头部
+		tpln.plnN = this.plnTou2.plnN
+		tpln.plnP = this.plnTou2
+		this.plnTou2.plnN.plnP = tpln
+		this.plnTou2.plnN = tpln
+	} else {
+		//键不存在
+		tpln := &ListNode{iKey: key, iValue: value}
+		//移动这个结点到头部
+		tpln.plnN = this.plnTou2.plnN
+		tpln.plnP = this.plnTou2
+		this.plnTou2.plnN.plnP = tpln
+		this.plnTou2.plnN = tpln
+		this.mapCache[key] = tpln //哈希表添加结点
+		this.iNowSize++           //计数增加
+		if this.iNowSize > this.iMaxSize {
+			//触发淘汰机制
+			tplnDel := this.plnWei3.plnP //要淘汰的节点
+			//从链表中移除这个结点
+			tplnDel.plnP.plnN = tplnDel.plnN
+			tplnDel.plnN.plnP = tplnDel.plnP
+			delete(this.mapCache, tplnDel.iKey) //哈希表移除结点
+			this.iNowSize--                     //计数减少
+		}
+	}
 }

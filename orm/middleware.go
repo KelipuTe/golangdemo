@@ -35,7 +35,7 @@ type S6QueryResult struct {
 	// 不同的查询，结果类型不一样，需要进行类型断言
 	// S6SELECT.First() => *T
 	// S6SELECT.List() => []*T
-	// S6SELECT.Get() => map[string]any
+	// S6SELECT.F8Get() => map[string]any
 	// INSERT.EXEC() => sql.Result
 	// UPDATE.EXEC() => sql.Result
 	// DELETE.EXEC() => sql.Result

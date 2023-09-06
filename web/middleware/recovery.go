@@ -2,9 +2,10 @@ package middleware
 
 import "demo-golang/web"
 
-func RecoveryMiddleware() web.HTTPMiddleware {
-	return func(next web.HTTPHandleFunc) web.HTTPHandleFunc {
-		return func(p7ctx *web.HTTPContext) {
+// [中间件]panic恢复
+func F8RecoveryMiddleware() web.F8HTTPMiddlewareFunc {
+	return func(next web.F8HTTPHandlerFunc) web.F8HTTPHandlerFunc {
+		return func(p7ctx *web.S6HTTPContext) {
 			defer func() {
 				if err := recover(); err != nil {
 					p7ctx.RespData = append(p7ctx.RespData, []byte("recover from panic\r\n")...)

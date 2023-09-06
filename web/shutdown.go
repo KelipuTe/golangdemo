@@ -2,11 +2,11 @@ package web
 
 import "context"
 
-// ShutdownCallback 服务关闭时需要执行的回调方法的定义
-type ShutdownCallback func(context.Context)
+// 服务关闭时需要执行的回调方法
+type F8ShutdownCallback func(context.Context)
 
-// ShutdownCallbackInterface 服务关闭时需要执行的回调方法的接口定义
-type ShutdownCallbackInterface interface {
-	// AddShutdownCallback 添加服务关闭时需要执行的回调方法
-	AddShutdownCallback(s5f4cb ...ShutdownCallback)
+// 服务关闭时需要执行的回调方法
+type I9ShutdownCallback interface {
+	// 添加服务关闭时需要执行的回调方法
+	F8AddShutdownCallback(...F8ShutdownCallback)
 }
