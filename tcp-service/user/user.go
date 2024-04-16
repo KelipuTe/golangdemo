@@ -3,7 +3,7 @@ package user
 import (
 	"demo-golang/tcp-service/api"
 	"demo-golang/tcp-service/client"
-	"demo-golang/tcp-service/protocol"
+	"demo-golang/tcp-service/config"
 	"demo-golang/tcp-service/protocol/stream"
 	"encoding/json"
 )
@@ -58,7 +58,7 @@ func (p1this *UserService) RegisteServiceProvider() {
 	// 发送数据
 	protocolName := p1this.p1innerClient.GetTCPConn().GetProtocolName()
 	switch protocolName {
-	case protocol.StreamStr:
+	case config.StreamStr:
 		t1p1protocol := p1this.p1innerClient.GetTCPConn().GetProtocol().(*stream.Stream)
 		t1p1protocol.SetDecodeMsg(string(p1apipkgJson))
 		p1this.p1innerClient.GetTCPConn().SendMsg([]byte{})

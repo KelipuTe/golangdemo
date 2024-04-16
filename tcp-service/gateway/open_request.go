@@ -8,7 +8,7 @@ import (
 )
 
 func (p1this *Gateway) DispatchOpenRequest(p1conn *service.TCPConnection) {
-	msg := p1conn.GetProtocol().(*http.HTTP)
+	msg := p1conn.GetProtocolHandler().(*http.Handler)
 
 	t1p1conn := p1this.GetInnerConn(msg.Uri)
 	// 如果找不到 api 对应的服务提供者，就直接报错给外部连接

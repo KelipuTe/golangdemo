@@ -1,6 +1,7 @@
 package http
 
 import (
+	"demo-golang/tcp-service/config"
 	"demo-golang/tcp-service/protocol"
 	goErrors "errors"
 	"strconv"
@@ -12,19 +13,14 @@ import (
 const (
 	ParseStatusRecvBufferEmpty uint8 = iota // 缓冲区为空
 	ParseStatusNotHTTP                      // 没找到 \r\n\r\n
-	ParseStatusIncomplete                   // 报文不完整（没接收全）
+	ParseStatusIncomplete                   // 报文不完整
 	ParseStatusParseErr                     // 解析出错
 )
 
-const (
-	// content-type
-	StrXWWWFormUrlencoded = "application/x-www-form-urlencoded"
-)
+var _ protocol.HandlerI9 = &Handler{}
 
-var _ protocol.Protocol = &HTTP{}
-
-// HTTP 协议
-type HTTP struct {
+// Handler http协议处理器
+type Handler struct {
 	// ParseStatus 解析状态，详见 ParseStatus 开头的常量
 	ParseStatus uint8
 
@@ -51,12 +47,11 @@ type HTTP struct {
 	MapBody map[string]string
 }
 
-func NewHTTP() *HTTP {
-	return &HTTP{}
+func NewHandlerHTTP() *Handler {
+	return &Handler{}
 }
 
-// Protocol.FirstMsgLength
-func (p1this *HTTP) FirstMsgLength(sli1recv []byte) (uint64, error) {
+func (p1this *Handler) FirstMsgLen(sli1recv []byte) (uint64, error) {
 	var firstMsgLen uint64 = 0
 
 	recvLen := uint64(len(sli1recv))
@@ -101,8 +96,7 @@ func (p1this *HTTP) FirstMsgLength(sli1recv []byte) (uint64, error) {
 	return uint64(firstMsgLen), nil
 }
 
-// Protocol.Decode
-func (p1this *HTTP) Decode(sli1msg []byte) error {
+func (p1this *Handler) Decode(sli1msg []byte) error {
 	p1this.Sli1Msg = sli1msg
 	msg := string(p1this.Sli1Msg)
 	header := msg[0:p1this.HeaderLength]
@@ -113,13 +107,12 @@ func (p1this *HTTP) Decode(sli1msg []byte) error {
 	return nil
 }
 
-// Protocol.Encode
-func (p1this *HTTP) Encode() ([]byte, error) {
+func (p1this *Handler) Encode() ([]byte, error) {
 	return []byte{}, nil
 }
 
 // parseHeader 解析请求头
-func (p1this *HTTP) parseHeader(header string) {
+func (p1this *Handler) parseHeader(header string) {
 	p1this.MapHeader = make(map[string]string, 2)
 	sli1header := strings.Split(header, "\r\n")
 	firstLine := sli1header[0]
@@ -141,7 +134,7 @@ func (p1this *HTTP) parseHeader(header string) {
 }
 
 // parseQuery 解析查询参数
-func (p1this *HTTP) parseQuery(uri string) {
+func (p1this *Handler) parseQuery(uri string) {
 	index := strings.Index(uri, "?")
 	if index > 0 {
 		// 有 "?"
@@ -162,11 +155,11 @@ func (p1this *HTTP) parseQuery(uri string) {
 }
 
 // parseBody 解析请求体
-func (p1this *HTTP) parseBody(body string) {
+func (p1this *Handler) parseBody(body string) {
 	c7t4, ok := p1this.MapHeader["content-type"]
 	if ok {
 		switch c7t4 {
-		case StrXWWWFormUrlencoded:
+		case config.ContentTypeFormStr:
 			p1this.MapBody = make(map[string]string)
 			sli1Body := strings.Split(body, "&")
 			for _, val := range sli1Body {

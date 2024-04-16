@@ -1,115 +1,52 @@
 package service
 
 import (
-	goErrors "errors"
+	"demo-golang/tcp-service/config"
+	"errors"
 	"fmt"
 	"log"
 	"net"
 	"os"
 	"runtime"
 	"strconv"
-
-	pkgErrors "github.com/pkg/errors"
+	"sync"
 )
 
-const (
-	RunStatusOff uint8 = iota // 服务（连接）关闭
-	RunStatusOn               // 服务（连接）运行
-)
-
-const (
-	DebugStatusOff uint8 = iota // debug 关
-	DebugStatusOn               // debug 开
-)
-
-// TCPService 默认属性值
-
-const defaultName string = "default-service"
-
-// TCPService 默认方法
-
-func defaultOnServiceStart(p1service *TCPService) {
-	if p1service.IsDebug() {
-		fmt.Println(fmt.Sprintf("%s.OnServiceStart", p1service.name))
-	}
-}
-
-func defaultOnServiceError(p1service *TCPService, err error) {
-	if p1service.IsDebug() {
-		fmt.Println(fmt.Sprintf("%s.OnServiceError", p1service.name))
-	}
-	fmt.Println(fmt.Sprintf("%s", err))
-}
-
-func defaultOnConnConnect(p1conn *TCPConnection) {
-	if p1conn.p1service.IsDebug() {
-		fmt.Println(fmt.Sprintf("%s.OnConnConnect", p1conn.p1service.name))
-	}
-}
-
-func defaultOnConnRequest(p1conn *TCPConnection) {
-	if p1conn.p1service.IsDebug() {
-		fmt.Println(fmt.Sprintf("%s.OnConnRequest", p1conn.p1service.name))
-	}
-}
-
-func defaultOnConnClose(p1conn *TCPConnection) {
-	if p1conn.p1service.IsDebug() {
-		fmt.Println(fmt.Sprintf("%s.OnConnClose", p1conn.p1service.name))
-	}
-}
-
-// TCPService TCP 服务端
+// TCPService tcp服务端
 type TCPService struct {
-	// name 服务端名称
-	name string
-	// runStatus 运行状态，详见 RunStatus 开头的常量
-	runStatus uint8
-	// debugStatus debug 开关状态，详见 DebugStatus 开头的常量
-	debugStatus uint8
+	name         string             //名称
+	runStatus    config.RunStatus   //运行状态
+	debugStatus  config.DebugStatus //debug开关
+	protocolName string             //使用的协议
+	address      string             //ip地址
+	port         uint16             //端口号
 
-	// protocolName 协议名称
-	protocolName string
+	listener     net.Listener              //socket本体
+	connPool     map[string]*TCPConnection //连接上来的tcp
+	connPoolLock *sync.Mutex               //连接专用的锁
+	maxConnNum   uint32                    //最大tcp连接数
+	nowConnNum   uint32                    //当前tcp连接数
 
-	// address IP 地址
-	address string
-	// port 端口号
-	port uint16
-	// p1listener net.Listener
-	p1listener net.Listener
-
-	// mapConnPool TCP 连接（TCPConnection）池
-	mapConnPool map[string]*TCPConnection
-	// maxConnNum TCP 连接，最大连接数
-	maxConnNum uint32
-	// nowConnNum TCP 连接，当前连接数
-	nowConnNum uint32
-
-	// OnServiceStart 服务端启动事件回调
-	OnServiceStart func(*TCPService)
-	// OnServiceError 服务端错误事件回调
-	OnServiceError func(*TCPService, error)
-	// OnConnConnect TCP 连接，连接事件回调
-	OnConnConnect func(*TCPConnection)
-	// OnConnRequest TCP 连接，请求事件回调
-	OnConnRequest func(*TCPConnection)
-	// OnConnClose TCP 连接，关闭事件回调
-	OnConnClose func(*TCPConnection)
+	OnServiceStart func(*TCPService)        //服务端，启动事件回调
+	OnServiceError func(*TCPService, error) //服务端，错误事件回调
+	OnConnConnect  func(*TCPConnection)     //tcp连接，连接事件回调
+	OnConnRequest  func(*TCPConnection)     //tcp连接，请求事件回调
+	OnConnClose    func(*TCPConnection)     //tcp连接，关闭事件回调
 }
 
-// NewTCPService 创建默认的 TCPService
 func NewTCPService(protocolName string, address string, port uint16) *TCPService {
 	return &TCPService{
 		name:         defaultName,
-		runStatus:    RunStatusOn,
-		debugStatus:  DebugStatusOff,
+		runStatus:    config.RunStatusOff,
+		debugStatus:  config.DebugStatusOff,
 		protocolName: protocolName,
 		address:      address,
 		port:         port,
 
-		mapConnPool: make(map[string]*TCPConnection),
-		maxConnNum:  1024,
-		nowConnNum:  0,
+		connPool:     make(map[string]*TCPConnection),
+		maxConnNum:   1024,
+		nowConnNum:   0,
+		connPoolLock: &sync.Mutex{},
 
 		OnServiceStart: defaultOnServiceStart,
 		OnServiceError: defaultOnServiceError,
@@ -120,50 +57,52 @@ func NewTCPService(protocolName string, address string, port uint16) *TCPService
 }
 
 // SetName 设置服务名称
-func (p1this *TCPService) SetName(name string) {
-	p1this.name = name
+func (s *TCPService) SetName(name string) {
+	s.name = name
 }
 
 // GetName 获取服务名称
-func (p1this *TCPService) GetName() string {
-	return p1this.name
+func (s *TCPService) GetName() string {
+	return s.name
 }
 
-// IsRun 服务是不是正在运行
-func (p1this *TCPService) IsRun() bool {
-	return RunStatusOn == p1this.runStatus
+// IsRun 是不是运行中
+func (s *TCPService) IsRun() bool {
+	return s.runStatus == config.RunStatusOn
 }
 
-// SetDebugStatusOn 打开 debug
-func (p1this *TCPService) SetDebugStatusOn() {
-	p1this.debugStatus = DebugStatusOn
+// OpenDebug 打开debug
+func (s *TCPService) OpenDebug() {
+	s.debugStatus = config.DebugStatusOn
 }
 
-// IsDebug 是否是 debug 模式
-func (p1this *TCPService) IsDebug() bool {
-	return DebugStatusOn == p1this.debugStatus
+// IsDebug 是否是debug模式
+func (s *TCPService) IsDebug() bool {
+	return s.debugStatus == config.DebugStatusOn
 }
 
 // Start 服务启动
-func (p1this *TCPService) Start() {
-	p1this.StartInfo()
+func (s *TCPService) Start() {
+	s.StartInfo()
 
-	t1address := p1this.address + ":" + strconv.Itoa(int(p1this.port))
-	listener, err := net.Listen("tcp4", t1address)
-	if nil != err {
-		p1this.OnServiceError(p1this, pkgErrors.WithMessage(err, fmt.Sprintf("%s.F8Start", p1this.name)))
+	address := s.address + ":" + strconv.Itoa(int(s.port))
+	listener, err := net.Listen("tcp4", address)
+	if err != nil {
+		errStr := fmt.Sprintf("service [%s] Start() with err:%s", s.name, err.Error())
+		s.OnServiceError(s, errors.New(errStr))
 		return
 	}
 
-	p1this.p1listener = listener
-	defer p1this.p1listener.Close()
+	s.listener = listener
+	defer s.listener.Close()
 
-	p1this.OnServiceStart(p1this)
-	p1this.StartListen()
+	s.runStatus = config.RunStatusOn
+	s.OnServiceStart(s)
+	s.StartListen()
 }
 
-// StartInfo 输出服务配置和环境参数
-func (p1this *TCPService) StartInfo() {
+// StartInfo 输出服务的配置和环境参数
+func (s *TCPService) StartInfo() {
 	log.Println("runtime.GOOS=", runtime.GOOS)
 	log.Println("runtime.NumCPU()=", runtime.NumCPU())
 	log.Println("runtime.Version()=", runtime.Version())
@@ -171,50 +110,58 @@ func (p1this *TCPService) StartInfo() {
 }
 
 // StartListen 开始监听
-func (p1this *TCPService) StartListen() {
-	for p1this.IsRun() {
-		// net.Listener.Accept，系统调用，获取 TCP 连接
-		p1netConn, err := p1this.p1listener.Accept()
-		if nil != err {
-			p1this.OnServiceError(p1this, pkgErrors.WithMessage(err, fmt.Sprintf("%s.StartListen", p1this.name)))
+func (s *TCPService) StartListen() {
+	for s.IsRun() {
+		// net.Listener.Accept，系统调用，获取连接上来的tcp
+		conn, err := s.listener.Accept()
+		if err != nil {
+			errStr := fmt.Sprintf("service [%s] StartListen() with err:%s", s.name, err.Error())
+			s.OnServiceError(s, errors.New(errStr))
 			return
 		}
-		// 判断 TCP 连接当前数量是否超过最大连接数
-		if p1this.nowConnNum >= p1this.maxConnNum {
-			err = goErrors.New("nowConnNum >= maxConnNum")
-			p1this.OnServiceError(p1this, pkgErrors.WithMessage(err, fmt.Sprintf("%s.StartListen", p1this.name)))
+
+		// 判断当前tcp连接数是否超过最大tcp连接数
+		if s.nowConnNum >= s.maxConnNum {
+			errStr := fmt.Sprintf("service [%s] nowConnNum >= maxConnNum", s.name)
+			s.OnServiceError(s, errors.New(errStr))
 		}
 
-		p1TCPConn := NewTCPConnection(p1this, p1netConn)
-		p1this.AddConnection(p1TCPConn)
-		p1this.OnConnConnect(p1TCPConn)
-		go p1TCPConn.HandleConnection()
+		tcpConn := NewTCPConnection(s, conn)
+		s.AddConnection(tcpConn)
+		tcpConn.runStatus = config.RunStatusOn
+		s.OnConnConnect(tcpConn)
+		go tcpConn.HandleConnection()
 	}
 }
 
 // AddConnection 添加连接
-func (p1this *TCPService) AddConnection(p1conn *TCPConnection) {
-	// 用 Linux C 编码时，可以通过 socket 的文件描述符区分 TCP 连接
-	// 在 go 中也可以获得文件描述符，但是文件描述符不是唯一的，不能用于区分
-	if p1this.IsDebug() {
-		fd, err := p1conn.p1conn.(*net.TCPConn).File()
+func (s *TCPService) AddConnection(tcpConn *TCPConnection) {
+	//用c编码时，可以通过socket的文件描述符区分tcp连接
+	//在go中也可以获得文件描述符，但是文件描述符不是唯一的，所以不能用于区分tcp连接
+	if s.IsDebug() {
+		fd, err := tcpConn.netConn.(*net.TCPConn).File()
 		fmt.Println("net.TCPConn.File", fd.Fd(), err)
 	}
 
-	addrStr := p1conn.p1conn.RemoteAddr().String()
-	p1this.nowConnNum++
-	p1this.mapConnPool[addrStr] = p1conn
+	//这里不用处理并发问题，建立连接的时候，是单线程的
+	addrStr := tcpConn.netConn.RemoteAddr().String()
+	s.nowConnNum++
+	s.connPool[addrStr] = tcpConn
 
-	if p1this.IsDebug() {
+	if s.IsDebug() {
 		fmt.Println("net.TCPConn.RemoteAddr.String", addrStr)
 	}
 }
 
 // DeleteConnection 移除连接
-func (p1this *TCPService) DeleteConnection(p1conn *TCPConnection) {
-	addrStr := p1conn.p1conn.RemoteAddr().String()
-	if _, ok := p1this.mapConnPool[addrStr]; ok {
-		delete(p1this.mapConnPool, addrStr)
-		p1this.nowConnNum--
+func (s *TCPService) DeleteConnection(tcpConn *TCPConnection) {
+	//这里需要处理并发问题，关闭连接的时候，存在并发情况
+	s.connPoolLock.Lock()
+	defer s.connPoolLock.Unlock()
+
+	addrStr := tcpConn.netConn.RemoteAddr().String()
+	if _, ok := s.connPool[addrStr]; ok {
+		delete(s.connPool, addrStr)
+		s.nowConnNum--
 	}
 }

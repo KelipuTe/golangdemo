@@ -2,6 +2,7 @@ package gateway
 
 import (
 	"demo-golang/tcp-service/api"
+	"demo-golang/tcp-service/config"
 	"demo-golang/tcp-service/service"
 	"encoding/json"
 	"fmt"
@@ -9,32 +10,12 @@ import (
 	"time"
 )
 
-const defaultName string = "default-gateway"
-
-const (
-	DebugStatusOff uint8 = iota // debug 关
-	DebugStatusOn               // debug 开
-)
-
-var P1gateway *Gateway
-
-func init() {
-	P1gateway = &Gateway{
-		name:              defaultName,
-		debugStatus:       DebugStatusOff,
-		mapInnerConnPool:  make(map[string][]*service.TCPConnection),
-		mapInnerConnCount: make(map[string]uint64),
-		mapConnToPing:     make(map[string]*service.TCPConnection),
-		mapOpenConn:       make(map[string]*service.TCPConnection),
-	}
-}
-
 // Gateway 服务
 type Gateway struct {
 	// name Gateway 服务名称
 	name string
 	// debugStatus debug 开关状态，详见 DebugStatus 开头的常量
-	debugStatus uint8
+	debugStatus config.DebugStatus
 
 	// p1innerService 需要一个内部 TCP 服务端为服务提供者提供服务。
 	p1innerService *service.TCPService
@@ -55,12 +36,12 @@ type Gateway struct {
 
 // SetDebugStatusOn 打开 debug
 func (p1this *Gateway) SetDebugStatusOn() {
-	p1this.debugStatus = DebugStatusOn
+	p1this.debugStatus = config.DebugStatusOn
 }
 
 // IsDebug 是否是 debug 模式
 func (p1this *Gateway) IsDebug() bool {
-	return DebugStatusOn == p1this.debugStatus
+	return p1this.debugStatus == config.DebugStatusOn
 }
 
 // SetInnerService 设置内部 TCP 服务端

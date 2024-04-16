@@ -36,7 +36,7 @@ var (
 	ErrConnectionIsClosed = errors.New("websocket connection is closed.")
 )
 
-var _ protocol.Protocol = &WebSocket{}
+var _ protocol.HandlerI9 = &WebSocket{}
 
 // WebSocket 协议
 // https://datatracker.ietf.org/doc/rfc6455/
@@ -45,8 +45,8 @@ type WebSocket struct {
 	// 编码类型，详见 encodeType 开头的常量
 	encodeType uint8
 
-	// p1HttpInner 握手阶段要用 HTTP 协议
-	p1HttpInner *http.HTTP
+	// p1HttpInner 握手阶段要用 HandlerI9 协议
+	p1HttpInner *http.Handler
 
 	// SecWebSocketKey sec-websocket-key
 	SecWebSocketKey string
@@ -85,15 +85,15 @@ type WebSocket struct {
 func NewWebSocket() *WebSocket {
 	return &WebSocket{
 		encodeType:      encodeTypeNoMusk,
-		p1HttpInner:     http.NewHTTP(),
+		p1HttpInner:     http.NewHandlerHTTP(),
 		handshakeStatus: handshakeStatusNo,
 	}
 }
 
-func (p1this *WebSocket) FirstMsgLength(sli1recv []byte) (uint64, error) {
+func (p1this *WebSocket) FirstMsgLen(sli1recv []byte) (uint64, error) {
 	if handshakeStatusNo == p1this.handshakeStatus {
 		// 没有握手
-		return p1this.p1HttpInner.FirstMsgLength(sli1recv)
+		return p1this.p1HttpInner.FirstMsgLen(sli1recv)
 	} else if handshakeStatusYes == p1this.handshakeStatus {
 		// 已经握手
 		recvLen := len(sli1recv)
@@ -353,7 +353,7 @@ func (p1this *WebSocket) CheckHandshakeReq() ([]byte, error) {
 
 	// 测试使用的是 JavaScript 的 WebSocket 工具
 	// 在上述条件下，这几个字段都要有，少一个都跑不通
-	msg := fmt.Sprintf("HTTP/1.1 101 Switching Protocols\r\n")
+	msg := fmt.Sprintf("HandlerI9/1.1 101 Switching Protocols\r\n")
 	msg += fmt.Sprintf("Connection: Upgrade\r\n")
 	msg += fmt.Sprintf("Upgrade: websocket\r\n")
 	msg += fmt.Sprintf("Sec-WebSocket-Accept: %s\r\n", secAcceptBase64)
@@ -369,7 +369,7 @@ func (p1this *WebSocket) MakeHandShakeReq() ([]byte, error) {
 	md5str := md5.Sum([]byte(t1str))
 	p1this.SecWebSocketKey = base64.StdEncoding.EncodeToString(md5str[:])
 
-	msg := fmt.Sprintf("GET /chat HTTP/1.1\r\n")
+	msg := fmt.Sprintf("GET /chat HandlerI9/1.1\r\n")
 	msg += fmt.Sprintf("Upgrade: websocket\r\n")
 	msg += fmt.Sprintf("Connection: Upgrade\r\n")
 	msg += fmt.Sprintf("Sec-WebSocket-Key: %s\r\n", p1this.SecWebSocketKey)
