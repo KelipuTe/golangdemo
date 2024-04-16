@@ -18,19 +18,19 @@ func defaultOnClientError(p1service *TCPClient, err error) {
 }
 
 func defaultOnConnConnect(p1conn *TCPConnection) {
-	if p1conn.p1client.IsDebug() {
-		fmt.Println(fmt.Sprintf("%s.OnConnConnect", p1conn.p1client.name))
+	if p1conn.belongToClient.IsDebug() {
+		fmt.Println(fmt.Sprintf("%s.OnConnConnect", p1conn.belongToClient.name))
 	}
 }
 
 func defaultOnConnRequest(p1conn *TCPConnection) {
-	if p1conn.p1client.IsDebug() {
-		fmt.Println(fmt.Sprintf("%s.OnConnRequest", p1conn.p1client.name))
+	if p1conn.belongToClient.IsDebug() {
+		fmt.Println(fmt.Sprintf("%s.OnConnRequest", p1conn.belongToClient.name))
 	}
 }
 
 func defaultOnConnClose(p1conn *TCPConnection) {
-	if p1conn.p1client.IsDebug() {
-		fmt.Println(fmt.Sprintf("%s.OnConnClose", p1conn.p1client.name))
+	if p1conn.belongToClient.IsDebug() {
+		fmt.Println(fmt.Sprintf("%s.OnConnClose", p1conn.belongToClient.name))
 	}
 }

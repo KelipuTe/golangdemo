@@ -11,53 +11,47 @@ const (
 )
 
 // 状态码文案
-var (
-	statusText = map[uint16]string{
-		StatusOk:                  "OK",
-		StatusBadRequest:          "Bad Request",
-		StatusNotFound:            "Not Found",
-		StatusInternalServerError: "Internal Server Error",
-	}
-)
+var statusText = map[uint16]string{
+	StatusOk:                  "OK",
+	StatusBadRequest:          "Bad Request",
+	StatusNotFound:            "Not Found",
+	StatusInternalServerError: "Internal Server Error",
+}
 
 // Response 响应
 type Response struct {
-	// 状态码
-	statusCode uint16
-	// 响应头
-	mapHeader map[string]string
+	statusCode uint16            //状态码
+	header     map[string]string //响应头
 }
 
 func NewResponse() *Response {
 	return &Response{
-		mapHeader: make(map[string]string, 2),
+		header: make(map[string]string, 2),
 	}
 }
 
-// SetHeader 设置状态码
-func (p1this *Response) SetStatusCode(statusCode uint16) {
-	p1this.statusCode = statusCode
+func (r *Response) SetStatusCode(code uint16) {
+	r.statusCode = code
 }
 
-// SetHeader 设置响应头
-func (p1this *Response) SetHeader(key string, val string) {
-	p1this.mapHeader[key] = val
+func (r *Response) SetHeader(k string, v string) {
+	r.header[k] = v
 }
 
 // MakeMsg 构造响应报文
-func (p1this *Response) MakeResponse(body string) string {
-	respStr := fmt.Sprintf("Handler/1.1 %d %v\r\n", p1this.statusCode, statusText[p1this.statusCode])
+func (r *Response) MakeMsg(body string) string {
+	msg := fmt.Sprintf("HTTP/1.1 %d %v\r\n", r.statusCode, statusText[r.statusCode])
 
-	_, ok := p1this.mapHeader["Content-Type"]
+	_, ok := r.header["Content-Type"]
 	if !ok {
-		p1this.mapHeader["Content-Type"] = "text/html; charset=utf8"
+		r.header["Content-Type"] = "text/html; charset=utf8"
 	}
 
-	for key, val := range p1this.mapHeader {
-		respStr += fmt.Sprintf("%s: %s\r\n", key, val)
+	for k, v := range r.header {
+		msg += fmt.Sprintf("%s: %s\r\n", k, v)
 	}
 
-	respStr += fmt.Sprintf("Content-Length: %v\r\n\r\n%s", len(body), body)
+	msg += fmt.Sprintf("Content-Length: %v\r\n\r\n%s", len(body), body)
 
-	return respStr
+	return msg
 }

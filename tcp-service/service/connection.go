@@ -3,6 +3,7 @@ package service
 import (
 	"demo-golang/tcp-service/config"
 	"demo-golang/tcp-service/protocol"
+	"demo-golang/tcp-service/protocol/abs"
 	"demo-golang/tcp-service/protocol/http"
 	"demo-golang/tcp-service/protocol/stream"
 	"demo-golang/tcp-service/protocol/websocket"
@@ -17,39 +18,28 @@ type TCPConnection struct {
 	runStatus       config.RunStatus //连接状态
 	belongToService *TCPService      //连接所属的服务端
 
-	protocolName    string             //协议名称
-	protocolHandler protocol.HandlerI9 //协议处理
+	protocolName    string        //协议名称
+	protocolHandler abs.HandlerI9 //协议处理器
 
-	netConn          net.Conn //net.Conn
-	recvBuffer       []byte   // 接收缓冲区
-	recvBufferMaxLen uint64   // 接收缓冲区最大长度
-	recvBufferNowLen uint64   // 接收缓冲区当前长度
+	netConn          net.Conn //tcp连接本体
+	recvBuffer       []byte   //接收缓冲区
+	recvBufferMaxLen uint64   //接收缓冲区最大长度
+	recvBufferNowLen uint64   //接收缓冲区当前长度
 }
 
 func NewTCPConnection(service *TCPService, conn net.Conn) *TCPConnection {
-	tcpConn := &TCPConnection{
+	return &TCPConnection{
 		runStatus:       config.RunStatusOff,
 		belongToService: service,
 
 		protocolName:    service.protocolName,
-		protocolHandler: nil,
+		protocolHandler: protocol.NewHandler(service.protocolName),
 
 		netConn:          conn,
 		recvBuffer:       make([]byte, config.RecvBufferMaxLen),
 		recvBufferMaxLen: config.RecvBufferMaxLen,
 		recvBufferNowLen: 0,
 	}
-
-	switch tcpConn.protocolName {
-	case config.HTTPStr:
-		tcpConn.protocolHandler = http.NewHandlerHTTP()
-	case config.StreamStr:
-		tcpConn.protocolHandler = stream.NewStream()
-	case config.WebSocketStr:
-		tcpConn.protocolHandler = websocket.NewWebSocket()
-	}
-
-	return tcpConn
 }
 
 // IsRun 是不是运行中
@@ -63,7 +53,7 @@ func (c *TCPConnection) IsDebug() bool {
 }
 
 // GetProtocolHandler 获取协议处理器
-func (c *TCPConnection) GetProtocolHandler() protocol.HandlerI9 {
+func (c *TCPConnection) GetProtocolHandler() abs.HandlerI9 {
 	return c.protocolHandler
 }
 
@@ -75,7 +65,7 @@ func (c *TCPConnection) GetNetConnRemoteAddr() string {
 // HandleConnection 处理连接
 func (c *TCPConnection) HandleConnection() {
 	for c.IsRun() {
-		//net.Conn.Read，系统调用，从 socket 读取数据
+		//net.Conn.Read，系统调用，从socket读取数据
 		byteNum, err := c.netConn.Read(c.recvBuffer[c.recvBufferNowLen:])
 
 		if c.IsDebug() {
@@ -131,7 +121,7 @@ func (c *TCPConnection) HandleBuffer() {
 			//这里模仿的是 HTTP 1.1 协议，短连接。
 			c.HandleHTTPMsg(firstMsg)
 			c.belongToService.OnConnRequest(c)
-			return
+			//处理完一条消息后，客户端会关闭tcp连接
 		case config.StreamStr:
 			//这里模仿的是自定义 Stream 协议，长链接
 			c.HandleStreamMsg(firstMsg)
@@ -151,7 +141,7 @@ func (c *TCPConnection) HandleBuffer() {
 			//   t1p1protocol.SetDecodeMsg(fmt.Sprintf("this is %s.", c.belongToService.name))
 			//   c.SendMsg([]byte{})
 			// }
-			// 处理完一条消息后，不会关闭 TCP 连接
+			// 处理完一条消息后，不会关闭tcp连接
 		}
 
 		//处理接收缓冲区中剩余的数据
@@ -204,11 +194,11 @@ func (c *TCPConnection) HandleWebSocketMsg(sli1firstMsg []byte) error {
 			fmt.Println(fmt.Sprintf("%+v", string(sli1respMsg)))
 		}
 
-		if nil != err {
+		if err != nil {
 			// 发送 400 给客户端，并且关闭连接
 			resp := http.NewResponse()
 			resp.SetStatusCode(http.StatusBadRequest)
-			respStr := resp.MakeResponse(fmt.Sprintf("this is %s. handshake err: %s", c.belongToService.name, err))
+			respStr := resp.MakeMsg(fmt.Sprintf("this is %s. handshake err: %s", c.belongToService.name, err))
 			c.WriteData([]byte(respStr))
 
 			return err
@@ -253,7 +243,7 @@ func (c *TCPConnection) WriteData(sli1data []byte) error {
 		fmt.Println(fmt.Sprintf("%s.TCPConnection.WriteData.byteNum: %d", c.belongToService.name, byteNum))
 	}
 
-	if nil != err {
+	if err != nil {
 		c.belongToService.OnServiceError(c.belongToService, err)
 		c.CloseConnection()
 	}
@@ -267,9 +257,8 @@ func (c *TCPConnection) WriteData(sli1data []byte) error {
 // CloseConnection 关闭连接
 func (c *TCPConnection) CloseConnection() {
 	c.runStatus = config.RunStatusOff
+	_ = c.netConn.Close()
 	c.recvBufferNowLen = 0
-	c.netConn.Close()
 	c.belongToService.DeleteConnection(c)
 	c.belongToService.OnConnClose(c)
-
 }

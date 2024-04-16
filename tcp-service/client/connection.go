@@ -3,6 +3,7 @@ package client
 import (
 	"demo-golang/tcp-service/config"
 	"demo-golang/tcp-service/protocol"
+	"demo-golang/tcp-service/protocol/abs"
 	"demo-golang/tcp-service/protocol/http"
 	"demo-golang/tcp-service/protocol/stream"
 	"demo-golang/tcp-service/protocol/websocket"
@@ -13,173 +14,122 @@ import (
 )
 
 // TCPConnection tcp连接，封装 net.Conn
+// 这个和 service 那里的那个 TCPConnection 很像
 type TCPConnection struct {
-	// 连接状态，详见 RunStatus 开头的常量
-	runStatus config.RunStatus
+	runStatus      config.RunStatus //连接状态
+	belongToClient *TCPClient       //连接所属的客户端
 
-	// TCP 连接所属 TCP 客户端
-	p1client *TCPClient
+	protocolName    string        //协议名称
+	protocolHandler abs.HandlerI9 //协议处理器
 
-	// 协议名称
-	protocolName string
-	// protocol.HandlerI9
-	p1protocol protocol.HandlerI9
-
-	// net.Conn
-	p1conn net.Conn
-	// 接收缓冲区
-	sli1recvBuffer []byte
-	// 接收缓冲区最大大小
-	recvBufferMax uint64
-	// 接收缓冲区当前大小
-	recvBufferNow uint64
+	netConn          net.Conn //tcp连接本体
+	recvBuffer       []byte   //接收缓冲区
+	recvBufferMaxLen uint64   //接收缓冲区最大大小
+	recvBufferNowLen uint64   //接收缓冲区当前大小
 }
 
-// NewTCPConnection 创建 TCPConnection
-func NewTCPConnection(p1client *TCPClient, p1netConn net.Conn) *TCPConnection {
-	p1tcpConn := &TCPConnection{
+func NewTCPConnection(client *TCPClient, conn net.Conn) *TCPConnection {
+	return &TCPConnection{
 		runStatus:      config.RunStatusOn,
-		p1client:       p1client,
-		protocolName:   "",
-		p1protocol:     nil,
-		p1conn:         p1netConn,
-		sli1recvBuffer: make([]byte, config.RecvBufferMaxLen),
-		recvBufferMax:  config.RecvBufferMaxLen,
-		recvBufferNow:  0,
+		belongToClient: client,
+
+		protocolName:    client.protocolName,
+		protocolHandler: protocol.NewHandler(client.protocolName),
+
+		netConn:          conn,
+		recvBuffer:       make([]byte, config.RecvBufferMaxLen),
+		recvBufferMaxLen: config.RecvBufferMaxLen,
+		recvBufferNowLen: 0,
 	}
-
-	p1tcpConn.protocolName = p1client.protocolName
-
-	switch p1tcpConn.protocolName {
-	case config.HTTPStr:
-		p1tcpConn.p1protocol = http.NewHandlerHTTP()
-	case config.StreamStr:
-		p1tcpConn.p1protocol = stream.NewStream()
-	case config.WebSocketStr:
-		p1tcpConn.p1protocol = websocket.NewWebSocket()
-	}
-
-	return p1tcpConn
 }
 
-// IsRun TCP 连接是不是正在运行
-func (p1this *TCPConnection) IsRun() bool {
-	return config.RunStatusOn == p1this.runStatus
+func (c *TCPConnection) IsRun() bool {
+	return config.RunStatusOn == c.runStatus
 }
 
-// TCPClient.IsDebug
-func (p1this *TCPConnection) IsDebug() bool {
-	return p1this.p1client.IsDebug()
+func (c *TCPConnection) IsDebug() bool {
+	return c.belongToClient.IsDebug()
 }
 
-// 获取连接所属的客户端
-func (p1this *TCPConnection) GetClient() *TCPClient {
-	return p1this.p1client
+func (c *TCPConnection) GetClient() *TCPClient {
+	return c.belongToClient
 }
 
-// 获取连接的协议名称
-func (p1this *TCPConnection) GetProtocolName() string {
-	return p1this.protocolName
+func (c *TCPConnection) GetProtocolName() string {
+	return c.protocolName
 }
 
-// 获取连接的协议实例
-func (p1this *TCPConnection) GetProtocol() protocol.HandlerI9 {
-	return p1this.p1protocol
+func (c *TCPConnection) GetProtocolHandler() abs.HandlerI9 {
+	return c.protocolHandler
 }
 
-// GetNetConnRemoteAddr 获取连接 IP 和端口
-func (p1this *TCPConnection) GetNetConnRemoteAddr() string {
-	return p1this.p1conn.RemoteAddr().String()
+func (c *TCPConnection) GetNetConnRemoteAddr() string {
+	return c.netConn.RemoteAddr().String()
 }
 
-// HandleConnection 处理连接
-func (p1this *TCPConnection) HandleConnection(deferFunc func()) {
+func (c *TCPConnection) HandleConnection(deferFunc func()) {
 	defer func() {
 		deferFunc()
 	}()
 
-	// 连上服务端之后，发送测试消息
-	// 这里就不发送测试消息了，消息由外部请求触发发送
-	switch p1this.protocolName {
-	case config.HTTPStr:
-		// 发送 HandlerI9 消息
-		// resp := http.NewResponse()
-		// resp.SetStatusCode(http.StatusOk)
-		// respStr := resp.MakeResponse(fmt.Sprintf("this is %s.", p1this.p1client.name))
-		// p1this.SendMsg([]byte(respStr))
-	case config.StreamStr:
-		// 发送自定义字节流消息
-		// t1p1protocol := p1this.p1protocol.(*stream.Stream)
-		// t1p1protocol.SetDecodeMsg(fmt.Sprintf("this is %s.", p1this.p1client.name))
-		// p1this.SendMsg([]byte{})
-	case config.WebSocketStr:
-		// 发送 WebSocket 握手消息
-		t1p1protocol := p1this.p1protocol.(*websocket.WebSocket)
-		sli1respMsg, _ := t1p1protocol.MakeHandShakeReq()
-		p1this.WriteData(sli1respMsg)
-	}
+	for c.IsRun() {
+		byteNum, err := c.netConn.Read(c.recvBuffer[c.recvBufferNowLen:])
 
-	// 发送完了之后等待服务端响应
-	for p1this.IsRun() {
-		byteNum, err := p1this.p1conn.Read(p1this.sli1recvBuffer[p1this.recvBufferNow:])
-
-		if p1this.IsDebug() {
-			fmt.Println(fmt.Sprintf("%s.TCPConnection.HandleConnection.byteNum: %d", p1this.p1client.name, byteNum))
+		if c.IsDebug() {
+			fmt.Println(fmt.Sprintf("%s.TCPConnection.HandleConnection.byteNum: %d", c.belongToClient.name, byteNum))
 		}
 
-		if nil != err {
+		if err != nil {
 			if err == io.EOF {
-				// 对端关闭了连接
-				p1this.CloseConnection()
+				c.CloseConnection()
 				return
 			}
-			p1this.p1client.OnClientError(p1this.p1client, err)
+			c.belongToClient.OnClientError(c.belongToClient, err)
 			return
 		}
 
-		p1this.recvBufferNow += uint64(byteNum)
+		c.recvBufferNowLen += uint64(byteNum)
 
-		if p1this.IsDebug() {
-			fmt.Println(fmt.Sprintf("%s.TCPConnection.HandleConnection.recvBufferNow: %d", p1this.p1client.name, p1this.recvBufferNow))
-			fmt.Println(fmt.Sprintf("%s.TCPConnection.HandleConnection.sli1recvBuffer:", p1this.p1client.name))
-			fmt.Println(string(p1this.sli1recvBuffer[0:p1this.recvBufferNow]))
+		if c.IsDebug() {
+			fmt.Println(fmt.Sprintf("%s.TCPConnection.HandleConnection.recvBufferNowLen: %d", c.belongToClient.name, c.recvBufferNowLen))
+			fmt.Println(fmt.Sprintf("%s.TCPConnection.HandleConnection.recvBuffer:", c.belongToClient.name))
+			fmt.Println(string(c.recvBuffer[0:c.recvBufferNowLen]))
 		}
 
-		p1this.HandleBuffer()
+		c.HandleBuffer()
 	}
 }
 
-// HandleBuffer 处理缓冲区
-func (p1this *TCPConnection) HandleBuffer() {
-	sli1Copy := p1this.sli1recvBuffer[0:p1this.recvBufferNow]
-	for p1this.recvBufferNow > 0 {
-		firstMsgLength, err := p1this.p1protocol.FirstMsgLen(sli1Copy)
-		sli1firstMsg := p1this.sli1recvBuffer[0:firstMsgLength]
+func (c *TCPConnection) HandleBuffer() {
+	sli1Copy := c.recvBuffer[0:c.recvBufferNowLen]
+	for c.recvBufferNowLen > 0 {
+		firstMsgLength, err := c.protocolHandler.FirstMsgLen(sli1Copy)
+		sli1firstMsg := c.recvBuffer[0:firstMsgLength]
 
-		switch p1this.protocolName {
+		switch c.protocolName {
 		case config.HTTPStr:
 			// HandlerI9 1.1 协议的消息，解析之后由外部实现的 OnConnRequest 继续处理
-			t1p1protocol := p1this.p1protocol.(*http.Handler)
+			t1p1protocol := c.protocolHandler.(*http.Handler)
 			t1p1protocol.Decode(sli1firstMsg)
 
-			if p1this.IsDebug() {
-				fmt.Println(fmt.Sprintf("%s.TCPConnection.HandleBuffer.StreamStr.Decode: ", p1this.p1client.name))
+			if c.IsDebug() {
+				fmt.Println(fmt.Sprintf("%s.TCPConnection.HandleBuffer.StreamStr.Decode: ", c.belongToClient.name))
 				fmt.Println(fmt.Sprintf("%+v", t1p1protocol))
 			}
-			p1this.p1client.OnConnRequest(p1this)
+			c.belongToClient.OnConnRequest(c)
 		case config.StreamStr:
 			// 自定义 Stream 协议的消息，解析之后由外部实现的 OnConnRequest 继续处理
-			t1p1protocol := p1this.p1protocol.(*stream.Stream)
+			t1p1protocol := c.protocolHandler.(*stream.Stream)
 			t1p1protocol.Decode(sli1firstMsg)
 
-			if p1this.IsDebug() {
-				fmt.Println(fmt.Sprintf("%s.TCPConnection.HandleBuffer.StreamStr.Decode: ", p1this.p1client.name))
+			if c.IsDebug() {
+				fmt.Println(fmt.Sprintf("%s.TCPConnection.HandleBuffer.StreamStr.Decode: ", c.belongToClient.name))
 				fmt.Println(fmt.Sprintf("%+v", t1p1protocol))
 			}
-			p1this.p1client.OnConnRequest(p1this)
+			c.belongToClient.OnConnRequest(c)
 		case config.WebSocketStr:
 			// WebSocket 协议的消息，需要判断是握手消息还是测试消息
-			t1p1protocol := p1this.p1protocol.(*websocket.WebSocket)
+			t1p1protocol := c.protocolHandler.(*websocket.WebSocket)
 			t1p1protocol.Decode(sli1firstMsg)
 
 			if t1p1protocol.IsHandshakeStatusNo() {
@@ -187,74 +137,62 @@ func (p1this *TCPConnection) HandleBuffer() {
 				err = t1p1protocol.CheckHandShakeResp()
 				if err == nil {
 					t1p1protocol.SetHandshakeStatusYes()
-					t1p1protocol.SetDecodeMsg(fmt.Sprintf("this is %s.", p1this.p1client.name))
-					p1this.SendMsg([]byte{})
+					t1p1protocol.SetDecodeMsg(fmt.Sprintf("this is %s.", c.belongToClient.name))
+					c.SendMsg([]byte{})
 				} else {
-					p1this.CloseConnection()
+					c.CloseConnection()
 				}
 			} else {
 				// 测试消息，解析之后直接输出
-				if p1this.IsDebug() {
-					fmt.Println(fmt.Sprintf("%s.TCPConnection.HandleBuffer.WebSocketStr.Decode: ", p1this.p1client.name))
+				if c.IsDebug() {
+					fmt.Println(fmt.Sprintf("%s.TCPConnection.HandleBuffer.WebSocketStr.Decode: ", c.belongToClient.name))
 					fmt.Println(fmt.Sprintf("%+v", t1p1protocol))
-					p1this.p1client.OnConnRequest(p1this)
+					c.belongToClient.OnConnRequest(c)
 				}
 			}
 		}
 
-		p1this.sli1recvBuffer = p1this.sli1recvBuffer[firstMsgLength:]
-		// recvBufferNow 是 uint64 类型的，做减法的时候小心溢出
-		if p1this.recvBufferNow <= firstMsgLength {
-			p1this.recvBufferNow = 0
+		c.recvBuffer = c.recvBuffer[firstMsgLength:]
+		// recvBufferNowLen 是 uint64 类型的，做减法的时候小心溢出
+		if c.recvBufferNowLen <= firstMsgLength {
+			c.recvBufferNowLen = 0
 			break
 		} else {
-			p1this.recvBufferNow -= firstMsgLength
+			c.recvBufferNowLen -= firstMsgLength
 		}
 	}
 }
 
-// SendMsg 发送数据
-func (p1this *TCPConnection) SendMsg(sli1msg []byte) {
-	switch p1this.protocolName {
-	case config.TCPStr, config.HTTPStr:
-		if p1this.IsDebug() {
-			fmt.Println(fmt.Sprintf("%s.TCPConnection.SendMsg: ", p1this.p1client.name))
-			fmt.Println(string(sli1msg))
-		}
-		p1this.WriteData(sli1msg)
-	case config.StreamStr, config.WebSocketStr:
-		t1sli1msg, _ := p1this.p1protocol.Encode()
-		if p1this.IsDebug() {
-			fmt.Println(fmt.Sprintf("%s.TCPConnection.SendMsg: ", p1this.p1client.name))
-			fmt.Println(string(t1sli1msg))
-		}
-		p1this.WriteData(t1sli1msg)
+func (c *TCPConnection) SendMsg(msg []byte) {
+	if c.IsDebug() {
+		fmt.Println(fmt.Sprintf("client [%s] send:", c.belongToClient.name))
+		fmt.Println(string(msg))
 	}
+	_ = c.WriteData(msg)
 }
 
-// WriteData 发送数据
-func (p1this *TCPConnection) WriteData(sli1data []byte) (err error) {
-	byteNum, err := p1this.p1conn.Write(sli1data)
+func (c *TCPConnection) WriteData(data []byte) error {
+	byteNum, err := c.netConn.Write(data)
 
-	if p1this.IsDebug() {
-		fmt.Println(fmt.Sprintf("%s.TCPConnection.WriteData.byteNum: %d", p1this.p1client.name, byteNum))
+	if c.IsDebug() {
+		fmt.Println(fmt.Sprintf("client [%s] write [%d] bytes data.", c.belongToClient.name, byteNum))
 	}
 
-	if nil != err {
-		p1this.p1client.OnClientError(p1this.p1client, err)
-		p1this.CloseConnection()
+	if err != nil {
+		c.belongToClient.OnClientError(c.belongToClient, err)
+		c.CloseConnection()
+		return err
 	}
 
-	if byteNum != len(sli1data) {
-		return errors.New("write byte != data length")
+	if byteNum != len(data) {
+		return errors.New("write bytes != data len")
 	}
 	return nil
 }
 
-// CloseConnection 关闭连接
-func (p1this *TCPConnection) CloseConnection() {
-	p1this.runStatus = config.RunStatusOff
-	p1this.recvBufferNow = 0
-	p1this.p1client.OnConnClose(p1this)
-	p1this.p1conn.Close()
+func (c *TCPConnection) CloseConnection() {
+	c.runStatus = config.RunStatusOff
+	_ = c.netConn.Close()
+	c.recvBufferNowLen = 0
+	c.belongToClient.OnConnClose(c)
 }

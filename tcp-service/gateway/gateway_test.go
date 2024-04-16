@@ -12,7 +12,7 @@ import (
 func Test_Gateway(t *testing.T) {
 	gateway := &Gateway{
 		name:              defaultName,
-		debugStatus:       DebugStatusOff,
+		debugStatus:       config.DebugStatusOff,
 		mapInnerConnPool:  make(map[string][]*service.TCPConnection),
 		mapInnerConnCount: make(map[string]uint64),
 		mapConnToPing:     make(map[string]*service.TCPConnection),

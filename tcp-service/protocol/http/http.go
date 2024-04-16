@@ -2,7 +2,7 @@ package http
 
 import (
 	"demo-golang/tcp-service/config"
-	"demo-golang/tcp-service/protocol"
+	"demo-golang/tcp-service/protocol/abs"
 	goErrors "errors"
 	"strconv"
 	"strings"
@@ -17,7 +17,7 @@ const (
 	ParseStatusParseErr                     // 解析出错
 )
 
-var _ protocol.HandlerI9 = &Handler{}
+var _ abs.HandlerI9 = &Handler{}
 
 // Handler http协议处理器
 type Handler struct {
@@ -47,7 +47,7 @@ type Handler struct {
 	MapBody map[string]string
 }
 
-func NewHandlerHTTP() *Handler {
+func NewHandler() *Handler {
 	return &Handler{}
 }
 

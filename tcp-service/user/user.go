@@ -59,7 +59,7 @@ func (p1this *UserService) RegisteServiceProvider() {
 	protocolName := p1this.p1innerClient.GetTCPConn().GetProtocolName()
 	switch protocolName {
 	case config.StreamStr:
-		t1p1protocol := p1this.p1innerClient.GetTCPConn().GetProtocol().(*stream.Stream)
+		t1p1protocol := p1this.p1innerClient.GetTCPConn().GetProtocolHandler().(*stream.Stream)
 		t1p1protocol.SetDecodeMsg(string(p1apipkgJson))
 		p1this.p1innerClient.GetTCPConn().SendMsg([]byte{})
 	}
@@ -68,7 +68,7 @@ func (p1this *UserService) RegisteServiceProvider() {
 // DispatchRequest 处理 gateway 发送过来的请求
 func (p1this *UserService) DispatchRequest(p1conn *client.TCPConnection) {
 	p1apipkg := &api.APIPackage{}
-	msg := p1conn.GetProtocol().(*stream.Stream).GetDecodeMsg()
+	msg := p1conn.GetProtocolHandler().(*stream.Stream).GetDecodeMsg()
 	json.Unmarshal([]byte(msg), p1apipkg)
 
 	switch p1apipkg.Type {
@@ -80,7 +80,7 @@ func (p1this *UserService) DispatchRequest(p1conn *client.TCPConnection) {
 			p1apipkg.Data = p1conn.GetNetConnRemoteAddr()
 			p1apipkgJson, _ := json.Marshal(p1apipkg)
 
-			t1p1protocol := p1this.p1innerClient.GetTCPConn().GetProtocol().(*stream.Stream)
+			t1p1protocol := p1this.p1innerClient.GetTCPConn().GetProtocolHandler().(*stream.Stream)
 			t1p1protocol.SetDecodeMsg(string(p1apipkgJson))
 			p1this.p1innerClient.GetTCPConn().SendMsg([]byte{})
 		default:

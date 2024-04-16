@@ -34,7 +34,7 @@ func (p1this *Gateway) DispatchInnerRequest(p1conn *service.TCPConnection) {
 		default:
 			resp := http.NewResponse()
 			resp.SetStatusCode(http.StatusOk)
-			respStr := resp.MakeResponse(p1apipkg.Data)
+			respStr := resp.MakeMsg(p1apipkg.Data)
 
 			t1p1connection := p1this.mapOpenConn[p1apipkg.Id]
 			t1p1connection.SendMsg([]byte(respStr))

@@ -103,6 +103,7 @@ func (s *TCPService) Start() {
 
 // StartInfo 输出服务的配置和环境参数
 func (s *TCPService) StartInfo() {
+	log.Println("version: ", config.Version)
 	log.Println("runtime.GOOS=", runtime.GOOS)
 	log.Println("runtime.NumCPU()=", runtime.NumCPU())
 	log.Println("runtime.Version()=", runtime.Version())
@@ -130,7 +131,7 @@ func (s *TCPService) StartListen() {
 		s.AddConnection(tcpConn)
 		tcpConn.runStatus = config.RunStatusOn
 		s.OnConnConnect(tcpConn)
-		go tcpConn.HandleConnection()
+		go tcpConn.HandleConnection() //tcp连接丢出去自己执行
 	}
 }
 

@@ -2,6 +2,10 @@ package protocol
 
 import (
 	"demo-golang/tcp-service/config"
+	"demo-golang/tcp-service/protocol/abs"
+	"demo-golang/tcp-service/protocol/http"
+	"demo-golang/tcp-service/protocol/stream"
+	"demo-golang/tcp-service/protocol/websocket"
 	"sync"
 )
 
@@ -25,12 +29,14 @@ func IsSupported(name string) bool {
 	return ok
 }
 
-// HandlerI9 协议处理器
-type HandlerI9 interface {
-	// FirstMsgLen 计算缓冲区中第1个完整的报文的长度
-	FirstMsgLen(buffer []byte) (uint64, error)
-	// Decode 报文解码
-	Decode(msg []byte) error
-	// Encode 报文编码
-	Encode() ([]byte, error)
+func NewHandler(protocolName string) abs.HandlerI9 {
+	switch protocolName {
+	case config.HTTPStr:
+		return http.NewHandler()
+	case config.StreamStr:
+		return stream.NewStream()
+	case config.WebSocketStr:
+		return websocket.NewWebSocket()
+	}
+	return nil
 }

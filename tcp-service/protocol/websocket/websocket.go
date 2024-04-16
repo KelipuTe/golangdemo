@@ -3,7 +3,7 @@ package websocket
 import (
 	"crypto/md5"
 	"crypto/sha1"
-	"demo-golang/tcp-service/protocol"
+	"demo-golang/tcp-service/protocol/abs"
 	"demo-golang/tcp-service/protocol/http"
 	"encoding/base64"
 	"errors"
@@ -36,7 +36,7 @@ var (
 	ErrConnectionIsClosed = errors.New("websocket connection is closed.")
 )
 
-var _ protocol.HandlerI9 = &WebSocket{}
+var _ abs.HandlerI9 = &WebSocket{}
 
 // WebSocket 协议
 // https://datatracker.ietf.org/doc/rfc6455/
@@ -85,7 +85,7 @@ type WebSocket struct {
 func NewWebSocket() *WebSocket {
 	return &WebSocket{
 		encodeType:      encodeTypeNoMusk,
-		p1HttpInner:     http.NewHandlerHTTP(),
+		p1HttpInner:     http.NewHandler(),
 		handshakeStatus: handshakeStatusNo,
 	}
 }

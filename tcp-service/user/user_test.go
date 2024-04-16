@@ -16,7 +16,7 @@ func Test_User(t *testing.T) {
 
 	p1innerClient := client.NewTCPClient(config.StreamStr, "127.0.0.1", 9501)
 	p1innerClient.SetName(fmt.Sprintf("%s-client-user", config.StreamStr))
-	p1innerClient.SetDebugStatusOn()
+	p1innerClient.OpenDebug()
 
 	p1innerClient.OnClientStart = func(p1client *client.TCPClient) {
 		if p1client.IsDebug() {

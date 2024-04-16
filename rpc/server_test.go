@@ -7,6 +7,16 @@ import (
 	"testing"
 )
 
+func Test_Server(p7s6t *testing.T) {
+	p7s6server := F8NewS6RPCServer(
+		F8SetS6RPCServerProtocol(protocol.F8NewS6CustomRPC()),
+	)
+	p7s6UserService := &S6UserService{}
+	p7s6server.F8RegisterService(p7s6UserService)
+
+	_ = p7s6server.F8Start("127.0.0.1:9602")
+}
+
 func TestF8HandleRPC(p7s6t *testing.T) {
 	s5s6case := []struct {
 		name           string

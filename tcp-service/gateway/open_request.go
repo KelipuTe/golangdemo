@@ -15,7 +15,7 @@ func (p1this *Gateway) DispatchOpenRequest(p1conn *service.TCPConnection) {
 	if nil == t1p1conn {
 		resp := http.NewResponse()
 		resp.SetStatusCode(http.StatusBadRequest)
-		respStr := resp.MakeResponse("api not found.")
+		respStr := resp.MakeMsg("api not found.")
 
 		p1conn.SendMsg([]byte(respStr))
 		p1conn.CloseConnection()

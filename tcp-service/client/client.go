@@ -2,14 +2,17 @@ package client
 
 import (
 	"demo-golang/tcp-service/config"
+	"log"
 	"net"
+	"os"
+	"runtime"
 	"strconv"
 	"sync"
 
 	pkgErrors "github.com/pkg/errors"
 )
 
-// TCPClient tcp客户端，负责接收外部请求并转发给gateway
+// TCPClient tcp客户端
 type TCPClient struct {
 	name         string             //客户端名称
 	runStatus    config.RunStatus   //运行状态
@@ -18,18 +21,18 @@ type TCPClient struct {
 	address      string             //ip地址
 	port         uint16             //端口号
 
-	conn          *TCPConnection          //tcp连接
+	conn          *TCPConnection          //tcp连接本体
 	OnClientStart func(*TCPClient)        //客户端启动事件回调
 	OnClientError func(*TCPClient, error) //客户端错误事件回调
-	OnConnConnect func(*TCPConnection)    //TCP 连接，连接事件回调
-	OnConnRequest func(*TCPConnection)    //TCP 连接，请求事件回调
-	OnConnClose   func(*TCPConnection)    //TCP 连接，关闭事件回调
+	OnConnConnect func(*TCPConnection)    //tcp连接，连接事件回调
+	OnConnRequest func(*TCPConnection)    //tcp连接，请求事件回调
+	OnConnClose   func(*TCPConnection)    //tcp连接，关闭事件回调
 }
 
 func NewTCPClient(protocolName string, address string, port uint16) *TCPClient {
 	return &TCPClient{
 		name:         defaultName,
-		runStatus:    config.RunStatusOn,
+		runStatus:    config.RunStatusOff,
 		debugStatus:  config.DebugStatusOff,
 		protocolName: protocolName,
 		address:      address,
@@ -43,45 +46,53 @@ func NewTCPClient(protocolName string, address string, port uint16) *TCPClient {
 	}
 }
 
-// SetName 设置客户端名称
-func (p1this *TCPClient) SetName(name string) {
-	p1this.name = name
+func (c *TCPClient) SetName(name string) {
+	c.name = name
 }
 
-// GetName 获取客户端名称
-func (p1this *TCPClient) GetName() string {
-	return p1this.name
+func (c *TCPClient) GetName() string {
+	return c.name
 }
 
-// SetDebugStatusOn 打开 debug
-func (p1this *TCPClient) SetDebugStatusOn() {
-	p1this.debugStatus = config.DebugStatusOn
+func (c *TCPClient) OpenDebug() {
+	c.debugStatus = config.DebugStatusOn
 }
 
-// IsDebug 是否是 debug 模式
-func (p1this *TCPClient) IsDebug() bool {
-	return p1this.debugStatus == config.DebugStatusOn
+func (c *TCPClient) IsDebug() bool {
+	return c.debugStatus == config.DebugStatusOn
 }
 
-// GetTCPConn 获取 TCP 客户端内部的 TCP 连接
-func (p1this *TCPClient) GetTCPConn() *TCPConnection {
-	return p1this.conn
+// GetTCPConn 获取tcp连接本体
+func (c *TCPClient) GetTCPConn() *TCPConnection {
+	return c.conn
 }
 
-func (p1this *TCPClient) Start() {
-	p1this.OnClientStart(p1this)
+func (c *TCPClient) Start() {
+	c.StartInfo()
 
-	p1conn, err := net.Dial("tcp4", p1this.address+":"+strconv.Itoa(int(p1this.port)))
-	if nil != err {
-		p1this.OnClientError(p1this, pkgErrors.WithMessage(err, "TCPClient.StartListen"))
+	c.OnClientStart(c)
+
+	conn, err := net.Dial("tcp4", c.address+":"+strconv.Itoa(int(c.port)))
+	if err != nil {
+		c.OnClientError(c, pkgErrors.WithMessage(err, "TCPClient.StartListen"))
 		return
 	}
 
-	p1this.conn = NewTCPConnection(p1this, p1conn)
-	p1this.OnConnConnect(p1this.conn)
+	c.conn = NewTCPConnection(c, conn)
+	c.runStatus = config.RunStatusOn
+	c.OnConnConnect(c.conn)
 
 	var wg sync.WaitGroup
 	wg.Add(1)
-	go p1this.conn.HandleConnection(wg.Done)
+	go c.conn.HandleConnection(wg.Done)
 	wg.Wait()
+}
+
+// StartInfo 输出服务的配置和环境参数
+func (c *TCPClient) StartInfo() {
+	log.Println("version: ", config.Version)
+	log.Println("runtime.GOOS=", runtime.GOOS)
+	log.Println("runtime.NumCPU()=", runtime.NumCPU())
+	log.Println("runtime.Version()=", runtime.Version())
+	log.Println("os.Getpid()=", os.Getpid())
 }
