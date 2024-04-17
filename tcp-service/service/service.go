@@ -131,7 +131,7 @@ func (s *TCPService) StartListen() {
 		s.AddConnection(tcpConn)
 		tcpConn.runStatus = config.RunStatusOn
 		s.OnConnConnect(tcpConn)
-		go tcpConn.HandleConnection() //tcp连接丢出去自己执行
+		go tcpConn.HandleConnection() //把tcp连接丢出去自己执行
 	}
 }
 

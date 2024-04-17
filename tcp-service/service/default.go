@@ -21,18 +21,18 @@ func defaultOnServiceError(service *TCPService, err error) {
 
 func defaultOnConnConnect(conn *TCPConnection) {
 	if conn.belongToService.IsDebug() {
-		fmt.Println(fmt.Sprintf("service [%s] OnConnConnect", conn.belongToService.name))
+		fmt.Println(fmt.Sprintf("service [%s] AfterConnConnect", conn.belongToService.name))
 	}
 }
 
 func defaultOnConnRequest(conn *TCPConnection) {
 	if conn.belongToService.IsDebug() {
-		fmt.Println(fmt.Sprintf("service [%s] OnConnRequest", conn.belongToService.name))
+		fmt.Println(fmt.Sprintf("service [%s] OnConnGetRequest", conn.belongToService.name))
 	}
 }
 
 func defaultOnConnClose(conn *TCPConnection) {
 	if conn.belongToService.IsDebug() {
-		fmt.Println(fmt.Sprintf("service [%s] OnConnClose", conn.belongToService.name))
+		fmt.Println(fmt.Sprintf("service [%s] AfterConnClose", conn.belongToService.name))
 	}
 }

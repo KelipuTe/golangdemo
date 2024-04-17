@@ -12,46 +12,51 @@ import (
 	pkgErrors "github.com/pkg/errors"
 )
 
-// TCPClient tcp客户端
+// TCPClient 客户端
 type TCPClient struct {
-	name         string             //客户端名称
-	runStatus    config.RunStatus   //运行状态
-	debugStatus  config.DebugStatus //debug 开关状态
-	protocolName string             //使用的协议
-	address      string             //ip地址
-	port         uint16             //端口号
+	runStatus   config.RunStatus   //运行状态
+	debugStatus config.DebugStatus //debug 开关状态
 
-	conn          *TCPConnection          //tcp连接本体
-	OnClientStart func(*TCPClient)        //客户端启动事件回调
-	OnClientError func(*TCPClient, error) //客户端错误事件回调
-	OnConnConnect func(*TCPConnection)    //tcp连接，连接事件回调
-	OnConnRequest func(*TCPConnection)    //tcp连接，请求事件回调
-	OnConnClose   func(*TCPConnection)    //tcp连接，关闭事件回调
+	name         string //客户端名称
+	address      string //ip地址
+	port         uint16 //端口号
+	protocolName string //使用的协议
+
+	OnClientError func(*TCPClient, error) //客户端，发生错误时的事件回调
+
+	conn *TCPConnection //tcp连接本体
+
+	AfterConnConnect func(*TCPConnection) //tcp连接，连接上之后的事件回调
+	OnConnGetRequest func(*TCPConnection) //tcp连接，接到请求时的事件回调
+	AfterConnClose   func(*TCPConnection) //tcp连接，连接关闭后的事件回调
 }
 
-func NewTCPClient(protocolName string, address string, port uint16) *TCPClient {
+func NewTCPClient(address string, port uint16, protocolName string) *TCPClient {
 	return &TCPClient{
+		runStatus:   config.RunStatusOff,
+		debugStatus: config.DebugStatusOff,
+
 		name:         defaultName,
-		runStatus:    config.RunStatusOff,
-		debugStatus:  config.DebugStatusOff,
-		protocolName: protocolName,
 		address:      address,
 		port:         port,
+		protocolName: protocolName,
 
-		OnClientStart: defaultOnClientStart,
 		OnClientError: defaultOnClientError,
-		OnConnConnect: defaultOnConnConnect,
-		OnConnRequest: defaultOnConnRequest,
-		OnConnClose:   defaultOnConnClose,
-	}
-}
 
-func (c *TCPClient) SetName(name string) {
-	c.name = name
+		conn: nil,
+
+		AfterConnConnect: defaultAfterConnConnect,
+		OnConnGetRequest: defaultOnConnGetRequest,
+		AfterConnClose:   defaultAfterConnClose,
+	}
 }
 
 func (c *TCPClient) GetName() string {
 	return c.name
+}
+
+func (c *TCPClient) SetName(name string) {
+	c.name = name
 }
 
 func (c *TCPClient) OpenDebug() {
@@ -70,8 +75,6 @@ func (c *TCPClient) GetTCPConn() *TCPConnection {
 func (c *TCPClient) Start() {
 	c.StartInfo()
 
-	c.OnClientStart(c)
-
 	conn, err := net.Dial("tcp4", c.address+":"+strconv.Itoa(int(c.port)))
 	if err != nil {
 		c.OnClientError(c, pkgErrors.WithMessage(err, "TCPClient.StartListen"))
@@ -80,7 +83,7 @@ func (c *TCPClient) Start() {
 
 	c.conn = NewTCPConnection(c, conn)
 	c.runStatus = config.RunStatusOn
-	c.OnConnConnect(c.conn)
+	c.AfterConnConnect(c.conn)
 
 	var wg sync.WaitGroup
 	wg.Add(1)

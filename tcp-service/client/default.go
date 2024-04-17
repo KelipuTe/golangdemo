@@ -4,33 +4,27 @@ import "fmt"
 
 const defaultName string = "default-client" //默认名称
 
-func defaultOnClientStart(p1service *TCPClient) {
-	if p1service.IsDebug() {
-		fmt.Println(fmt.Sprintf("%s.OnServiceStart", p1service.name))
+func defaultOnClientError(client *TCPClient, err error) {
+	if client.IsDebug() {
+		fmt.Println(fmt.Sprintf("client [%s] OnClientError", client.name))
+	}
+	fmt.Println(fmt.Sprintf("client [%s] err:[%s]", client.name, err.Error()))
+}
+
+func defaultAfterConnConnect(conn *TCPConnection) {
+	if conn.belongToClient.IsDebug() {
+		fmt.Println(fmt.Sprintf("client [%s] AfterConnConnect", conn.belongToClient.name))
 	}
 }
 
-func defaultOnClientError(p1service *TCPClient, err error) {
-	if p1service.IsDebug() {
-		fmt.Println(fmt.Sprintf("%s.OnServiceError", p1service.name))
-	}
-	fmt.Println(fmt.Sprintf("%s", err))
-}
-
-func defaultOnConnConnect(p1conn *TCPConnection) {
-	if p1conn.belongToClient.IsDebug() {
-		fmt.Println(fmt.Sprintf("%s.OnConnConnect", p1conn.belongToClient.name))
+func defaultOnConnGetRequest(conn *TCPConnection) {
+	if conn.belongToClient.IsDebug() {
+		fmt.Println(fmt.Sprintf("client [%s] OnConnGetRequest", conn.belongToClient.name))
 	}
 }
 
-func defaultOnConnRequest(p1conn *TCPConnection) {
-	if p1conn.belongToClient.IsDebug() {
-		fmt.Println(fmt.Sprintf("%s.OnConnRequest", p1conn.belongToClient.name))
-	}
-}
-
-func defaultOnConnClose(p1conn *TCPConnection) {
-	if p1conn.belongToClient.IsDebug() {
-		fmt.Println(fmt.Sprintf("%s.OnConnClose", p1conn.belongToClient.name))
+func defaultAfterConnClose(conn *TCPConnection) {
+	if conn.belongToClient.IsDebug() {
+		fmt.Println(fmt.Sprintf("client [%s] AfterConnClose", conn.belongToClient.name))
 	}
 }

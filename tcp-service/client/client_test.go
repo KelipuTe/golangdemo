@@ -10,10 +10,10 @@ import (
 )
 
 func Test_Client_HTTP(t *testing.T) {
-	client := NewTCPClient(config.HTTPStr, "127.0.0.1", 9501)
+	client := NewTCPClient("127.0.0.1", 9501, config.HTTPStr)
 	client.SetName(fmt.Sprintf("%s-client", config.HTTPStr))
 	client.OpenDebug()
-	client.OnConnConnect = func(conn *TCPConnection) {
+	client.AfterConnConnect = func(conn *TCPConnection) {
 		if conn.IsDebug() {
 			req := http.NewRequest()
 			req.SetMethod(http.MethodGet)
@@ -25,10 +25,10 @@ func Test_Client_HTTP(t *testing.T) {
 }
 
 func Test_Client_Stream(t *testing.T) {
-	client := NewTCPClient(config.StreamStr, "127.0.0.1", 9502)
+	client := NewTCPClient("127.0.0.1", 9502, config.StreamStr)
 	client.SetName(fmt.Sprintf("%s-client", config.StreamStr))
 	client.OpenDebug()
-	client.OnConnConnect = func(conn *TCPConnection) {
+	client.AfterConnConnect = func(conn *TCPConnection) {
 		if conn.IsDebug() {
 			handler := conn.protocolHandler.(*stream.Stream)
 			handler.SetDecodeMsg(fmt.Sprintf("this is %s.", conn.belongToClient.name))
@@ -40,10 +40,10 @@ func Test_Client_Stream(t *testing.T) {
 }
 
 func Test_Client_WebSocket(t *testing.T) {
-	client := NewTCPClient(config.WebSocketStr, "127.0.0.1", 9503)
+	client := NewTCPClient("127.0.0.1", 9503, config.WebSocketStr)
 	client.SetName(fmt.Sprintf("%s-client", config.WebSocketStr))
 	client.OpenDebug()
-	client.OnConnConnect = func(conn *TCPConnection) {
+	client.AfterConnConnect = func(conn *TCPConnection) {
 		//发送握手消息
 		handler := conn.protocolHandler.(*websocket.WebSocket)
 		respMsg, _ := handler.MakeHandShakeReq()

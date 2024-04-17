@@ -100,11 +100,13 @@ func (c *TCPConnection) HandleBuffer() {
 	for c.recvBufferNowLen > 0 {
 		firstMsgLen, err := c.protocolHandler.FirstMsgLen(copyBuffer)
 		if err != nil {
+			//处理解析异常
 			if c.protocolName == config.HTTPStr {
-				//处理解析异常
 				handler := c.protocolHandler.(*http.Handler)
 				switch handler.ParseStatus {
-				case http.ParseStatusRecvBufferEmpty, http.ParseStatusNotHTTP, http.ParseStatusIncomplete:
+				case http.ParseStatusRecvBufferEmpty,
+					http.ParseStatusNotHTTP,
+					http.ParseStatusIncomplete:
 					//继续接收
 				case http.ParseStatusParseErr:
 					//明显出错
@@ -118,17 +120,18 @@ func (c *TCPConnection) HandleBuffer() {
 
 		switch c.protocolName {
 		case config.HTTPStr:
-			//这里模仿的是 HTTP 1.1 协议，短连接。
+			//HTTP 1.1 协议，短连接。
+			//处理完一条消息后，理论上客户端会关闭tcp连接
 			c.HandleHTTPMsg(firstMsg)
 			c.belongToService.OnConnRequest(c)
-			//处理完一条消息后，客户端会关闭tcp连接
 		case config.StreamStr:
-			//这里模仿的是自定义 Stream 协议，长链接
+			//自定义 Stream 协议，长链接
+			//处理完一条消息后，理论上客户端不会关闭tcp连接
 			c.HandleStreamMsg(firstMsg)
 			c.belongToService.OnConnRequest(c)
-			//处理完一条消息后，不会关闭tcp连接
 		case config.WebSocketStr:
-			//这里模仿的是 WebSocket 协议，长链接
+			//WebSocket 协议，长链接
+			//处理完一条消息后，理论上客户端不会关闭tcp连接
 			err := c.HandleWebSocketMsg(firstMsg)
 			if err != nil {
 				c.CloseConnection()
@@ -141,7 +144,6 @@ func (c *TCPConnection) HandleBuffer() {
 			//   t1p1protocol.SetDecodeMsg(fmt.Sprintf("this is %s.", c.belongToService.name))
 			//   c.SendMsg([]byte{})
 			// }
-			// 处理完一条消息后，不会关闭tcp连接
 		}
 
 		//处理接收缓冲区中剩余的数据

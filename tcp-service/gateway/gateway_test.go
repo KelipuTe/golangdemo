@@ -37,14 +37,14 @@ func Test_Gateway(t *testing.T) {
 
 	innerService.OnConnRequest = func(p1conn *service.TCPConnection) {
 		if innerService.IsDebug() {
-			fmt.Println(fmt.Sprintf("%s.OnConnRequest", innerService.GetName()))
+			fmt.Println(fmt.Sprintf("%s.OnConnGetRequest", innerService.GetName()))
 		}
 		gateway.DispatchInnerRequest(p1conn)
 	}
 
 	innerService.OnConnClose = func(p1conn *service.TCPConnection) {
 		if innerService.IsDebug() {
-			fmt.Println(fmt.Sprintf("%s.OnConnClose", innerService.GetName()))
+			fmt.Println(fmt.Sprintf("%s.AfterConnClose", innerService.GetName()))
 		}
 		gateway.DeleteServiceProvider(p1conn)
 	}

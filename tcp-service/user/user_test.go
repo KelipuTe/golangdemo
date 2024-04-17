@@ -14,30 +14,25 @@ func Test_User(t *testing.T) {
 
 	P1UserService := &UserService{}
 
-	p1innerClient := client.NewTCPClient(config.StreamStr, "127.0.0.1", 9501)
+	p1innerClient := client.NewTCPClient("127.0.0.1", 9501, config.StreamStr)
 	p1innerClient.SetName(fmt.Sprintf("%s-client-user", config.StreamStr))
 	p1innerClient.OpenDebug()
 
-	p1innerClient.OnClientStart = func(p1client *client.TCPClient) {
-		if p1client.IsDebug() {
-			fmt.Println(fmt.Sprintf("%s.OnServiceStart", p1client.GetName()))
-		}
-		P1UserService.SetInnerClient(p1client)
-	}
-
-	p1innerClient.OnConnConnect = func(p1conn *client.TCPConnection) {
+	p1innerClient.AfterConnConnect = func(p1conn *client.TCPConnection) {
 		if p1innerClient.IsDebug() {
-			fmt.Println(fmt.Sprintf("%s.OnConnConnect", p1innerClient.GetName()))
+			fmt.Println(fmt.Sprintf("%s.AfterConnConnect", p1innerClient.GetName()))
 		}
 		P1UserService.RegisteServiceProvider()
 	}
 
-	p1innerClient.OnConnRequest = func(p1conn *client.TCPConnection) {
+	p1innerClient.OnConnGetRequest = func(p1conn *client.TCPConnection) {
 		if p1innerClient.IsDebug() {
-			fmt.Println(fmt.Sprintf("%s.OnConnConnect", p1innerClient.GetName()))
+			fmt.Println(fmt.Sprintf("%s.AfterConnConnect", p1innerClient.GetName()))
 		}
 		P1UserService.DispatchRequest(p1conn)
 	}
+
+	P1UserService.SetInnerClient(p1innerClient)
 	p1innerClient.Start()
 
 	signal.WaitForShutdown()

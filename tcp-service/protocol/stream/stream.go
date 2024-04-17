@@ -43,12 +43,12 @@ func (p1this *Stream) Decode(sli1msg []byte) error {
 	return nil
 }
 
-func (p1this *Stream) SetDecodeMsg(msg string) {
-	p1this.DecodeMsg = msg
-}
-
 func (p1this *Stream) GetDecodeMsg() string {
 	return p1this.DecodeMsg
+}
+
+func (p1this *Stream) SetDecodeMsg(msg string) {
+	p1this.DecodeMsg = msg
 }
 
 func (p1this *Stream) Encode() ([]byte, error) {
