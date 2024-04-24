@@ -1,18 +1,22 @@
 package http
 
 import (
+	"log"
 	"net"
 	"strconv"
 )
 
 type Client struct {
-	ip   string
-	port int
-	conn *DialConn
+	ip        string
+	port      int
+	conn      *DialConn
+	keepAlive bool
 }
 
 func NewClient() *Client {
-	return &Client{}
+	return &Client{
+		keepAlive: false,
+	}
 }
 
 func (t *Client) Send(req *Request) (*Response, error) {
@@ -20,18 +24,26 @@ func (t *Client) Send(req *Request) (*Response, error) {
 	if err != nil {
 		return nil, err
 	}
+	t.keepAlive = req.isKeepAlive()
 
-	addr := t.ip + ":" + strconv.Itoa(t.port)
-	netConn, err := net.Dial("tcp4", addr)
-	if err != nil {
-		return nil, err
+	if t.conn == nil {
+		addr := t.ip + ":" + strconv.Itoa(t.port)
+		netConn, err := net.Dial("tcp4", addr)
+		if err != nil {
+			return nil, err
+		}
+		log.Println("conn dial")
+		t.dialConn(netConn)
 	}
 
-	httpConn := t.dialConn(netConn)
-	httpConn.SendReq(req)
+	t.conn.SendReq(req)
 
 	resp := NewResponse()
-	httpConn.waitResp(resp)
+	t.conn.waitResp(resp)
+
+	if !t.keepAlive {
+		t.CloseConn()
+	}
 
 	return resp, nil
 }
@@ -44,5 +56,13 @@ func (t *Client) parseDNS(req *Request) error {
 
 func (t *Client) dialConn(netConn net.Conn) *DialConn {
 	httpConn := NewDialConn(t, netConn)
+	t.conn = httpConn
 	return httpConn
+}
+
+func (t *Client) CloseConn() {
+	if t.conn != nil {
+		t.conn.close()
+		t.conn = nil
+	}
 }

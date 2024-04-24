@@ -2,6 +2,7 @@ package http
 
 import (
 	"io"
+	"log"
 	"net"
 )
 
@@ -57,5 +58,6 @@ func (t *DialConn) waitResp(resp *Response) {
 }
 
 func (t *DialConn) close() {
+	log.Println("conn close")
 	_ = t.conn.Close()
 }

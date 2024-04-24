@@ -124,7 +124,6 @@ func (t *Request) parseHeader() error {
 	t.Version = urlSplit[2]
 
 	//请求头
-	t.Header = make(map[string]string)
 	for _, v := range headerSplit[1:] {
 		vSplit := strings.Split(v, ": ") //用 ": " 切成键值
 		if len(vSplit) == 2 {
@@ -147,7 +146,6 @@ func (t *Request) parseQuery() error {
 	query := t.Uri[index+1:] //查询参数
 	t.Uri = t.Uri[:index]    //没有查询参数的uri
 	if query != "" {
-		t.Query = make(map[string]string)
 		querySplit := strings.Split(query, "&")
 		for _, v := range querySplit {
 			vSplit := strings.Split(v, "=")
@@ -188,4 +186,21 @@ func (t *Request) parseJson() (map[string]any, error) {
 	}
 
 	return ret, nil
+}
+
+func (t *Request) KeepAliveOn() {
+	t.Header["connection"] = "keep-alive"
+}
+
+func (t *Request) KeepAliveOff() {
+	t.Header["connection"] = "close"
+}
+
+func (t *Request) isKeepAlive() bool {
+	if conn, ok := t.Header["connection"]; ok {
+		if conn == "keep-alive" {
+			return true
+		}
+	}
+	return false
 }

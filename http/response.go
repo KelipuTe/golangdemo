@@ -101,7 +101,6 @@ func (t *Response) parseHeader() error {
 	t.StatusCode = statusCode
 
 	//响应头
-	t.Header = make(map[string]string)
 	for _, v := range headerSplit[1:] {
 		vSplit := strings.Split(v, ": ") //用 ": " 切成键值
 		if len(vSplit) == 2 {

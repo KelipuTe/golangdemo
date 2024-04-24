@@ -1,6 +1,7 @@
 package http
 
 import (
+	"log"
 	"net"
 	"strconv"
 	"sync"
@@ -48,6 +49,7 @@ func (t *Server) StartListen() error {
 		if err != nil {
 			return err
 		}
+		log.Println("conn accept")
 		httpConn := t.acceptConn(netConn)
 
 		go httpConn.handleConn()
@@ -67,7 +69,7 @@ func (t *Server) acceptConn(netConn net.Conn) *AcceptConn {
 	return httpConn
 }
 
-func (t *Server) connClose(c *AcceptConn) {
+func (t *Server) closeConn(c *AcceptConn) {
 	t.connPoolLock.Lock()
 	defer t.connPoolLock.Unlock()
 

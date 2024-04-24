@@ -2,6 +2,7 @@ package http
 
 import (
 	"io"
+	"log"
 	"net"
 )
 
@@ -14,6 +15,7 @@ type AcceptConn struct {
 	conn          net.Conn
 	readBuffer    []byte //接收缓冲区
 	readBufferLen int    //接收缓冲区长度
+	keepAlive     bool
 }
 
 func NewAcceptConn(s *Server, c net.Conn) *AcceptConn {
@@ -22,42 +24,49 @@ func NewAcceptConn(s *Server, c net.Conn) *AcceptConn {
 		conn:          c,
 		readBuffer:    make([]byte, readBufferMaxLen),
 		readBufferLen: 0,
+		keepAlive:     false,
 	}
 }
 
 func (t *AcceptConn) handleConn() {
-	num, err := t.conn.Read(t.readBuffer[t.readBufferLen:])
+	for {
+		num, err := t.conn.Read(t.readBuffer[t.readBufferLen:])
 
-	if err != nil {
-		if err == io.EOF {
-			t.close()
-			return
-		}
-		return
-	}
-
-	t.readBufferLen += num
-
-	for t.readBufferLen > 0 {
-		copyBuffer := t.readBuffer[0:t.readBufferLen]
-
-		req := NewRequest()
-		req.Addr = t.conn.RemoteAddr().String()
-		err := req.decode(copyBuffer, t.readBufferLen)
 		if err != nil {
-			t.close()
+			if err == io.EOF {
+				t.close()
+				return
+			}
 			return
 		}
 
-		t.readBuffer = t.readBuffer[req.MsgLen:]
-		t.readBufferLen -= req.MsgLen
+		t.readBufferLen += num
 
-		resp := NewResponse()
-		t.server.handler.HandleHTTP(req, resp)
-		t.sendResp(resp)
+		for t.readBufferLen > 0 {
+			copyBuffer := t.readBuffer[0:t.readBufferLen]
+
+			req := NewRequest()
+			req.Addr = t.conn.RemoteAddr().String()
+			err := req.decode(copyBuffer, t.readBufferLen)
+			if err != nil {
+				t.close()
+				return
+			}
+
+			t.readBuffer = t.readBuffer[req.MsgLen:]
+			t.readBufferLen -= req.MsgLen
+			t.keepAlive = req.isKeepAlive()
+
+			resp := NewResponse()
+			t.server.handler.HandleHTTP(req, resp)
+			t.sendResp(resp)
+		}
+
+		if !t.keepAlive {
+			t.close()
+			return
+		}
 	}
-
-	t.server.connClose(t)
 }
 
 func (t *AcceptConn) sendResp(resp *Response) {
@@ -69,6 +78,7 @@ func (t *AcceptConn) sendResp(resp *Response) {
 }
 
 func (t *AcceptConn) close() {
+	log.Println("conn close")
 	_ = t.conn.Close()
-	t.server.connClose(t)
+	t.server.closeConn(t)
 }
