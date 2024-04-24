@@ -45,70 +45,70 @@ func NewTCPConnection(client *TCPClient, conn net.Conn) *TCPConnection {
 	}
 }
 
-func (c *TCPConnection) IsRun() bool {
-	return config.RunStatusOn == c.runStatus
+func (t *TCPConnection) IsRun() bool {
+	return t.runStatus == config.RunStatusOn
 }
 
-func (c *TCPConnection) IsDebug() bool {
-	return c.belongToClient.IsDebug()
+func (t *TCPConnection) IsDebug() bool {
+	return t.belongToClient.IsDebug()
 }
 
-func (c *TCPConnection) GetClient() *TCPClient {
-	return c.belongToClient
+func (t *TCPConnection) GetClient() *TCPClient {
+	return t.belongToClient
 }
 
-func (c *TCPConnection) GetProtocolName() string {
-	return c.protocolName
+func (t *TCPConnection) GetProtocolName() string {
+	return t.protocolName
 }
 
-func (c *TCPConnection) GetProtocolHandler() abs.HandlerI9 {
-	return c.protocolHandler
+func (t *TCPConnection) GetProtocolHandler() abs.HandlerI9 {
+	return t.protocolHandler
 }
 
-func (c *TCPConnection) GetNetConnRemoteAddr() string {
-	return c.netConn.RemoteAddr().String()
+func (t *TCPConnection) GetNetConnRemoteAddr() string {
+	return t.netConn.RemoteAddr().String()
 }
 
-func (c *TCPConnection) HandleConnection(deferFunc func()) {
+func (t *TCPConnection) HandleConnection(deferFunc func()) {
 	defer func() {
 		deferFunc()
 	}()
 
-	for c.IsRun() {
-		byteNum, err := c.netConn.Read(c.recvBuffer[c.recvBufferNowLen:])
+	for t.IsRun() {
+		byteNum, err := t.netConn.Read(t.recvBuffer[t.recvBufferNowLen:])
 
-		if c.IsDebug() {
-			fmt.Println(fmt.Sprintf("client [%s] read [%d] bytes", c.belongToClient.name, byteNum))
+		if t.IsDebug() {
+			fmt.Println(fmt.Sprintf("client [%s] read [%d] bytes", t.belongToClient.name, byteNum))
 		}
 
 		if err != nil {
 			if err == io.EOF {
-				c.CloseConnection()
+				t.CloseConnection()
 				return
 			}
-			c.belongToClient.OnClientError(c.belongToClient, err)
+			t.belongToClient.OnClientError(t.belongToClient, err)
 			return
 		}
 
-		c.recvBufferNowLen += uint64(byteNum)
+		t.recvBufferNowLen += uint64(byteNum)
 
-		if c.IsDebug() {
-			fmt.Println(fmt.Sprintf("client [%s] recvBuffer:", c.belongToClient.name))
-			fmt.Println(string(c.recvBuffer[0:c.recvBufferNowLen]))
+		if t.IsDebug() {
+			fmt.Println(fmt.Sprintf("client [%s] recvBuffer:", t.belongToClient.name))
+			fmt.Println(string(t.recvBuffer[0:t.recvBufferNowLen]))
 		}
 
-		c.HandleBuffer()
+		t.HandleBuffer()
 	}
 }
 
-func (c *TCPConnection) HandleBuffer() {
-	copyBuffer := c.recvBuffer[0:c.recvBufferNowLen]
-	for c.recvBufferNowLen > 0 {
-		firstMsgLen, err := c.protocolHandler.FirstMsgLen(copyBuffer)
+func (t *TCPConnection) HandleBuffer() {
+	copyBuffer := t.recvBuffer[0:t.recvBufferNowLen]
+	for t.recvBufferNowLen > 0 {
+		firstMsgLen, err := t.protocolHandler.FirstMsgLen(copyBuffer)
 		if err != nil {
 			//处理解析异常
-			if c.protocolName == config.HTTPStr {
-				handler := c.protocolHandler.(*http.Handler)
+			if t.protocolName == config.HTTPStr {
+				handler := t.protocolHandler.(*http.Handler)
 				switch handler.ParseStatus {
 				case http.ParseStatusRecvBufferEmpty,
 					http.ParseStatusNotHTTP,
@@ -116,30 +116,30 @@ func (c *TCPConnection) HandleBuffer() {
 					//继续接收
 				case http.ParseStatusParseErr:
 					//明显出错
-					c.CloseConnection()
+					t.CloseConnection()
 				}
 			}
 			break
 		}
-		firstMsg := c.recvBuffer[0:firstMsgLen]
+		firstMsg := t.recvBuffer[0:firstMsgLen]
 
-		switch c.protocolName {
+		switch t.protocolName {
 		case config.HTTPStr:
-			c.HandleHTTPMsg(firstMsg)
-			c.belongToClient.OnConnGetRequest(c)
+			t.HandleHTTPMsg(firstMsg)
+			t.belongToClient.OnConnGetRequest(t)
 		case config.StreamStr:
 			// 自定义 Stream 协议的消息，解析之后由外部实现的 OnConnGetRequest 继续处理
-			t1p1protocol := c.protocolHandler.(*stream.Stream)
+			t1p1protocol := t.protocolHandler.(*stream.Stream)
 			t1p1protocol.Decode(firstMsg)
 
-			if c.IsDebug() {
-				fmt.Println(fmt.Sprintf("%s.TCPConnection.HandleBuffer.StreamStr.Decode: ", c.belongToClient.name))
+			if t.IsDebug() {
+				fmt.Println(fmt.Sprintf("%s.TCPConnection.HandleBuffer.StreamStr.Decode: ", t.belongToClient.name))
 				fmt.Println(fmt.Sprintf("%+v", t1p1protocol))
 			}
-			c.belongToClient.OnConnGetRequest(c)
+			t.belongToClient.OnConnGetRequest(t)
 		case config.WebSocketStr:
 			// WebSocket 协议的消息，需要判断是握手消息还是测试消息
-			t1p1protocol := c.protocolHandler.(*websocket.WebSocket)
+			t1p1protocol := t.protocolHandler.(*websocket.WebSocket)
 			t1p1protocol.Decode(firstMsg)
 
 			if t1p1protocol.IsHandshakeStatusNo() {
@@ -147,60 +147,60 @@ func (c *TCPConnection) HandleBuffer() {
 				err = t1p1protocol.CheckHandShakeResp()
 				if err == nil {
 					t1p1protocol.SetHandshakeStatusYes()
-					t1p1protocol.SetDecodeMsg(fmt.Sprintf("this is %s.", c.belongToClient.name))
-					c.SendMsg([]byte{})
+					t1p1protocol.SetDecodeMsg(fmt.Sprintf("this is %s.", t.belongToClient.name))
+					t.SendMsg([]byte{})
 				} else {
-					c.CloseConnection()
+					t.CloseConnection()
 				}
 			} else {
 				// 测试消息，解析之后直接输出
-				if c.IsDebug() {
-					fmt.Println(fmt.Sprintf("%s.TCPConnection.HandleBuffer.WebSocketStr.Decode: ", c.belongToClient.name))
+				if t.IsDebug() {
+					fmt.Println(fmt.Sprintf("%s.TCPConnection.HandleBuffer.WebSocketStr.Decode: ", t.belongToClient.name))
 					fmt.Println(fmt.Sprintf("%+v", t1p1protocol))
-					c.belongToClient.OnConnGetRequest(c)
+					t.belongToClient.OnConnGetRequest(t)
 				}
 			}
 		}
 
-		c.recvBuffer = c.recvBuffer[firstMsgLen:]
+		t.recvBuffer = t.recvBuffer[firstMsgLen:]
 		// recvBufferNowLen 是 uint64 类型的，做减法的时候小心溢出
-		if c.recvBufferNowLen <= firstMsgLen {
-			c.recvBufferNowLen = 0
+		if t.recvBufferNowLen <= firstMsgLen {
+			t.recvBufferNowLen = 0
 			break
 		} else {
-			c.recvBufferNowLen -= firstMsgLen
+			t.recvBufferNowLen -= firstMsgLen
 		}
 	}
 }
 
-func (c *TCPConnection) HandleHTTPMsg(sli1firstMsg []byte) {
-	t1p1protocol := c.protocolHandler.(*http.Handler)
+func (t *TCPConnection) HandleHTTPMsg(sli1firstMsg []byte) {
+	t1p1protocol := t.protocolHandler.(*http.Handler)
 	t1p1protocol.Decode(sli1firstMsg)
 
-	if c.IsDebug() {
-		fmt.Println(fmt.Sprintf("%s.TCPConnection.HandelHTTPMsg.Decode: ", c.belongToClient.name))
+	if t.IsDebug() {
+		fmt.Println(fmt.Sprintf("%s.TCPConnection.HandelHTTPMsg.Decode: ", t.belongToClient.name))
 		fmt.Println(fmt.Sprintf("%+v", t1p1protocol))
 	}
 }
 
-func (c *TCPConnection) SendMsg(msg []byte) {
-	if c.IsDebug() {
-		fmt.Println(fmt.Sprintf("client [%s] send:", c.belongToClient.name))
+func (t *TCPConnection) SendMsg(msg []byte) {
+	if t.IsDebug() {
+		fmt.Println(fmt.Sprintf("client [%s] send:", t.belongToClient.name))
 		fmt.Println(string(msg))
 	}
-	_ = c.WriteData(msg)
+	_ = t.WriteData(msg)
 }
 
-func (c *TCPConnection) WriteData(data []byte) error {
-	byteNum, err := c.netConn.Write(data)
+func (t *TCPConnection) WriteData(data []byte) error {
+	byteNum, err := t.netConn.Write(data)
 
-	if c.IsDebug() {
-		fmt.Println(fmt.Sprintf("client [%s] write [%d] bytes data.", c.belongToClient.name, byteNum))
+	if t.IsDebug() {
+		fmt.Println(fmt.Sprintf("client [%s] write [%d] bytes data.", t.belongToClient.name, byteNum))
 	}
 
 	if err != nil {
-		c.belongToClient.OnClientError(c.belongToClient, err)
-		c.CloseConnection()
+		t.belongToClient.OnClientError(t.belongToClient, err)
+		t.CloseConnection()
 		return err
 	}
 
@@ -210,9 +210,9 @@ func (c *TCPConnection) WriteData(data []byte) error {
 	return nil
 }
 
-func (c *TCPConnection) CloseConnection() {
-	c.runStatus = config.RunStatusOff
-	_ = c.netConn.Close()
-	c.recvBufferNowLen = 0
-	c.belongToClient.AfterConnClose(c)
+func (t *TCPConnection) CloseConnection() {
+	t.runStatus = config.RunStatusOff
+	_ = t.netConn.Close()
+	t.recvBufferNowLen = 0
+	t.belongToClient.AfterConnClose(t)
 }
