@@ -1,4 +1,4 @@
-package http
+package stream
 
 import (
 	"io"
@@ -37,6 +37,11 @@ func (t *DialConn) waitResp(resp *Response) {
 	num, err := t.conn.Read(t.readBuffer[t.readBufferLen:])
 
 	if err != nil {
+		if err == io.EOF {
+			t.close()
+			return
+		}
+		log.Println("conn read error:", err)
 		t.close()
 		return
 	}
@@ -48,11 +53,6 @@ func (t *DialConn) waitResp(resp *Response) {
 
 		err := resp.decode(copyBuffer, t.readBufferLen)
 		if err != nil {
-			if err == io.EOF {
-				t.close()
-				return
-			}
-			log.Println("conn read error:", err)
 			t.close()
 			return
 		}
@@ -65,6 +65,6 @@ func (t *DialConn) waitResp(resp *Response) {
 // close 关闭连接
 func (t *DialConn) close() {
 	log.Println("conn close")
-
 	_ = t.conn.Close()
+	t.client.connClose()
 }

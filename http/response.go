@@ -14,11 +14,12 @@ var (
 	}
 )
 
+// Response 响应
 type Response struct {
-	HeaderLen  int
-	ContentLen int
-	MsgLen     int
-	Msg        string
+	HeaderLen  int    //响应头长度
+	ContentLen int    //响应体长度
+	MsgLen     int    //消息长度
+	Msg        string //消息体
 
 	Version    string            //版本
 	StatusCode int               //状态码

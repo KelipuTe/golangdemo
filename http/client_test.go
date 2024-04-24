@@ -8,6 +8,8 @@ import (
 
 func Test_Client_Get(t *testing.T) {
 	c := NewClient()
+	defer c.CloseConn()
+
 	req := NewRequest()
 	req.Method = MethodGet
 	req.Uri = "/api/user"
@@ -21,6 +23,8 @@ func Test_Client_Get(t *testing.T) {
 
 func Test_Client_Post(t *testing.T) {
 	c := NewClient()
+	defer c.CloseConn()
+
 	req := NewRequest()
 	req.Method = MethodPost
 	req.Uri = "/api/order"
@@ -34,6 +38,7 @@ func Test_Client_Post(t *testing.T) {
 
 func Test_Client_KeepAliveOn(t *testing.T) {
 	c := NewClient()
+	defer c.CloseConn()
 
 	req := NewRequest()
 	req.Method = MethodGet
@@ -61,6 +66,7 @@ func Test_Client_KeepAliveOn(t *testing.T) {
 
 func Test_Client_KeepAliveOff(t *testing.T) {
 	c := NewClient()
+	defer c.CloseConn()
 
 	req := NewRequest()
 	req.Method = MethodGet

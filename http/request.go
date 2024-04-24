@@ -19,11 +19,12 @@ var (
 	ErrParseFailed = errors.New("解析失败")
 )
 
+// Request 请求
 type Request struct {
-	HeaderLen  int
-	ContentLen int
-	MsgLen     int
-	Msg        string
+	HeaderLen  int    //请求头长度
+	ContentLen int    //请求体长度
+	MsgLen     int    //消息长度
+	Msg        string //消息体
 
 	Addr    string            //请求IP和端口
 	Method  string            //请求方法
@@ -93,8 +94,7 @@ func (t *Request) decode(buffer []byte, bufferLen int) error {
 
 	t.MsgLen = t.HeaderLen + t.ContentLen
 	if t.MsgLen > bufferLen {
-		// 计算出来的报文长度大于接收缓冲区中数据的长度
-		return ErrParseFailed
+		return ErrParseFailed //计算出来的报文长度大于接收缓冲区中数据的长度
 	}
 	t.Msg = bufferStr[0:t.MsgLen]
 

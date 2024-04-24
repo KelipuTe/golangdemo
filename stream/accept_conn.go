@@ -1,9 +1,10 @@
-package http
+package stream
 
 import (
 	"io"
 	"log"
 	"net"
+	"time"
 )
 
 const (
@@ -16,7 +17,6 @@ type AcceptConn struct {
 	conn          net.Conn //tcp连接本体
 	readBuffer    []byte   //接收缓冲区
 	readBufferLen int      //接收缓冲区长度
-	keepAlive     bool
 }
 
 func NewAcceptConn(s *Server, c net.Conn) *AcceptConn {
@@ -25,19 +25,27 @@ func NewAcceptConn(s *Server, c net.Conn) *AcceptConn {
 		conn:          c,
 		readBuffer:    make([]byte, readBufferMaxLen),
 		readBufferLen: 0,
-		keepAlive:     false,
 	}
 }
 
 // handleMsg 处理消息
 func (t *AcceptConn) handleMsg() {
 	for {
-		num, err := t.conn.Read(t.readBuffer[t.readBufferLen:])
+		err := t.conn.SetReadDeadline(time.Now().Add(5 * time.Second))
+		if err != nil {
+			t.close()
+			return
+		}
 
+		num, err := t.conn.Read(t.readBuffer[t.readBufferLen:])
 		if err != nil {
 			if err == io.EOF {
 				t.close()
 				return
+			}
+			if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
+				log.Println("conn read timeout")
+				continue //超时，可以回去，继续等待
 			}
 			log.Println("conn read error:", err)
 			t.close()
@@ -59,17 +67,10 @@ func (t *AcceptConn) handleMsg() {
 
 			t.readBuffer = t.readBuffer[req.MsgLen:]
 			t.readBufferLen -= req.MsgLen
-			t.keepAlive = req.isKeepAlive()
 
 			resp := NewResponse()
 			t.server.handler.HandleMsg(req, resp)
 			t.sendResp(resp)
-		}
-
-		// 如果不是长连接，则关闭连接
-		if !t.keepAlive {
-			t.close()
-			return
 		}
 	}
 }
