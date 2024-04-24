@@ -30,7 +30,7 @@ func (t *TestHandler) HandleHTTP(req *Request, resp *Response) {
 func Test_Server(t *testing.T) {
 	h := NewTestHandler()
 	s := NewServer("localhost", 9601, h)
-	err := s.StartListen()
+	err := s.Start()
 	if err != nil {
 		t.Error(err)
 	}

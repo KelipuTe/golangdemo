@@ -88,7 +88,7 @@ func (s *TCPService) Start() {
 	address := s.address + ":" + strconv.Itoa(int(s.port))
 	listener, err := net.Listen("tcp4", address)
 	if err != nil {
-		errStr := fmt.Sprintf("service [%s] StartListen() with err:%s", s.name, err.Error())
+		errStr := fmt.Sprintf("service [%s] Start() with err:%s", s.name, err.Error())
 		s.OnServiceError(s, errors.New(errStr))
 		return
 	}
@@ -116,7 +116,7 @@ func (s *TCPService) StartListen() {
 		// net.Listener.Accept，系统调用，获取连接上来的tcp
 		conn, err := s.listener.Accept()
 		if err != nil {
-			errStr := fmt.Sprintf("service [%s] StartListen() with err:%s", s.name, err.Error())
+			errStr := fmt.Sprintf("service [%s] Start() with err:%s", s.name, err.Error())
 			s.OnServiceError(s, errors.New(errStr))
 			return
 		}

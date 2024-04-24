@@ -11,10 +11,12 @@ const (
 	connPoolNumMax = 1024 //最大tcp连接数
 )
 
+// Handler 处理http请求的接口，需要外部实现
 type Handler interface {
 	HandleHTTP(req *Request, resp *Response)
 }
 
+// Server 服务端
 type Server struct {
 	ip           string
 	port         int
@@ -36,40 +38,41 @@ func NewServer(ip string, port int, h Handler) *Server {
 	}
 }
 
-func (t *Server) StartListen() error {
+// Start 启动服务
+func (t *Server) Start() error {
 	addr := t.ip + ":" + strconv.Itoa(t.port)
-	netListener, err := net.Listen("tcp4", addr)
+	netListener, err := net.Listen("tcp4", addr) //开始监听
 	if err != nil {
 		return err
 	}
 	t.listener = netListener
 
 	for {
-		netConn, err := t.listener.Accept()
+		netConn, err := t.listener.Accept() //等待连接
 		if err != nil {
 			return err
 		}
-		log.Println("conn accept")
-		httpConn := t.acceptConn(netConn)
+		httpConn := t.connAccept(netConn)
 
-		go httpConn.handleConn()
+		go httpConn.handleMsg() //可以并发处理每个连接
 	}
 }
 
-func (t *Server) acceptConn(netConn net.Conn) *AcceptConn {
-	httpConn := NewAcceptConn(t, netConn)
+// connAccept 连接接受
+func (t *Server) connAccept(netConn net.Conn) *AcceptConn {
+	log.Println("conn accept")
 
-	t.connPoolLock.Lock()
-	defer t.connPoolLock.Unlock()
+	httpConn := NewAcceptConn(t, netConn)
 
 	t.connPoolNum++
 	addr := httpConn.conn.RemoteAddr().String()
-	t.connPool[addr] = httpConn
+	t.connPool[addr] = httpConn //这里没有并发
 
 	return httpConn
 }
 
-func (t *Server) closeConn(c *AcceptConn) {
+// connClose 连接关闭
+func (t *Server) connClose(c *AcceptConn) {
 	t.connPoolLock.Lock()
 	defer t.connPoolLock.Unlock()
 
@@ -77,6 +80,6 @@ func (t *Server) closeConn(c *AcceptConn) {
 	if _, ok := t.connPool[addr]; !ok {
 		return
 	}
-	delete(t.connPool, addr)
+	delete(t.connPool, addr) //这里有并发
 	t.connPoolNum--
 }

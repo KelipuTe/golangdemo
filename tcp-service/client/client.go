@@ -77,7 +77,7 @@ func (c *TCPClient) Start() {
 
 	conn, err := net.Dial("tcp4", c.address+":"+strconv.Itoa(int(c.port)))
 	if err != nil {
-		c.OnClientError(c, pkgErrors.WithMessage(err, "TCPClient.StartListen"))
+		c.OnClientError(c, pkgErrors.WithMessage(err, "TCPClient.Start"))
 		return
 	}
 
