@@ -102,7 +102,6 @@ func (p1this *WebSocket) FirstMsgLen(sli1recv []byte) (uint64, error) {
 			return 0, ErrDataIncomplete
 		}
 
-		// 取 FIN，第 1 个字节的第 1 位
 		t1fin := sli1recv[0] & 0b10000000
 		if t1fin == 0b10000000 {
 			p1this.fin = true
@@ -353,7 +352,7 @@ func (p1this *WebSocket) CheckHandshakeReq() ([]byte, error) {
 
 	// 测试使用的是 JavaScript 的 WebSocket 工具
 	// 在上述条件下，这几个字段都要有，少一个都跑不通
-	msg := fmt.Sprintf("HandlerI9/1.1 101 Switching Protocols\r\n")
+	msg := fmt.Sprintf("HTTP/1.1 101 Switching Protocols\r\n")
 	msg += fmt.Sprintf("Connection: Upgrade\r\n")
 	msg += fmt.Sprintf("Upgrade: websocket\r\n")
 	msg += fmt.Sprintf("Sec-WebSocket-Accept: %s\r\n", secAcceptBase64)
@@ -369,7 +368,7 @@ func (p1this *WebSocket) MakeHandShakeReq() ([]byte, error) {
 	md5str := md5.Sum([]byte(t1str))
 	p1this.SecWebSocketKey = base64.StdEncoding.EncodeToString(md5str[:])
 
-	msg := fmt.Sprintf("GET /chat HandlerI9/1.1\r\n")
+	msg := fmt.Sprintf("GET /chat HTTP/1.1\r\n")
 	msg += fmt.Sprintf("Upgrade: websocket\r\n")
 	msg += fmt.Sprintf("Connection: Upgrade\r\n")
 	msg += fmt.Sprintf("Sec-WebSocket-Key: %s\r\n", p1this.SecWebSocketKey)

@@ -24,7 +24,7 @@ type Request struct {
 	HeaderLen  int    //请求头长度
 	ContentLen int    //请求体长度
 	MsgLen     int    //消息长度
-	Msg        string //消息体
+	Msg        []byte //消息体
 
 	Addr    string            //请求IP和端口
 	Method  string            //请求方法
@@ -43,8 +43,8 @@ func NewRequest() *Request {
 	}
 }
 
-// 结构体->http请求报文
-func (t *Request) encode() ([]byte, error) {
+// Encode 结构体->http请求报文
+func (t *Request) Encode() ([]byte, error) {
 	msg := fmt.Sprintf("%s %s", t.Method, t.Uri)
 	if len(t.Query) > 0 {
 		msg += "?"
@@ -68,8 +68,8 @@ func (t *Request) encode() ([]byte, error) {
 	return []byte(msg), nil
 }
 
-// http请求报文->结构体
-func (t *Request) decode(buffer []byte, bufferLen int) error {
+// Decode http请求报文->结构体
+func (t *Request) Decode(buffer []byte, bufferLen int) error {
 	bufferStr := string(buffer)
 
 	//找到 \r\n\r\n 的位置，用这个位置可以分隔请求头和请求体
@@ -96,20 +96,20 @@ func (t *Request) decode(buffer []byte, bufferLen int) error {
 	if t.MsgLen > bufferLen {
 		return ErrParseFailed //计算出来的报文长度大于接收缓冲区中数据的长度
 	}
-	t.Msg = bufferStr[0:t.MsgLen]
+	t.Msg = buffer[0:t.MsgLen]
 
 	err := t.parseHeader()
 	if err != nil {
 		return err
 	}
 
-	t.Body = t.Msg[t.HeaderLen:]
+	t.Body = string(t.Msg[t.HeaderLen:])
 
 	return nil
 }
 
 func (t *Request) parseHeader() error {
-	header := t.Msg[:t.HeaderLen]
+	header := string(t.Msg[:t.HeaderLen])
 	headerSplit := strings.Split(header, "\r\n")
 
 	//请求行
@@ -127,7 +127,7 @@ func (t *Request) parseHeader() error {
 	for _, v := range headerSplit[1:] {
 		vSplit := strings.Split(v, ": ") //用 ": " 切成键值
 		if len(vSplit) == 2 {
-			t.Header[strings.ToLower(vSplit[0])] = vSplit[1] //键名全部转成小写
+			t.Header[vSplit[0]] = vSplit[1] //键名全部转成小写
 		}
 	}
 
@@ -150,7 +150,7 @@ func (t *Request) parseQuery() error {
 		for _, v := range querySplit {
 			vSplit := strings.Split(v, "=")
 			if len(vSplit) == 2 {
-				t.Query[strings.ToLower(vSplit[0])] = vSplit[1]
+				t.Query[vSplit[0]] = vSplit[1]
 			}
 		}
 	}
@@ -159,7 +159,7 @@ func (t *Request) parseQuery() error {
 }
 
 func (t *Request) parseForm() (map[string]string, error) {
-	ct := t.Header["content-type"]
+	ct := t.Header["Content-Type"]
 	if ct != "application/x-www-form-urlencoded" {
 		return nil, ErrParseFailed
 	}
@@ -175,7 +175,7 @@ func (t *Request) parseForm() (map[string]string, error) {
 }
 
 func (t *Request) parseJson() (map[string]any, error) {
-	ct := t.Header["content-type"]
+	ct := t.Header["Content-Type"]
 	if ct != "application/json" {
 		return nil, ErrParseFailed
 	}
@@ -189,15 +189,15 @@ func (t *Request) parseJson() (map[string]any, error) {
 }
 
 func (t *Request) KeepAliveOn() {
-	t.Header["connection"] = "keep-alive"
+	t.Header["Connection"] = "keep-alive"
 }
 
 func (t *Request) KeepAliveOff() {
-	t.Header["connection"] = "close"
+	t.Header["Connection"] = "close"
 }
 
 func (t *Request) isKeepAlive() bool {
-	if conn, ok := t.Header["connection"]; ok {
+	if conn, ok := t.Header["Connection"]; ok {
 		if conn == "keep-alive" {
 			return true
 		}

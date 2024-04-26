@@ -51,7 +51,7 @@ func (t *AcceptConn) handleMsg() {
 
 			req := NewRequest()
 			req.Addr = t.conn.RemoteAddr().String()
-			err := req.decode(copyBuffer, t.readBufferLen)
+			err := req.Decode(copyBuffer, t.readBufferLen)
 			if err != nil {
 				t.close()
 				return
@@ -76,7 +76,7 @@ func (t *AcceptConn) handleMsg() {
 
 // sendResp 发送响应
 func (t *AcceptConn) sendResp(resp *Response) {
-	writeBuffer, err := resp.encode()
+	writeBuffer, err := resp.Encode()
 	if err != nil {
 		return
 	}

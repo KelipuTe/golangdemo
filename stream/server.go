@@ -53,8 +53,8 @@ func (t *Server) Start() error {
 			return err
 		}
 
-		httpConn := t.connAccept(netConn)
-		go httpConn.handleMsg() //可以并发处理每个连接
+		acceptConn := t.connAccept(netConn)
+		go acceptConn.handleMsg() //可以并发处理每个连接
 	}
 }
 
@@ -62,13 +62,13 @@ func (t *Server) Start() error {
 func (t *Server) connAccept(netConn net.Conn) *AcceptConn {
 	log.Println("conn accept")
 
-	httpConn := NewAcceptConn(t, netConn)
+	acceptConn := NewAcceptConn(t, netConn)
 
 	t.connPoolNum++
-	addr := httpConn.conn.RemoteAddr().String()
-	t.connPool[addr] = httpConn //这里没有并发
+	addr := acceptConn.conn.RemoteAddr().String()
+	t.connPool[addr] = acceptConn //这里没有并发
 
-	return httpConn
+	return acceptConn
 }
 
 // connClose 连接关闭

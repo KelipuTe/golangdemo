@@ -125,7 +125,7 @@ func (c *TCPConnection) HandleBuffer() {
 			c.HandleHTTPMsg(firstMsg)
 			c.belongToService.OnConnRequest(c)
 		case config.StreamStr:
-			//自定义 Stream 协议，长链接
+			//自定义 MsgBody 协议，长链接
 			//处理完一条消息后，理论上客户端不会关闭tcp连接
 			c.HandleStreamMsg(firstMsg)
 			c.belongToService.OnConnRequest(c)
@@ -139,11 +139,11 @@ func (c *TCPConnection) HandleBuffer() {
 			}
 			c.belongToService.OnConnRequest(c)
 			//如果握手成功，就直接响应一个固定的测试消息
-			// t1p1protocol := c.protocolHandler.(*websocket.WebSocket)
-			// if t1p1protocol.IsHandshakeStatusYes() {
-			//   t1p1protocol.SetDecodeMsg(fmt.Sprintf("this is %s.", c.belongToService.name))
-			//   c.SendMsg([]byte{})
-			// }
+			t1p1protocol := c.protocolHandler.(*websocket.WebSocket)
+			if t1p1protocol.IsHandshakeStatusYes() {
+				t1p1protocol.SetDecodeMsg(fmt.Sprintf("this is %s.", c.belongToService.name))
+				c.SendMsg([]byte{})
+			}
 		}
 
 		//处理接收缓冲区中剩余的数据

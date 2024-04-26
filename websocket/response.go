@@ -1,26 +1,30 @@
-package stream
+package websocket
 
 type Response struct {
 	MsgBody
 }
 
 func NewResponse() *Response {
-	return &Response{}
+	return &Response{
+		MsgBody{
+			Fin:    fin1,
+			Opcode: opcodeText,
+			Mask:   musk0,
+		},
+	}
 }
 
 func (t *Response) encode() ([]byte, error) {
-	return encode(t.Body)
+	return encode(&t.MsgBody)
 }
 
 func (t *Response) decode(buffer []byte, bufferLen int) error {
-	msgLen, err := decode(buffer, bufferLen)
+	msgBody, err := decode(buffer, bufferLen)
 	if err != nil {
 		return err
 	}
 
-	t.MsgLen = msgLen
-	t.MsgBody.Msg = buffer[0:msgLen]
-	t.Body = string(buffer[4:msgLen])
+	t.MsgBody = *msgBody
 
 	return nil
 }

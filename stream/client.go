@@ -44,11 +44,11 @@ func (t *Client) Send(req *Request) (*Response, error) {
 func (t *Client) connDial(netConn net.Conn) *DialConn {
 	log.Println("conn dial")
 
-	httpConn := NewDialConn(t, netConn)
+	dialConn := NewDialConn(t, netConn)
 
-	t.conn = httpConn
+	t.conn = dialConn
 
-	return httpConn
+	return dialConn
 }
 
 func (t *Client) connClose() {

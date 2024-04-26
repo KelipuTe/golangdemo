@@ -18,11 +18,11 @@ func (t *TestHandler) HandleMsg(req *Request, resp *Response) {
 	log.Println(req.Version)
 	if req.Method == MethodGet {
 		log.Println(req.Query)
-		resp.StatusCode = 200
+		resp.Status = 200
 		resp.Body = "{\"id\":1,\"name\":\"tom\"}"
 	} else if req.Method == MethodPost {
 		log.Println(req.Body)
-		resp.StatusCode = 200
+		resp.Status = 200
 		resp.Body = "{\"id\":1,\"price\":100}"
 	}
 }

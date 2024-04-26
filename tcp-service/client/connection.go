@@ -128,7 +128,7 @@ func (t *TCPConnection) HandleBuffer() {
 			t.HandleHTTPMsg(firstMsg)
 			t.belongToClient.OnConnGetRequest(t)
 		case config.StreamStr:
-			// 自定义 Stream 协议的消息，解析之后由外部实现的 OnConnGetRequest 继续处理
+			// 自定义 MsgBody 协议的消息，解析之后由外部实现的 OnConnGetRequest 继续处理
 			t1p1protocol := t.protocolHandler.(*stream.Stream)
 			t1p1protocol.Decode(firstMsg)
 

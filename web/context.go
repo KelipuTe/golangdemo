@@ -18,7 +18,7 @@ type S6HTTPContext struct {
 	M3PathParam map[string]string
 
 	// 暂存请求数据
-	// 因为 http.Request.Body 是流，只能读一次（和 linux c 的 recvFrom() 类似）
+	// 因为 http.Request.Payload 是流，只能读一次（和 linux c 的 recvFrom() 类似）
 	// 如果等到应用层再调用，那么在中间件里面记录请求日志或者进行预处理就无法实现
 	// 这里的方案是，在所有的处理流程开始前就读取然后存下来，再造一个流放回去
 	ReqBody []byte

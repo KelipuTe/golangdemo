@@ -1,8 +1,8 @@
 package service
 
 import (
+	"demo-golang/signal"
 	"demo-golang/tcp-service/config"
-	"demo-golang/tcp-service/tool/signal"
 	"fmt"
 	"testing"
 )
@@ -12,7 +12,7 @@ func Test_Service_HTTP(t *testing.T) {
 	service.SetName(fmt.Sprintf("%s-service", config.HTTPStr))
 	service.OpenDebug()
 	service.Start()
-	signal.WaitForShutdown()
+	signal.WaitForSIGINT()
 }
 
 func Test_Service_Stream(t *testing.T) {
@@ -20,7 +20,7 @@ func Test_Service_Stream(t *testing.T) {
 	service.SetName(fmt.Sprintf("%s-service", config.StreamStr))
 	service.OpenDebug()
 	service.Start()
-	signal.WaitForShutdown()
+	signal.WaitForSIGINT()
 }
 
 // 可以用 EasySwoole-WebSocket在线测试工具
@@ -31,5 +31,5 @@ func Test_Service_WebSocket(t *testing.T) {
 	service.SetName(fmt.Sprintf("%s-service", config.WebSocketStr))
 	service.OpenDebug()
 	service.Start()
-	signal.WaitForShutdown()
+	signal.WaitForSIGINT()
 }

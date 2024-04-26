@@ -63,11 +63,11 @@ func (t *Client) parseDNS(req *Request) error {
 func (t *Client) connDial(netConn net.Conn) *DialConn {
 	log.Println("conn dial")
 
-	httpConn := NewDialConn(t, netConn)
+	dialConn := NewDialConn(t, netConn)
 
-	t.conn = httpConn
+	t.conn = dialConn
 
-	return httpConn
+	return dialConn
 }
 
 // CloseConn 关闭连接

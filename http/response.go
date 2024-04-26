@@ -6,11 +6,17 @@ import (
 	"strings"
 )
 
-const StatusCodeOK = 200
+const (
+	StatusSwitchingProtocols = 101
+
+	StatusOK = 200
+)
 
 var (
-	statusCodeText = map[int]string{
-		StatusCodeOK: "OK",
+	statusText = map[int]string{
+		StatusSwitchingProtocols: "Switching Protocols",
+
+		StatusOK: "OK",
 	}
 )
 
@@ -19,12 +25,12 @@ type Response struct {
 	HeaderLen  int    //响应头长度
 	ContentLen int    //响应体长度
 	MsgLen     int    //消息长度
-	Msg        string //消息体
+	Msg        []byte //消息体
 
-	Version    string            //版本
-	StatusCode int               //状态码
-	Header     map[string]string //解析后的响应头
-	Body       string            //响应体
+	Version string            //版本
+	Status  int               //状态码
+	Header  map[string]string //解析后的响应头
+	Body    string            //响应体
 }
 
 func NewResponse() *Response {
@@ -34,9 +40,9 @@ func NewResponse() *Response {
 	}
 }
 
-// 结构体->http响应报文
-func (t *Response) encode() ([]byte, error) {
-	msg := fmt.Sprintf("%s %d %v\r\n", t.Version, t.StatusCode, statusCodeText[t.StatusCode])
+// Encode 结构体->http响应报文
+func (t *Response) Encode() ([]byte, error) {
+	msg := fmt.Sprintf("%s %d %v\r\n", t.Version, t.Status, statusText[t.Status])
 
 	for k, v := range t.Header {
 		msg += fmt.Sprintf("%s: %s\r\n", k, v)
@@ -47,8 +53,8 @@ func (t *Response) encode() ([]byte, error) {
 	return []byte(msg), nil
 }
 
-// http响应报文->结构体
-func (t *Response) decode(buffer []byte, bufferLen int) error {
+// Decode http响应报文->结构体
+func (t *Response) Decode(buffer []byte, bufferLen int) error {
 	bufferStr := string(buffer)
 
 	//找到 \r\n\r\n 的位置，用这个位置可以分隔请求头和请求体
@@ -76,20 +82,20 @@ func (t *Response) decode(buffer []byte, bufferLen int) error {
 		// 计算出来的报文长度大于接收缓冲区中数据的长度
 		return ErrParseFailed
 	}
-	t.Msg = bufferStr[0:t.MsgLen]
+	t.Msg = buffer[0:t.MsgLen]
 
 	err := t.parseHeader()
 	if err != nil {
 		return err
 	}
 
-	t.Body = t.Msg[t.HeaderLen:]
+	t.Body = string(t.Msg[t.HeaderLen:])
 
 	return nil
 }
 
 func (t *Response) parseHeader() error {
-	header := t.Msg[:t.HeaderLen]
+	header := string(t.Msg[:t.HeaderLen])
 	headerSplit := strings.Split(header, "\r\n")
 
 	//响应行
@@ -99,7 +105,7 @@ func (t *Response) parseHeader() error {
 	if err != nil {
 		return ErrParseFailed
 	}
-	t.StatusCode = statusCode
+	t.Status = statusCode
 
 	//响应头
 	for _, v := range headerSplit[1:] {

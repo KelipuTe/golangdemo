@@ -19,6 +19,8 @@ func (t *TestHandler) HandleMsg(req *Request, resp *Response) {
 		resp.Body = "{\"id\":1,\"name\":\"tom\"}"
 	} else if data["method"] == "/api/order" {
 		resp.Body = "{\"id\":1,\"price\":100}"
+	} else {
+		resp.Body = "404 not found"
 	}
 }
 

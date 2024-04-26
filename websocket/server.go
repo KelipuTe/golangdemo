@@ -1,4 +1,4 @@
-package http
+package websocket
 
 import (
 	"log"
@@ -13,7 +13,7 @@ const (
 
 // Handler 处理请求的接口，需要外部实现
 type Handler interface {
-	HandleMsg(req *Request, resp *Response)
+	HandleMsg(req *Request, conn *AcceptConn)
 }
 
 // Server 服务端
