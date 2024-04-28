@@ -5,35 +5,32 @@ import (
 	"testing"
 )
 
-type TestHandler struct {
+type TestServerHandler struct {
 }
 
-func NewTestHandler() *TestHandler {
-	return &TestHandler{}
+func NewTestServerHandler() *TestServerHandler {
+	return &TestServerHandler{}
 }
 
-func (t *TestHandler) HandleMsg(req *Request, conn *AcceptConn) {
+func (t *TestServerHandler) HandleMsg(req *Msg, conn *AcceptConn) {
 	log.Println(req.MsgLen, req.Fin, req.Opcode, req.Payload)
+
 	data, _ := req.parseJson()
-	resp := NewResponse()
-
-	if data["method"] == "/api/user" {
-		resp.Payload = "{\"id\":1,\"name\":\"tom\"}"
-	} else if data["method"] == "/api/order" {
-		resp.Payload = "{\"id\":1,\"price\":100}"
-	} else {
-		resp.Payload = "123"
+	if data["method"] == "/api/msg_only" {
+		log.Println(data)
+	} else if data["method"] == "/api/need_resp" {
+		resp := NewUnmaskTextMsg()
+		resp.Payload = "{\"method\":\"/api/msg_only\",\"msg\":\"server\"}"
+		_ = conn.sendMsg(resp)
 	}
-
-	conn.sendResp(resp)
 }
 
-// 可以用这个网站测试 http://www.websocket-test.com/
 func Test_Server(t *testing.T) {
-	h := NewTestHandler()
+	h := NewTestServerHandler()
 	s := NewServer("localhost", 9603, h)
 	err := s.Start()
 	if err != nil {
 		t.Error(err)
 	}
+	defer s.Close()
 }

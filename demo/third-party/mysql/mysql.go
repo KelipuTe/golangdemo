@@ -44,7 +44,7 @@ func Query(pdb *sql.DB) {
 	rows, err := pdb.Query("SELECT * FROM test")
 	checkErr(err)
 
-	//rows.CloseConn()是幂等的，如果rows.Next()返回false，rows也会自动关闭
+	//rows.Close()是幂等的，如果rows.Next()返回false，rows也会自动关闭
 	defer rows.Close() //关闭rows，提前写
 
 	//rows.Next()迭代查询数据，获取不到数据时返回false，配合rows.Scan()获取数据

@@ -1,6 +1,7 @@
 package http
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -18,6 +19,10 @@ var (
 
 		StatusOK: "OK",
 	}
+)
+
+var (
+	ErrParseRespFailed = errors.New("解析 HTTP 响应报文失败")
 )
 
 // Response 响应
@@ -60,7 +65,7 @@ func (t *Response) Decode(buffer []byte, bufferLen int) error {
 	//找到 \r\n\r\n 的位置，用这个位置可以分隔请求头和请求体
 	rnrnIndex := strings.Index(bufferStr, "\r\n\r\n")
 	if rnrnIndex <= 0 {
-		return ErrParseFailed
+		return ErrParseRespFailed
 	}
 	//请求头长度等于 \r\n\r\n 的位置下标加上 \r\n\r\n 的长度
 	t.HeaderLen = rnrnIndex + 4
@@ -72,7 +77,7 @@ func (t *Response) Decode(buffer []byte, bufferLen int) error {
 		clStr = clStr[0:rnIndex]                //截取 Content-Length 的字符串值
 		cl, err := strconv.Atoi(clStr)          //把字符串值转换成整数值
 		if err != nil {
-			return ErrParseFailed
+			return ErrParseRespFailed
 		}
 		t.ContentLen = cl
 	}
@@ -80,7 +85,7 @@ func (t *Response) Decode(buffer []byte, bufferLen int) error {
 	t.MsgLen = t.HeaderLen + t.ContentLen
 	if t.MsgLen > bufferLen {
 		// 计算出来的报文长度大于接收缓冲区中数据的长度
-		return ErrParseFailed
+		return ErrParseRespFailed
 	}
 	t.Msg = buffer[0:t.MsgLen]
 
@@ -103,7 +108,7 @@ func (t *Response) parseHeader() error {
 	t.Version = statusSplit[0]
 	statusCode, err := strconv.Atoi(statusSplit[1])
 	if err != nil {
-		return ErrParseFailed
+		return ErrParseRespFailed
 	}
 	t.Status = statusCode
 

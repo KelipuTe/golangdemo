@@ -7,27 +7,27 @@ import (
 	"sync"
 )
 
-const (
-	connPoolNumMax = 1024 //最大tcp连接数
-)
-
-// Handler 处理请求的接口，需要外部实现
-type Handler interface {
-	HandleMsg(req *Request, conn *AcceptConn)
+// ServerHandler 处理消息的接口，需要外部实现
+type ServerHandler interface {
+	HandleMsg(req *Msg, conn *AcceptConn)
 }
 
 // Server 服务端
 type Server struct {
-	ip           string
-	port         int
+	ip   string
+	port int
+
 	listener     net.Listener
 	connPool     map[string]*AcceptConn //连接上来的tcp
 	connPoolNum  int                    //当前tcp连接数
 	connPoolLock *sync.Mutex            //connPool的锁
-	handler      Handler
+
+	handler ServerHandler
+
+	isRunning bool //是否运行
 }
 
-func NewServer(ip string, port int, h Handler) *Server {
+func NewServer(ip string, port int, h ServerHandler) *Server {
 	return &Server{
 		ip:           ip,
 		port:         port,
@@ -35,6 +35,7 @@ func NewServer(ip string, port int, h Handler) *Server {
 		connPoolNum:  0,
 		connPoolLock: &sync.Mutex{},
 		handler:      h,
+		isRunning:    true,
 	}
 }
 
@@ -47,8 +48,8 @@ func (t *Server) Start() error {
 	}
 	t.listener = netListener
 
-	for {
-		netConn, err := t.listener.Accept() //等待连接
+	for t.isRunning {
+		netConn, err := t.listener.Accept() //等待客户端连接上来
 		if err != nil {
 			return err
 		}
@@ -56,9 +57,11 @@ func (t *Server) Start() error {
 		acceptConn := t.connAccept(netConn)
 		go acceptConn.handleMsg() //可以并发处理每个连接
 	}
+
+	return nil
 }
 
-// connAccept 连接接受
+// connAccept 连接建立
 func (t *Server) connAccept(netConn net.Conn) *AcceptConn {
 	log.Println("conn accept")
 
@@ -82,4 +85,13 @@ func (t *Server) connClose(c *AcceptConn) {
 	}
 	delete(t.connPool, addr) //这里有并发
 	t.connPoolNum--
+}
+
+// Close 关闭服务
+func (t *Server) Close() {
+	_ = t.listener.Close()
+	t.isRunning = false
+	for _, v := range t.connPool {
+		v.close()
+	}
 }

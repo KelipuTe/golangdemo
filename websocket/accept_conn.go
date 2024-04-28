@@ -12,17 +12,17 @@ import (
 	"time"
 )
 
-const (
-	readBufferMaxLen = 1048576 // 1048576 == 2^20 == 1MB。
-)
-
 // AcceptConn 服务端封装的tcp连接
 type AcceptConn struct {
-	server        *Server
+	server *Server
+
 	conn          net.Conn //tcp连接本体
 	readBuffer    []byte   //接收缓冲区
 	readBufferLen int      //接收缓冲区长度
-	hasHandshake  bool     //是否握手
+
+	hasHandshake bool //是否握手
+
+	isRunning bool //是否运行
 }
 
 func NewAcceptConn(s *Server, c net.Conn) *AcceptConn {
@@ -32,12 +32,13 @@ func NewAcceptConn(s *Server, c net.Conn) *AcceptConn {
 		readBuffer:    make([]byte, readBufferMaxLen),
 		readBufferLen: 0,
 		hasHandshake:  false,
+		isRunning:     true,
 	}
 }
 
 // handleMsg 处理消息
 func (t *AcceptConn) handleMsg() {
-	for {
+	for t.isRunning {
 		err := t.conn.SetReadDeadline(time.Now().Add(5 * time.Second))
 		if err != nil {
 			t.close()
@@ -61,13 +62,13 @@ func (t *AcceptConn) handleMsg() {
 
 		t.readBufferLen += num
 
+		var reqMerge *Msg = nil
 		for t.readBufferLen > 0 {
 			if t.hasHandshake {
 				//握好手了，用websocket解析
 				copyBuffer := t.readBuffer[0:t.readBufferLen]
 
-				req := NewRequest()
-
+				req := NewMaskTestMsg()
 				req.Addr = t.conn.RemoteAddr().String()
 				err := req.decode(copyBuffer, t.readBufferLen)
 				if err != nil {
@@ -78,24 +79,60 @@ func (t *AcceptConn) handleMsg() {
 				t.readBuffer = t.readBuffer[req.MsgLen:]
 				t.readBufferLen -= req.MsgLen
 
-				t.server.handler.HandleMsg(req, t)
-
+				switch req.Opcode {
+				case opcodeText:
+					//看看需不需要合并
+					if req.Fin == fin1 {
+						if reqMerge == nil {
+							t.server.handler.HandleMsg(req, t)
+						} else {
+							reqMerge.Payload = reqMerge.Payload + req.Payload
+							t.server.handler.HandleMsg(req, t)
+							reqMerge = nil
+						}
+					} else {
+						if reqMerge == nil {
+							reqMerge = req
+						} else {
+							reqMerge.Payload = reqMerge.Payload + req.Payload
+						}
+					}
+				case opcodePing:
+					log.Println("get ping from", req.Addr)
+					resp := NewPongMsg()
+					err := t.sendMsg(resp)
+					if err != nil {
+						t.close()
+						return
+					}
+					continue
+				case opcodePong:
+					log.Println("get pong from", req.Addr)
+					continue
+				default:
+				}
 			} else {
 				//没有握手，用http解析
 				req := http.NewRequest()
 				resp := http.NewResponse()
 				err := t.checkHandshakeReq(req, resp)
-				t.sendHandshakeResp(resp)
+				if err != nil {
+					t.close()
+					return
+				}
+				err = t.sendHandshakeResp(resp)
 				if err != nil {
 					t.close()
 					return
 				}
 				t.hasHandshake = true
+				go t.sendPing()
 			}
 		}
 	}
 }
 
+// checkHandshakeReq 检查握手请求
 func (t *AcceptConn) checkHandshakeReq(req *http.Request, resp *http.Response) error {
 	copyBuffer := t.readBuffer[0:t.readBufferLen]
 
@@ -147,27 +184,50 @@ func (t *AcceptConn) checkHandshakeReq(req *http.Request, resp *http.Response) e
 	return nil
 }
 
-func (t *AcceptConn) sendHandshakeResp(resp *http.Response) {
+// sendHandshakeResp 发送握手响应
+func (t *AcceptConn) sendHandshakeResp(resp *http.Response) error {
 	writeBuffer, err := resp.Encode()
 	if err != nil {
-		return
+		return err
 	}
-	_, _ = t.conn.Write(writeBuffer)
-	return
+	_, err = t.conn.Write(writeBuffer)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-// sendResp 发送响应
-func (t *AcceptConn) sendResp(resp *Response) {
-	writeBuffer, err := resp.encode()
-	if err != nil {
-		return
+// sendPing 发送心跳
+func (t *AcceptConn) sendPing() {
+	for t.isRunning {
+		req := NewPingMsg()
+		err := t.sendMsg(req)
+		if err != nil {
+			log.Println("send ping error:", err)
+			t.close()
+			return
+		}
+		time.Sleep(10 * time.Second)
 	}
-	_, _ = t.conn.Write(writeBuffer)
+}
+
+// sendMsg 发送消息
+func (t *AcceptConn) sendMsg(req *Msg) error {
+	writeBuffer, err := req.encode()
+	if err != nil {
+		return err
+	}
+	_, err = t.conn.Write(writeBuffer)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // close 关闭连接
 func (t *AcceptConn) close() {
 	log.Println("conn close")
 	_ = t.conn.Close()
+	t.isRunning = false
 	t.server.connClose(t) //通知server
 }

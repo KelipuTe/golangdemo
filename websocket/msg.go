@@ -1,28 +1,13 @@
 package websocket
 
-import "errors"
-
-const (
-	fin0 = 0b00000000 //Fin 0
-	fin1 = 0b10000000 //Fin 1
-
-	musk0 = 0b00000000 //musk 0
-	musk1 = 0b10000000 //musk 1
+import (
+	"encoding/json"
+	"time"
 )
 
-const (
-	opcodeText   uint8 = 0x01 //文本帧
-	opcodeBinary uint8 = 0x02 //二进制帧
-	opcodeClose  uint8 = 0x08 //连接断开
-	opcodePing   uint8 = 0x09 //ping
-	opcodePong   uint8 = 0x0A //pong
-)
+type Msg struct {
+	Addr string //请求IP和端口
 
-var (
-	ErrParseFailed = errors.New("解析失败")
-)
-
-type MsgBody struct {
 	Fin uint8 //FIN，1 bit，0=不是消息的最后一个分片；1=这是消息的最后一个分片；
 	//RSV1、RSV2、RSV3，各 1 bit，这里不处理。
 	Opcode       uint8   //OPCODE，4 bit
@@ -41,7 +26,47 @@ type MsgBody struct {
 	Payload string //请求体
 }
 
-func encode(t *MsgBody) ([]byte, error) {
+func NewMaskTestMsg() *Msg {
+	req := &Msg{
+		Fin:    fin1,
+		Opcode: opcodeText,
+		Mask:   musk1,
+	}
+
+	timestamp := time.Now().Second()
+	req.maskingKey[0] = byte(timestamp)
+	req.maskingKey[1] = byte(timestamp - 1)
+	req.maskingKey[2] = byte(timestamp - 2)
+	req.maskingKey[3] = byte(timestamp - 3)
+
+	return req
+}
+
+func NewUnmaskTextMsg() *Msg {
+	return &Msg{
+		Fin:    fin1,
+		Opcode: opcodeText,
+		Mask:   musk0,
+	}
+}
+
+func NewPingMsg() *Msg {
+	return &Msg{
+		Fin:    fin1,
+		Opcode: opcodePing,
+		Mask:   musk0,
+	}
+}
+
+func NewPongMsg() *Msg {
+	return &Msg{
+		Fin:    fin1,
+		Opcode: opcodePong,
+		Mask:   musk0,
+	}
+}
+
+func (t *Msg) encode() ([]byte, error) {
 	t.payloadLen = len(t.Payload)
 	var msg []byte
 	if t.Mask == musk1 {
@@ -50,7 +75,7 @@ func encode(t *MsgBody) ([]byte, error) {
 		if t.payloadLen <= 125 {
 			msg = make([]byte, 2+4+t.payloadLen)
 			msg[0] = t.Fin | t.Opcode
-			msg[1] = 0b01111111 & byte(t.payloadLen)
+			msg[1] = t.Mask | (0b01111111 & byte(t.payloadLen))
 			msg[2] = t.maskingKey[0]
 			msg[3] = t.maskingKey[1]
 			msg[4] = t.maskingKey[2]
@@ -59,7 +84,7 @@ func encode(t *MsgBody) ([]byte, error) {
 		} else if t.payloadLen <= 65535 {
 			msg = make([]byte, 2+2+4+t.payloadLen)
 			msg[0] = t.Fin | t.Opcode
-			msg[1] = 126
+			msg[1] = t.Mask | 126
 			msg[2] = uint8(t.payloadLen16 >> 8)
 			msg[3] = uint8(t.payloadLen16)
 			msg[4] = t.maskingKey[0]
@@ -70,7 +95,7 @@ func encode(t *MsgBody) ([]byte, error) {
 		} else {
 			msg = make([]byte, 2+8+4+t.payloadLen)
 			msg[0] = t.Fin | t.Opcode
-			msg[1] = 127
+			msg[1] = t.Mask | 127
 			msg[2] = uint8(t.payloadLen64 >> 56)
 			msg[3] = uint8(t.payloadLen64 >> 48)
 			msg[4] = uint8(t.payloadLen64 >> 40)
@@ -85,9 +110,8 @@ func encode(t *MsgBody) ([]byte, error) {
 			msg[13] = t.maskingKey[3]
 			i = 14
 		}
-		msg = append(msg, t.Payload...)
 		for j < t.payloadLen {
-			msg[i] = msg[i] ^ t.maskingKey[j%0b00000011]
+			msg[i] = t.Payload[j] ^ t.maskingKey[j%4]
 			i++
 			j++
 		}
@@ -96,19 +120,19 @@ func encode(t *MsgBody) ([]byte, error) {
 		if t.payloadLen <= 125 {
 			msg = make([]byte, 2+t.payloadLen)
 			msg[0] = t.Fin | t.Opcode
-			msg[1] = 0b01111111 & byte(t.payloadLen)
+			msg[1] = t.Mask | (0b01111111 & byte(t.payloadLen))
 			i = 2
 		} else if t.payloadLen <= 65535 {
-			msg = make([]byte, 2+2+4+t.payloadLen)
+			msg = make([]byte, 2+2+t.payloadLen)
 			msg[0] = t.Fin | t.Opcode
-			msg[1] = 126
+			msg[1] = t.Mask | 126
 			msg[2] = uint8(t.payloadLen16 >> 8)
 			msg[3] = uint8(t.payloadLen16)
 			i = 4
 		} else {
-			msg = make([]byte, 2+8+4+t.payloadLen)
+			msg = make([]byte, 2+8+t.payloadLen)
 			msg[0] = t.Fin | t.Opcode
-			msg[1] = 127
+			msg[1] = t.Mask | 127
 			msg[2] = uint8(t.payloadLen64 >> 56)
 			msg[3] = uint8(t.payloadLen64 >> 48)
 			msg[4] = uint8(t.payloadLen64 >> 40)
@@ -128,11 +152,10 @@ func encode(t *MsgBody) ([]byte, error) {
 	return msg, nil
 }
 
-func decode(buffer []byte, bufferLen int) (*MsgBody, error) {
-	t := &MsgBody{}
+func (t *Msg) decode(buffer []byte, bufferLen int) error {
 
 	if bufferLen < 2 {
-		return nil, ErrParseFailed //至少 2 个字节才能解析
+		return ErrParseFailed //至少 2 个字节才能解析
 	}
 
 	t.Fin = buffer[0] & 0b10000000 //取 FIN，第 1 个字节的第 1 位
@@ -154,7 +177,7 @@ func decode(buffer []byte, bufferLen int) (*MsgBody, error) {
 	}
 
 	if bufferLen < t.headerLen {
-		return nil, ErrParseFailed //请求头长度不够
+		return ErrParseFailed //请求头长度不够
 	}
 
 	if t.payloadLen8 == 126 {
@@ -181,29 +204,41 @@ func decode(buffer []byte, bufferLen int) (*MsgBody, error) {
 	t.MsgLen = t.headerLen + t.payloadLen
 
 	if bufferLen < t.MsgLen {
-		return nil, ErrParseFailed //消息长度不够
-	}
-
-	//取 Masking-key，请求头倒数第 4、3、2、1 字节
-	if t.Mask == musk1 {
-		t.maskingKey[0] = buffer[t.headerLen-4]
-		t.maskingKey[1] = buffer[t.headerLen-3]
-		t.maskingKey[2] = buffer[t.headerLen-2]
-		t.maskingKey[3] = buffer[t.headerLen-1]
+		return ErrParseFailed //消息长度不够
 	}
 
 	t.Msg = buffer[:t.MsgLen]
 
-	// 用 Masking-key 解析 Payload Data
-	msgUnMask := t.Msg
-	i, j := 0, t.headerLen
-	for j < t.MsgLen {
-		msgUnMask[j] = msgUnMask[j] ^ t.maskingKey[i%0b00000011]
-		i++
-		j++
+	if t.Mask == musk1 {
+		//取 Masking-key，请求头倒数第 4、3、2、1 字节
+		t.maskingKey[0] = buffer[t.headerLen-4]
+		t.maskingKey[1] = buffer[t.headerLen-3]
+		t.maskingKey[2] = buffer[t.headerLen-2]
+		t.maskingKey[3] = buffer[t.headerLen-1]
+
+		// 用 Masking-key 解析 Payload Data
+		msgUnMask := make([]byte, t.MsgLen)
+		copy(msgUnMask, t.Msg)
+		i, j := 0, t.headerLen
+		for j < t.MsgLen {
+			msgUnMask[j] = msgUnMask[j] ^ t.maskingKey[i%4]
+			i++
+			j++
+		}
+		t.Payload = string(msgUnMask[t.headerLen:])
+	} else {
+		t.Payload = string(t.Msg[t.headerLen:])
 	}
 
-	t.Payload = string(msgUnMask[t.headerLen:])
+	return nil
+}
 
-	return t, nil
+func (t *Msg) parseJson() (map[string]any, error) {
+	ret := make(map[string]any)
+	err := json.Unmarshal([]byte(t.Payload), &ret)
+	if err != nil {
+		return nil, err
+	}
+
+	return ret, nil
 }

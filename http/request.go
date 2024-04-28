@@ -16,7 +16,7 @@ const (
 )
 
 var (
-	ErrParseFailed = errors.New("解析失败")
+	ErrParseFailed = errors.New("解析 HTTP 请求报文失败")
 )
 
 // Request 请求
