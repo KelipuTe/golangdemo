@@ -5,7 +5,7 @@ const (
 )
 
 const (
-	readBufferMaxLen = 1048576 // 1048576 == 2^20 == 1MB。
+	readBufferMaxLen = 1048576 //1048576 == 2^20 == 1MB。
 )
 
 const (

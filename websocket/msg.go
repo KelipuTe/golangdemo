@@ -8,17 +8,16 @@ import (
 type Msg struct {
 	Addr string //请求IP和端口
 
-	Fin uint8 //FIN，1 bit，0=不是消息的最后一个分片；1=这是消息的最后一个分片；
-	//RSV1、RSV2、RSV3，各 1 bit，这里不处理。
-	Opcode       uint8   //OPCODE，4 bit
-	Mask         uint8   //MASK，1 bit，0=没有 Masking-key；1=有 Masking-key；
-	payloadLen8  uint8   //Payload len，7 bit
-	payloadLen16 uint16  //Extended payload length，16 bit，if payload len==126
-	payloadLen64 uint64  //Extended payload length，64 bit，if payload len==127
-	maskingKey   [4]byte //Masking-key，4 byte
+	Fin          uint8   //FIN，1 bit，是不是消息的最后一个分片。0=不是；1=是；
+	Opcode       uint8   //OPCODE，4 bit，操作码（报文类型）
+	Mask         uint8   //MASK，1 bit，Payload Data 有没有用掩码。0=没有；1=有；
+	payloadLen8  uint8   //Payload len，7 bit，Payload Data 的长度。
+	payloadLen16 uint16  //如果 Payload len=126，Extended payload length 就是 16 bit。
+	payloadLen64 uint64  //如果 Payload len=127，Extended payload length 就是 64 bit。
+	maskingKey   [4]byte //Masking-key，4 byte，4 个掩码。
 
-	headerLen  int //请求头长度
-	payloadLen int //请求体长度
+	headerLen  int //消息头长度
+	payloadLen int //有效载荷长度
 
 	MsgLen int    //消息长度
 	Msg    []byte //消息体
