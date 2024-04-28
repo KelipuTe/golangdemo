@@ -23,7 +23,7 @@ type Msg struct {
 	MsgLen int    //消息长度
 	Msg    []byte //消息体
 
-	Payload string //请求体
+	Payload string //有效载荷
 }
 
 func NewMaskTestMsg() *Msg {

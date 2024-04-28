@@ -6,10 +6,6 @@ import (
 	"net"
 )
 
-const (
-	readBufferMaxLen = 1048576 // 1048576 == 2^20 == 1MB。
-)
-
 // AcceptConn 服务端封装的tcp连接
 type AcceptConn struct {
 	server        *Server

@@ -7,10 +7,6 @@ import (
 	"sync"
 )
 
-const (
-	connPoolNumMax = 1024 //最大tcp连接数
-)
-
 // Handler 处理请求的接口，需要外部实现
 type Handler interface {
 	HandleMsg(req *Request, resp *Response)

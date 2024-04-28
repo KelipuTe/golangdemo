@@ -2,21 +2,9 @@ package http
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"strconv"
 	"strings"
-)
-
-const (
-	VersionX1Y1 = "HTTP/1.1"
-
-	MethodGet  = "GET"
-	MethodPost = "POST"
-)
-
-var (
-	ErrParseFailed = errors.New("解析 HTTP 请求报文失败")
 )
 
 // Request 请求
@@ -75,7 +63,7 @@ func (t *Request) Decode(buffer []byte, bufferLen int) error {
 	//找到 \r\n\r\n 的位置，用这个位置可以分隔请求头和请求体
 	rnrnIndex := strings.Index(bufferStr, "\r\n\r\n")
 	if rnrnIndex <= 0 {
-		return ErrParseFailed
+		return ErrParseReqFailed
 	}
 	//请求头长度等于 \r\n\r\n 的位置下标加上 \r\n\r\n 的长度
 	t.HeaderLen = rnrnIndex + 4
@@ -87,14 +75,14 @@ func (t *Request) Decode(buffer []byte, bufferLen int) error {
 		clStr = clStr[0:rnIndex]                //截取 Content-Length 的字符串值
 		cl, err := strconv.Atoi(clStr)          //把字符串值转换成整数值
 		if err != nil {
-			return ErrParseFailed
+			return ErrParseReqFailed
 		}
 		t.ContentLen = cl
 	}
 
 	t.MsgLen = t.HeaderLen + t.ContentLen
 	if t.MsgLen > bufferLen {
-		return ErrParseFailed //计算出来的报文长度大于接收缓冲区中数据的长度
+		return ErrParseReqFailed //计算出来的报文长度大于接收缓冲区中数据的长度
 	}
 	t.Msg = buffer[0:t.MsgLen]
 
@@ -141,7 +129,7 @@ func (t *Request) parseQuery() error {
 		return nil
 	} else if index == 0 {
 		// ? 在第一个字符的位置，不合法
-		return ErrParseFailed
+		return ErrParseReqFailed
 	}
 	query := t.Uri[index+1:] //查询参数
 	t.Uri = t.Uri[:index]    //没有查询参数的uri
@@ -161,7 +149,7 @@ func (t *Request) parseQuery() error {
 func (t *Request) parseForm() (map[string]string, error) {
 	ct := t.Header["Content-Type"]
 	if ct != "application/x-www-form-urlencoded" {
-		return nil, ErrParseFailed
+		return nil, ErrParseReqFailed
 	}
 	ret := make(map[string]string)
 	bodySplit := strings.Split(t.Body, "&")
@@ -177,7 +165,7 @@ func (t *Request) parseForm() (map[string]string, error) {
 func (t *Request) parseJson() (map[string]any, error) {
 	ct := t.Header["Content-Type"]
 	if ct != "application/json" {
-		return nil, ErrParseFailed
+		return nil, ErrParseReqFailed
 	}
 	ret := make(map[string]any)
 	err := json.Unmarshal([]byte(t.Body), &ret)

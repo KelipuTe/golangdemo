@@ -1,28 +1,9 @@
 package http
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
 	"strings"
-)
-
-const (
-	StatusSwitchingProtocols = 101
-
-	StatusOK = 200
-)
-
-var (
-	statusText = map[int]string{
-		StatusSwitchingProtocols: "Switching Protocols",
-
-		StatusOK: "OK",
-	}
-)
-
-var (
-	ErrParseRespFailed = errors.New("解析 HTTP 响应报文失败")
 )
 
 // Response 响应
