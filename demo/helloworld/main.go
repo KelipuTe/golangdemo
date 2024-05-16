@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-// 古老仪式
+// 神秘仪式
 func main() {
 	fmt.Printf("hello, world\n")
 }

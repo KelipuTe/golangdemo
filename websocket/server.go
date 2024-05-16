@@ -1,6 +1,7 @@
 package websocket
 
 import (
+	"demo-golang/http"
 	"log"
 	"net"
 	"strconv"
@@ -22,7 +23,9 @@ type Server struct {
 	connPoolNum  int                    //当前tcp连接数
 	connPoolLock *sync.Mutex            //connPool的锁
 
-	handler ServerHandler
+	handler ServerHandler //websocket处理接口
+
+	httpHandler http.Handler //http处理接口
 
 	isRunning bool //是否运行
 }
@@ -35,8 +38,13 @@ func NewServer(ip string, port int, h ServerHandler) *Server {
 		connPoolNum:  0,
 		connPoolLock: &sync.Mutex{},
 		handler:      h,
+		httpHandler:  nil,
 		isRunning:    true,
 	}
+}
+
+func (t *Server) SupportHTTP(h http.Handler) {
+	t.httpHandler = h
 }
 
 // Start 启动服务

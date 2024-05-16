@@ -69,8 +69,8 @@ func (t *DialConn) makeHandshakeReq(req *http.Request) {
 	req.Uri = "/chat"
 	req.Header["Connection"] = "Upgrade"
 	req.Header["Upgrade"] = "websocket"
-	req.Header["Sec-WebSocket-Key"] = t.secKey
 	req.Header["Sec-WebSocket-Version"] = "13"
+	req.Header["Sec-WebSocket-Key"] = t.secKey
 }
 
 // sendHandshakeReq 发送握手请求

@@ -113,27 +113,35 @@ func (t *AcceptConn) handleMsg() {
 				}
 			} else {
 				//没有握手，用http解析
-				req := http.NewRequest()
-				resp := http.NewResponse()
-				err := t.checkHandshakeReq(req, resp)
-				if err != nil {
-					t.close()
-					return
+				if t.isHandshakeReq(req) {
+					//有http升级websocket的字段，走握手逻辑
+					req := http.NewRequest()
+					resp := http.NewResponse()
+					err := t.checkHandshakeReq(req, resp)
+					if err != nil {
+						t.close()
+						return
+					}
+					err = t.sendHttpResp(resp)
+					if err != nil {
+						t.close()
+						return
+					}
+					t.hasHandshake = true
+					go t.sendPing()
+				} else {
+					//没有http升级websocket的字段，当http请求处理
+					req := http.NewRequest()
+					resp := http.NewResponse()
+					t.server.httpHandler.HandleMsg(req, resp)
+					t.sendHttpResp(resp)
 				}
-				err = t.sendHandshakeResp(resp)
-				if err != nil {
-					t.close()
-					return
-				}
-				t.hasHandshake = true
-				go t.sendPing()
 			}
 		}
 	}
 }
 
-// checkHandshakeReq 检查握手请求
-func (t *AcceptConn) checkHandshakeReq(req *http.Request, resp *http.Response) error {
+func (t *AcceptConn) parseReq(req *http.Request) error {
 	copyBuffer := t.readBuffer[0:t.readBufferLen]
 
 	req.Addr = t.conn.RemoteAddr().String()
@@ -144,6 +152,16 @@ func (t *AcceptConn) checkHandshakeReq(req *http.Request, resp *http.Response) e
 
 	t.readBuffer = t.readBuffer[req.MsgLen:]
 	t.readBufferLen -= req.MsgLen
+
+	return nil
+}
+
+func (t *AcceptConn) isHandshakeReq(req *http.Request) bool {
+
+}
+
+// checkHandshakeReq 检查握手请求
+func (t *AcceptConn) checkHandshakeReq(req *http.Request, resp *http.Response) error {
 
 	//检查握手信息
 	if v, ok := req.Header["Connection"]; !ok ||
@@ -184,8 +202,8 @@ func (t *AcceptConn) checkHandshakeReq(req *http.Request, resp *http.Response) e
 	return nil
 }
 
-// sendHandshakeResp 发送握手响应
-func (t *AcceptConn) sendHandshakeResp(resp *http.Response) error {
+// sendHttpResp 发送http响应
+func (t *AcceptConn) sendHttpResp(resp *http.Response) error {
 	writeBuffer, err := resp.Encode()
 	if err != nil {
 		return err
