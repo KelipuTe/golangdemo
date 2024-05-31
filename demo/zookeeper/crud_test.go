@@ -145,6 +145,33 @@ func Test_Get(t *testing.T) {
 	log.Println("stat:", stat)
 }
 
+// 查询节点的数据（监听）
+func Test_GetWatch(t *testing.T) {
+	conn := newConn()
+
+	path := "/config/project01/mysql/host"
+	data, stat, eventC7, err := conn.GetW(path)
+	if err != nil {
+		log.Println("err:", err)
+		return
+	}
+	log.Println("data:", string(data))
+	log.Println("stat:", stat)
+
+	for {
+		event, ok := <-eventC7
+		if !ok {
+			data, stat, eventC7, err = conn.GetW(path)
+			if err != nil {
+				log.Println("err:", err)
+				return
+			}
+			continue
+		}
+		log.Println("event:", event)
+	}
+}
+
 // 修改节点的数据
 func Test_Set(t *testing.T) {
 	conn := newConn()
