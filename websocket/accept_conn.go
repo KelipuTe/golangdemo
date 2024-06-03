@@ -66,11 +66,13 @@ func (t *AcceptConn) handleMsg() {
 		for t.readBufferLen > 0 {
 			if t.hasHandshake {
 				//握好手了，用websocket解析
+
+				//解析第一条消息
 				copyBuffer := t.readBuffer[0:t.readBufferLen]
 
-				req := NewMaskTestMsg()
+				req := NewMaskTextMsg()
 				req.Addr = t.conn.RemoteAddr().String()
-				err := req.decode(copyBuffer, t.readBufferLen)
+				err := req.Decode(copyBuffer, t.readBufferLen)
 				if err != nil {
 					t.close()
 					return
@@ -113,9 +115,23 @@ func (t *AcceptConn) handleMsg() {
 				}
 			} else {
 				//没有握手，用http解析
+
+				//解析第一条消息
+				copyBuffer := t.readBuffer[0:t.readBufferLen]
+
+				req := http.NewRequest()
+				req.Addr = t.conn.RemoteAddr().String()
+				err := req.Decode(copyBuffer, t.readBufferLen)
+				if err != nil {
+					t.close()
+					return
+				}
+
+				t.readBuffer = t.readBuffer[req.MsgLen:]
+				t.readBufferLen -= req.MsgLen
+
 				if t.isHandshakeReq(req) {
 					//有http升级websocket的字段，走握手逻辑
-					req := http.NewRequest()
 					resp := http.NewResponse()
 					err := t.checkHandshakeReq(req, resp)
 					if err != nil {
@@ -127,14 +143,30 @@ func (t *AcceptConn) handleMsg() {
 						t.close()
 						return
 					}
+					//握手成功
 					t.hasHandshake = true
+					//开始发送心跳
 					go t.sendPing()
 				} else {
 					//没有http升级websocket的字段，当http请求处理
-					req := http.NewRequest()
 					resp := http.NewResponse()
+
+					//如果没有设置http处理器，那就报个错然后关闭连接
+					if t.server.httpHandler == nil {
+						resp.Status = 500
+						resp.Body = "不支持http请求"
+						_ = t.sendHttpResp(resp)
+						t.close()
+						return
+					}
+
+					//如果设置了http处理器，那就走http处理逻辑
 					t.server.httpHandler.HandleMsg(req, resp)
-					t.sendHttpResp(resp)
+					err = t.sendHttpResp(resp)
+					if err != nil {
+						t.close()
+						return
+					}
 				}
 			}
 		}
@@ -157,7 +189,10 @@ func (t *AcceptConn) parseReq(req *http.Request) error {
 }
 
 func (t *AcceptConn) isHandshakeReq(req *http.Request) bool {
-
+	if _, ok := req.Header["Upgrade"]; ok {
+		return true
+	}
+	return false
 }
 
 // checkHandshakeReq 检查握手请求

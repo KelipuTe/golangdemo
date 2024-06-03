@@ -189,9 +189,9 @@ func (t *DialConn) handleMsg() {
 
 			copyBuffer := t.readBuffer[0:t.readBufferLen]
 
-			req := NewMaskTestMsg()
+			req := NewMaskTextMsg()
 			req.Addr = t.conn.RemoteAddr().String()
-			err := req.decode(copyBuffer, t.readBufferLen)
+			err := req.Decode(copyBuffer, t.readBufferLen)
 			if err != nil {
 				t.close()
 				return

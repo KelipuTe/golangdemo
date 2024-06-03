@@ -32,7 +32,7 @@ func Test_Client(t *testing.T) {
 	defer c.Close()
 
 	for {
-		req := NewMaskTestMsg()
+		req := NewMaskTextMsg()
 		req.Payload = "{\"method\":\"/api/msg_only\",\"msg\":\"client\"}"
 		err := c.Send(req)
 		if err != nil {
@@ -41,7 +41,7 @@ func Test_Client(t *testing.T) {
 
 		time.Sleep(5 * time.Second)
 
-		req2 := NewMaskTestMsg()
+		req2 := NewMaskTextMsg()
 		req2.Payload = "{\"method\":\"/api/need_resp\",\"msg\":\"client\"}"
 		err2 := c.Send(req2)
 		if err2 != nil {

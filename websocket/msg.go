@@ -25,7 +25,7 @@ type Msg struct {
 	Payload string //有效载荷
 }
 
-func NewMaskTestMsg() *Msg {
+func NewMaskTextMsg() *Msg {
 	req := &Msg{
 		Fin:    fin1,
 		Opcode: opcodeText,
@@ -151,8 +151,7 @@ func (t *Msg) encode() ([]byte, error) {
 	return msg, nil
 }
 
-func (t *Msg) decode(buffer []byte, bufferLen int) error {
-
+func (t *Msg) Decode(buffer []byte, bufferLen int) error {
 	if bufferLen < 2 {
 		return ErrParseFailed //至少 2 个字节才能解析
 	}
