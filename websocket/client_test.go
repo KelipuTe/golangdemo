@@ -24,7 +24,7 @@ func (t *TestClientHandler) HandleMsg(req *Msg, conn *DialConn) {
 
 func Test_Client(t *testing.T) {
 	h := NewTestClientHandler()
-	c := NewClient("localhost", 9603, h)
+	c := NewClient("localhost", 9601, h)
 	err := c.Start()
 	if err != nil {
 		t.Error(err)

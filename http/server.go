@@ -23,9 +23,9 @@ type Server struct {
 	handler      Handler
 }
 
-func NewServer(ip string, port int, h Handler) *Server {
+func NewServer(port int, h Handler) *Server {
 	return &Server{
-		ip:           ip,
+		ip:           "localhost",
 		port:         port,
 		connPool:     make(map[string]*AcceptConn, connPoolNumMax),
 		connPoolNum:  0,

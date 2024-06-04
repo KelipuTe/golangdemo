@@ -6,14 +6,14 @@ import (
 	"testing"
 )
 
-type TestServerHandler struct {
+type TestWSHandler struct {
 }
 
-func NewTestServerHandler() *TestServerHandler {
-	return &TestServerHandler{}
+func NewTestWSHandler() *TestWSHandler {
+	return &TestWSHandler{}
 }
 
-func (t *TestServerHandler) HandleMsg(req *Msg, conn *AcceptConn) {
+func (t *TestWSHandler) HandleMsg(req *Msg, conn *AcceptConn) {
 	log.Println(req.MsgLen, req.Fin, req.Opcode, req.Payload)
 
 	data, _ := req.parseJson()
@@ -26,14 +26,14 @@ func (t *TestServerHandler) HandleMsg(req *Msg, conn *AcceptConn) {
 	}
 }
 
-type TestHandler struct {
+type TestHTTPHandler struct {
 }
 
-func NewTestHandler() *TestHandler {
-	return &TestHandler{}
+func NewTestHTTPHandler() *TestHTTPHandler {
+	return &TestHTTPHandler{}
 }
 
-func (t *TestHandler) HandleMsg(req *http.Request, resp *http.Response) {
+func (t *TestHTTPHandler) HandleMsg(req *http.Request, resp *http.Response) {
 	log.Println(req.Method)
 	log.Println(req.Uri)
 	log.Println(req.Version)
@@ -49,9 +49,9 @@ func (t *TestHandler) HandleMsg(req *http.Request, resp *http.Response) {
 }
 
 func Test_Server(t *testing.T) {
-	h := NewTestServerHandler()
-	s := NewServer("localhost", 9603, h)
-	s.SupportHTTP(NewTestHandler())
+	h := NewTestWSHandler()
+	s := NewServer(9601, h)
+	s.SupportHTTP(NewTestHTTPHandler())
 	err := s.Start()
 	if err != nil {
 		t.Error(err)

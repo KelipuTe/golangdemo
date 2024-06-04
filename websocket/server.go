@@ -25,26 +25,32 @@ type Server struct {
 
 	handler ServerHandler //websocket处理接口
 
-	httpHandler http.Handler //http处理接口
+	httpHandler http.Handler      //http处理接口
+	onConn      func(*AcceptConn) //wb连接事件
 
 	isRunning bool //是否运行
 }
 
-func NewServer(ip string, port int, h ServerHandler) *Server {
+func NewServer(port int, h ServerHandler) *Server {
 	return &Server{
-		ip:           ip,
+		ip:           "localhost",
 		port:         port,
 		connPool:     make(map[string]*AcceptConn, connPoolNumMax),
 		connPoolNum:  0,
 		connPoolLock: &sync.Mutex{},
 		handler:      h,
 		httpHandler:  nil,
+		onConn:       nil,
 		isRunning:    true,
 	}
 }
 
 func (t *Server) SupportHTTP(h http.Handler) {
 	t.httpHandler = h
+}
+
+func (t *Server) OnConn(f func(*AcceptConn)) {
+	t.onConn = f
 }
 
 // Start 启动服务

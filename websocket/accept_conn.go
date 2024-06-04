@@ -36,6 +36,10 @@ func NewAcceptConn(s *Server, c net.Conn) *AcceptConn {
 	}
 }
 
+func (t *AcceptConn) GetRemoteAddr() string {
+	return t.conn.RemoteAddr().String()
+}
+
 // handleMsg 处理消息
 func (t *AcceptConn) handleMsg() {
 	for t.isRunning {
@@ -147,6 +151,10 @@ func (t *AcceptConn) handleMsg() {
 					t.hasHandshake = true
 					//开始发送心跳
 					go t.sendPing()
+					//ws连接事件
+					if t.server.onConn != nil {
+						t.server.onConn(t)
+					}
 				} else {
 					//没有http升级websocket的字段，当http请求处理
 					resp := http.NewResponse()
