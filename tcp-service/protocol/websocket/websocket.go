@@ -62,7 +62,7 @@ type WebSocket struct {
 	// MASK，1 bit
 	// 0（没有 Masking-key）；1（有 Masking-key）；
 	mask bool
-	// Payload len，7 bit
+	// Data len，7 bit
 	payloadLen8 uint8
 	// Extended payload length，16 bit，if payload len==126
 	payloadLen16 uint16
@@ -126,7 +126,7 @@ func (p1this *WebSocket) FirstMsgLen(sli1recv []byte) (uint64, error) {
 			p1this.mask = false
 		}
 
-		// 取 Payload len，第 2 个字节的后 7 位
+		// 取 Data len，第 2 个字节的后 7 位
 		p1this.payloadLen8 = sli1recv[1] & 0b0111111
 		if 126 == p1this.payloadLen8 {
 			p1this.headerLength += 2
@@ -143,13 +143,13 @@ func (p1this *WebSocket) FirstMsgLen(sli1recv []byte) (uint64, error) {
 
 		// 计算报文长度
 		if 126 == p1this.payloadLen8 {
-			// Payload len 为 126，需要扩展 2 个字节
+			// Data len 为 126，需要扩展 2 个字节
 			p1this.payloadLen16 = 0
 			p1this.payloadLen16 |= uint16(sli1recv[2]) << 8
 			p1this.payloadLen16 |= uint16(sli1recv[3]) << 0
 			msgLen = uint64(p1this.headerLength) + uint64(p1this.payloadLen16)
 		} else if 127 == p1this.payloadLen8 {
-			// Payload len 为 127，需要扩展 8 个字节
+			// Data len 为 127，需要扩展 8 个字节
 			p1this.payloadLen64 |= uint64(sli1recv[2]) << 56
 			p1this.payloadLen64 |= uint64(sli1recv[3]) << 48
 			p1this.payloadLen64 |= uint64(sli1recv[4]) << 40

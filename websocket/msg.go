@@ -10,8 +10,8 @@ type Msg struct {
 
 	Fin          uint8   //FIN，1 bit，是不是消息的最后一个分片。0=不是；1=是；
 	Opcode       uint8   //OPCODE，4 bit，操作码（报文类型）
-	Mask         uint8   //MASK，1 bit，Payload Data 有没有用掩码。0=没有；1=有；
-	payloadLen8  uint8   //Payload len，7 bit，Payload Data 的长度。
+	Mask         uint8   //MASK，1 bit，Data Data 有没有用掩码。0=没有；1=有；
+	payloadLen8  uint8   //Data len，7 bit，Data Data 的长度。
 	payloadLen16 uint16  //如果 Payload len=126，Extended payload length 就是 16 bit。
 	payloadLen64 uint64  //如果 Payload len=127，Extended payload length 就是 64 bit。
 	maskingKey   [4]byte //Masking-key，4 byte，4 个掩码。
@@ -167,11 +167,11 @@ func (t *Msg) Decode(buffer []byte, bufferLen int) error {
 		t.headerLen += 4 //有 Masking-key，请求头再加 4 个字节
 	}
 
-	t.payloadLen8 = buffer[1] & 0b01111111 //取 Payload len，第 2 个字节的后 7 位
+	t.payloadLen8 = buffer[1] & 0b01111111 //取 Data len，第 2 个字节的后 7 位
 	if t.payloadLen8 == 126 {
-		t.headerLen += 2 //如果 Payload len==126，请求头再加 2 个字节
+		t.headerLen += 2 //如果 Data len==126，请求头再加 2 个字节
 	} else if t.payloadLen8 == 127 {
-		t.headerLen += 8 //如果 Payload len==127，请求头再加 8 个字节
+		t.headerLen += 8 //如果 Data len==127，请求头再加 8 个字节
 	}
 
 	if bufferLen < t.headerLen {
@@ -214,7 +214,7 @@ func (t *Msg) Decode(buffer []byte, bufferLen int) error {
 		t.maskingKey[2] = buffer[t.headerLen-2]
 		t.maskingKey[3] = buffer[t.headerLen-1]
 
-		// 用 Masking-key 解析 Payload Data
+		// 用 Masking-key 解析 Data Data
 		msgUnMask := make([]byte, t.MsgLen)
 		copy(msgUnMask, t.Msg)
 		i, j := 0, t.headerLen
@@ -231,12 +231,7 @@ func (t *Msg) Decode(buffer []byte, bufferLen int) error {
 	return nil
 }
 
-func (t *Msg) parseJson() (map[string]any, error) {
-	ret := make(map[string]any)
-	err := json.Unmarshal([]byte(t.Payload), &ret)
-	if err != nil {
-		return nil, err
-	}
-
-	return ret, nil
+// ParseJson 可以传map指针或者结构体指针进来
+func (t *Msg) ParseJson(m any) error {
+	return json.Unmarshal([]byte(t.Payload), m)
 }

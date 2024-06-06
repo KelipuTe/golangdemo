@@ -221,7 +221,7 @@ func (t *DialConn) handleMsg() {
 			case opcodePing:
 				log.Println("get ping from", req.Addr)
 				resp := NewPongMsg()
-				err := t.sendMsg(resp)
+				err := t.SendMsg(resp)
 				if err != nil {
 					t.close()
 					return
@@ -239,7 +239,7 @@ func (t *DialConn) handleMsg() {
 func (t *DialConn) sendPing() {
 	for t.isRunning {
 		req := NewPingMsg()
-		err := t.sendMsg(req)
+		err := t.SendMsg(req)
 		if err != nil {
 			log.Println("send ping error:", err)
 			t.close()
@@ -249,8 +249,8 @@ func (t *DialConn) sendPing() {
 	}
 }
 
-// sendMsg 发送消息
-func (t *DialConn) sendMsg(req *Msg) error {
+// SendMsg 发送消息
+func (t *DialConn) SendMsg(req *Msg) error {
 	writeBuffer, err := req.encode()
 	if err != nil {
 		return err

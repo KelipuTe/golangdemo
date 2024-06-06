@@ -16,13 +16,14 @@ func NewTestClientHandler() *TestClientHandler {
 func (t *TestClientHandler) HandleMsg(req *Msg, conn *DialConn) {
 	log.Println(req.MsgLen, req.Fin, req.Opcode, req.Payload)
 
-	data, _ := req.parseJson()
+	data := make(map[string]any)
+	_ = req.ParseJson(&data)
 	if data["method"] == "/api/msg_only" {
 		log.Println(data)
 	}
 }
 
-func Test_Client(t *testing.T) {
+func TestClient(t *testing.T) {
 	h := NewTestClientHandler()
 	c := NewClient("localhost", 9601, h)
 	err := c.Start()

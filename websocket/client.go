@@ -69,7 +69,7 @@ func (t *Client) connClose() {
 
 // Send 发送消息
 func (t *Client) Send(req *Msg) error {
-	return t.conn.sendMsg(req)
+	return t.conn.SendMsg(req)
 }
 
 // Close 关闭连接

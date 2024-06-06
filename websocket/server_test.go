@@ -16,13 +16,14 @@ func NewTestWSHandler() *TestWSHandler {
 func (t *TestWSHandler) HandleMsg(req *Msg, conn *AcceptConn) {
 	log.Println(req.MsgLen, req.Fin, req.Opcode, req.Payload)
 
-	data, _ := req.parseJson()
+	data := make(map[string]any)
+	_ = req.ParseJson(&data)
 	if data["method"] == "/api/msg_only" {
 		log.Println(data)
 	} else if data["method"] == "/api/need_resp" {
 		resp := NewUnmaskTextMsg()
 		resp.Payload = "{\"method\":\"/api/msg_only\",\"msg\":\"server\"}"
-		_ = conn.sendMsg(resp)
+		_ = conn.SendMsg(resp)
 	}
 }
 
@@ -48,7 +49,7 @@ func (t *TestHTTPHandler) HandleMsg(req *http.Request, resp *http.Response) {
 	}
 }
 
-func Test_Server(t *testing.T) {
+func TestServer(t *testing.T) {
 	h := NewTestWSHandler()
 	s := NewServer(9601, h)
 	s.SupportHTTP(NewTestHTTPHandler())

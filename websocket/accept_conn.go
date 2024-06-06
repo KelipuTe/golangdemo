@@ -106,7 +106,7 @@ func (t *AcceptConn) handleMsg() {
 				case opcodePing:
 					log.Println("get ping from", req.Addr)
 					resp := NewPongMsg()
-					err := t.sendMsg(resp)
+					err := t.SendMsg(resp)
 					if err != nil {
 						t.close()
 						return
@@ -262,7 +262,7 @@ func (t *AcceptConn) sendHttpResp(resp *http.Response) error {
 func (t *AcceptConn) sendPing() {
 	for t.isRunning {
 		req := NewPingMsg()
-		err := t.sendMsg(req)
+		err := t.SendMsg(req)
 		if err != nil {
 			log.Println("send ping error:", err)
 			t.close()
@@ -272,8 +272,8 @@ func (t *AcceptConn) sendPing() {
 	}
 }
 
-// sendMsg 发送消息
-func (t *AcceptConn) sendMsg(req *Msg) error {
+// SendMsg 发送消息
+func (t *AcceptConn) SendMsg(req *Msg) error {
 	writeBuffer, err := req.encode()
 	if err != nil {
 		return err

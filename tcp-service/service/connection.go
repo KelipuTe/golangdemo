@@ -125,7 +125,7 @@ func (c *TCPConnection) HandleBuffer() {
 			c.HandleHTTPMsg(firstMsg)
 			c.belongToService.OnConnRequest(c)
 		case config.StreamStr:
-			//自定义 Msg 协议，长链接
+			//自定义 Data 协议，长链接
 			//处理完一条消息后，理论上客户端不会关闭tcp连接
 			c.HandleStreamMsg(firstMsg)
 			c.belongToService.OnConnRequest(c)
