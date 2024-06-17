@@ -7,18 +7,21 @@ import (
 type Gateway struct {
 	name string
 
-	//给内部服务注册用
+	//给内部注册用的服务
 	innerServer *websocket.Server
-	innerPool   map[string]*websocket.AcceptConn
+	//k=服务名，v=连接
+	innerPool map[string]*websocket.AcceptConn
 
-	//给外部调接口用
+	//给外部调接口用的服务
 	openServer *websocket.Server
-	openPool   map[string]*websocket.AcceptConn
+	//k=ip+端口，v=连接
+	openPool map[string]*websocket.AcceptConn
 }
 
 func NewGateway(name string, innerPort, openPort int) *Gateway {
 	ih := NewInnerHandler()
 	inner := websocket.NewServer(innerPort, ih)
+
 	oh := NewOpenHandler()
 	open := websocket.NewServer(openPort, oh)
 

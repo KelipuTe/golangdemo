@@ -52,7 +52,7 @@ func (t *TestHTTPHandler) HandleMsg(req *http.Request, resp *http.Response) {
 func TestServer(t *testing.T) {
 	h := NewTestWSHandler()
 	s := NewServer(9601, h)
-	s.SupportHTTP(NewTestHTTPHandler())
+	s.SetHTTPHandler(NewTestHTTPHandler())
 	err := s.Start()
 	if err != nil {
 		t.Error(err)

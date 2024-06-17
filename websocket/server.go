@@ -6,6 +6,7 @@ import (
 	"net"
 	"strconv"
 	"sync"
+	"time"
 )
 
 // ServerHandler 处理消息的接口，需要外部实现
@@ -25,10 +26,13 @@ type Server struct {
 
 	handler ServerHandler //websocket处理接口
 
-	httpHandler http.Handler      //http处理接口
-	onConn      func(*AcceptConn) //wb连接事件
+	httpHandler http.Handler //http处理接口
 
-	isRunning bool //是否运行
+	onConn func(*AcceptConn) //ws连接事件
+
+	isRun    bool          //是不是再跑
+	needPing bool          //需不需要ping
+	interval time.Duration //心跳间隔
 }
 
 func NewServer(port int, h ServerHandler) *Server {
@@ -41,16 +45,25 @@ func NewServer(port int, h ServerHandler) *Server {
 		handler:      h,
 		httpHandler:  nil,
 		onConn:       nil,
-		isRunning:    true,
+		isRun:        true,
+		needPing:     true,
 	}
 }
 
-func (t *Server) SupportHTTP(h http.Handler) {
+func (t *Server) SetHTTPHandler(h http.Handler) {
 	t.httpHandler = h
 }
 
-func (t *Server) OnConn(f func(*AcceptConn)) {
+func (t *Server) SetOnConn(f func(*AcceptConn)) {
 	t.onConn = f
+}
+
+func (t *Server) SetNeedPing(b bool) {
+	t.needPing = b
+}
+
+func (t *Server) SetInterval(i time.Duration) {
+	t.interval = i
 }
 
 // Start 启动服务
@@ -62,7 +75,7 @@ func (t *Server) Start() error {
 	}
 	t.listener = netListener
 
-	for t.isRunning {
+	for t.isRun {
 		netConn, err := t.listener.Accept() //等待客户端连接上来
 		if err != nil {
 			return err
@@ -104,7 +117,7 @@ func (t *Server) connClose(c *AcceptConn) {
 // Close 关闭服务
 func (t *Server) Close() {
 	_ = t.listener.Close()
-	t.isRunning = false
+	t.isRun = false
 	for _, v := range t.connPool {
 		v.close()
 	}

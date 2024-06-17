@@ -20,9 +20,9 @@ type AcceptConn struct {
 	readBuffer    []byte   //接收缓冲区
 	readBufferLen int      //接收缓冲区长度
 
-	hasHandshake bool //是否握手
+	hasHandshake bool //握手了没有
 
-	isRunning bool //是否运行
+	isRun bool //是不是再跑
 }
 
 func NewAcceptConn(s *Server, c net.Conn) *AcceptConn {
@@ -32,7 +32,7 @@ func NewAcceptConn(s *Server, c net.Conn) *AcceptConn {
 		readBuffer:    make([]byte, readBufferMaxLen),
 		readBufferLen: 0,
 		hasHandshake:  false,
-		isRunning:     true,
+		isRun:         true,
 	}
 }
 
@@ -42,7 +42,7 @@ func (t *AcceptConn) GetRemoteAddr() string {
 
 // handleMsg 处理消息
 func (t *AcceptConn) handleMsg() {
-	for t.isRunning {
+	for t.isRun {
 		err := t.conn.SetReadDeadline(time.Now().Add(5 * time.Second))
 		if err != nil {
 			t.close()
@@ -149,8 +149,10 @@ func (t *AcceptConn) handleMsg() {
 					}
 					//握手成功
 					t.hasHandshake = true
-					//开始发送心跳
-					go t.sendPing()
+					if t.server.needPing {
+						//服务端维持心跳
+						go t.sendPing()
+					}
 					//ws连接事件
 					if t.server.onConn != nil {
 						t.server.onConn(t)
@@ -205,7 +207,6 @@ func (t *AcceptConn) isHandshakeReq(req *http.Request) bool {
 
 // checkHandshakeReq 检查握手请求
 func (t *AcceptConn) checkHandshakeReq(req *http.Request, resp *http.Response) error {
-
 	//检查握手信息
 	if v, ok := req.Header["Connection"]; !ok ||
 		strings.Index(v, "Upgrade") < 0 {
@@ -234,8 +235,6 @@ func (t *AcceptConn) checkHandshakeReq(req *http.Request, resp *http.Response) e
 	saSHA1 := sha1.Sum([]byte(secAccept))                    //SHA1 计算摘要
 	saBase64 := base64.StdEncoding.EncodeToString(saSHA1[:]) //转成 base64
 
-	//测试使用的是 JavaScript 的 WebSocket 工具
-	//在上述条件下，这几个字段都要有，少一个都跑不通
 	resp.Status = http.StatusSwitchingProtocols
 	resp.Header["Connection"] = "Upgrade"
 	resp.Header["Upgrade"] = "websocket"
@@ -260,7 +259,7 @@ func (t *AcceptConn) sendHttpResp(resp *http.Response) error {
 
 // sendPing 发送心跳
 func (t *AcceptConn) sendPing() {
-	for t.isRunning {
+	for t.isRun {
 		req := NewPingMsg()
 		err := t.SendMsg(req)
 		if err != nil {
@@ -289,6 +288,6 @@ func (t *AcceptConn) SendMsg(req *Msg) error {
 func (t *AcceptConn) close() {
 	log.Println("conn close")
 	_ = t.conn.Close()
-	t.isRunning = false
+	t.isRun = false
 	t.server.connClose(t) //通知server
 }

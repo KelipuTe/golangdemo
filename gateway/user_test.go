@@ -4,6 +4,7 @@ import (
 	"demo-golang/signal"
 	"demo-golang/websocket"
 	"encoding/json"
+	"fmt"
 	"log"
 	"testing"
 )
@@ -16,25 +17,25 @@ func NewTestUserHandler() *TestUserHandler {
 }
 
 func (t *TestUserHandler) HandleMsg(req *websocket.Msg, conn *websocket.DialConn) {
-	log.Println(req.MsgLen, req.Fin, req.Opcode, req.Payload)
-
 	pkg := &Package{}
 	_ = req.ParseJson(pkg)
 
 	if pkg.Type == PackageTypeReq {
 		switch pkg.Uri {
-		case "/api/msg_only":
-			log.Println(pkg.Data)
-		case "/api/need_resp":
+		case "/api/get_user":
+			//{"type":1,"service":"user","uri":"/api/get_user","data":"1"}
 			respPkg := &Package{
-				From: pkg.From,
+				To:   pkg.From,
 				Type: PackageTypeResp,
-				Data: "{\"method\":\"/api/msg_only\",\"msg\":\"user\"}",
+				Data: fmt.Sprintf("{\"id\":%s,\"name\":\"name\"}", pkg.Data),
 			}
 			resp := websocket.NewUnmaskTextMsg()
 			respPkgJson, _ := json.Marshal(respPkg)
 			resp.Payload = string(respPkgJson)
 			_ = conn.SendMsg(resp)
+		case "/api/send_chat":
+			//{"type":1,"service":"user","uri":"/api/send_chat","data":"chat data"}
+			log.Println(pkg.Data)
 		}
 	}
 }
@@ -48,6 +49,7 @@ func TestInnerUser(t *testing.T) {
 	}
 	defer c.Close()
 
+	//注册
 	req := websocket.NewMaskTextMsg()
 	pkg := &Package{
 		Type:    PackageTypeReq,
