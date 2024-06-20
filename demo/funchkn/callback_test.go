@@ -1,11 +1,11 @@
 package funchkn
 
+//回调函数样例
+
 import (
 	"log"
 	"testing"
 )
-
-// 回调函数样例
 
 func TestCallback(t *testing.T) {
 	mul10 := func(n int) int {

@@ -1,11 +1,11 @@
 package funchkn
 
+//中间件样例
+
 import (
 	"log"
 	"testing"
 )
-
-// 中间件样例
 
 func TestMiddleware(t *testing.T) {
 	middlewareList := []middlewareExample{

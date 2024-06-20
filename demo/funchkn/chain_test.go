@@ -1,11 +1,11 @@
 package funchkn
 
+//链式调用样例
+
 import (
 	"log"
 	"testing"
 )
-
-//链式调用样例
 
 func TestChain(t *testing.T) {
 	funcList := []chainExample{
