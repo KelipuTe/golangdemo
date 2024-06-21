@@ -6,31 +6,31 @@ import (
 	"reflect"
 )
 
-// 实现这个接口，表示本地服务可以被改造成 RPC 服务
-// 可以被改造成 RPC 服务的本地服务（结构体）里面应该都是方法
-type I9RPCService interface {
-	// 获取本地服务对应的 RPC 服务的服务名
-	F8GetServiceName() string
+// ServiceI9 实现这个接口，表示本地服务可以被改造成 RPC 服务
+// 可以被改造成 RPC 服务的本地服务（结构体）里面，应该都只有方法
+type ServiceI9 interface {
+	// GetServiceName 获取本地服务对应的 RPC 服务的服务名
+	GetServiceName() string
 }
 
-// F8CoverWithRPC 把结构体改造成 RPC 服务
-// i9RPCClient 可以发起 RPC 调用的客户端
-// i9RPCService 一个可以被改造成 RPC 服务的结构体
-func F8CoverWithRPC(i9RPCClient I9RPCClient, i9RPCService I9RPCService) {
+// CoverWithRPC 把结构体改造成 RPC 服务
+// client 可以发起 RPC 调用的客户端
+// service 一个可以被改造成 RPC 服务的结构体
+func CoverWithRPC(client ClientI9, service ServiceI9) {
 	// 这里肯定是拿到一个接口（结构体指针）
-	i9RPCServiceValue := reflect.ValueOf(i9RPCService)
+	srv := reflect.ValueOf(service)
 	// 通过结构体指针拿到结构体值
-	s6RPCServiceValue := i9RPCServiceValue.Elem()
+	srve := srv.Elem()
 	// 通过结构体值拿到结构体类型
-	s6RPCServiceType := s6RPCServiceValue.Type()
+	srt := srve.Type()
 
 	// 这里应该全部都是方法
-	s6RPCServiceFieldNum := s6RPCServiceType.NumField()
+	s6RPCServiceFieldNum := srt.NumField()
 	for i := 0; i < s6RPCServiceFieldNum; i++ {
 		// 拿到结构体属性
-		s6StructField := s6RPCServiceType.Field(i)
+		s6StructField := srt.Field(i)
 		// 拿到结构体属性的值
-		s6StructFieldValue := s6RPCServiceValue.Field(i)
+		s6StructFieldValue := srve.Field(i)
 		// 拿到结构体属性的类型
 		s6StructFieldType := s6StructField.Type
 		// 判断一下结构体属性是否可修改
@@ -44,7 +44,7 @@ func F8CoverWithRPC(i9RPCClient I9RPCClient, i9RPCService I9RPCService) {
 			// 处理方法的返回值，这里只管第一个参数，第二个是 error
 			output := reflect.New(s6StructFieldType.Out(0).Elem()).Interface()
 			// 把方法的入参序列化
-			i9serialize := i9RPCClient.F8GetI9Serialize()
+			i9serialize := client.GetSerialize()
 			inputEncode, err := i9serialize.F8Encode(input)
 			if err != nil {
 				return []reflect.Value{reflect.ValueOf(output), reflect.ValueOf(err)}
@@ -56,15 +56,15 @@ func F8CoverWithRPC(i9RPCClient I9RPCClient, i9RPCService I9RPCService) {
 				m3ExtraData["flowId"] = i9ctxValue.Value("flowId").(string)
 			}
 			// 组装调用的请求数据
-			p7s6req := &protocol.S6RPCRequest{
-				ServiceName:             i9RPCService.F8GetServiceName(),
-				FunctionName:            s6StructField.Name,
-				M3MetaData:              m3ExtraData,
-				SerializeCode:           i9serialize.F8GetCode(),
-				FunctionInputDataEncode: inputEncode,
+			p7s6req := &protocol.Request{
+				ServiceName:   service.GetServiceName(),
+				FuncName:      s6StructField.Name,
+				MetaData:      m3ExtraData,
+				SerializeCode: i9serialize.F8GetCode(),
+				FuncInput:     inputEncode,
 			}
 			// 向远端发起调用
-			resp, err := i9RPCClient.F8SendRPC(args[0].Interface().(context.Context), p7s6req)
+			resp, err := client.SendRPC(args[0].Interface().(context.Context), p7s6req)
 			if err != nil {
 				return []reflect.Value{reflect.ValueOf(output), reflect.ValueOf(err)}
 			}
@@ -72,7 +72,7 @@ func F8CoverWithRPC(i9RPCClient I9RPCClient, i9RPCService I9RPCService) {
 				return []reflect.Value{reflect.ValueOf(output), reflect.ValueOf(resp.Error)}
 			}
 			// 把返回的数据反序列化
-			err = i9serialize.F8Decode(resp.FunctionOutputDataEncode, output)
+			err = i9serialize.F8Decode(resp.FuncOutput, output)
 			if err != nil {
 				return []reflect.Value{reflect.ValueOf(output), reflect.ValueOf(err)}
 			}

@@ -10,28 +10,28 @@ import (
 
 type s6MockI9RPCClient struct {
 	p7s6t       *testing.T
-	i9serialize serialize.I9Serialize
-	i9protocol  protocol.I9Protocol
-	p7s6req     *protocol.S6RPCRequest
-	p7s6resp    *protocol.S6RPCResponse
+	i9serialize serialize.SerializeI9
+	i9protocol  protocol.ProtocolI9
+	p7s6req     *protocol.Request
+	p7s6resp    *protocol.Response
 	err         error
 }
 
-func (p7this *s6MockI9RPCClient) F8GetI9Serialize() serialize.I9Serialize {
+func (p7this *s6MockI9RPCClient) GetSerialize() serialize.SerializeI9 {
 	return p7this.i9serialize
 }
 
-func (p7this *s6MockI9RPCClient) F8GetI9Protocol() protocol.I9Protocol {
+func (p7this *s6MockI9RPCClient) GetProtocol() protocol.ProtocolI9 {
 	return p7this.i9protocol
 }
 
-func (p7this *s6MockI9RPCClient) F8SendRPC(i9ctx context.Context, p7s6req *protocol.S6RPCRequest) (*protocol.S6RPCResponse, error) {
+func (p7this *s6MockI9RPCClient) SendRPC(i9ctx context.Context, p7s6req *protocol.Request) (*protocol.Response, error) {
 	assert.Equal(p7this.p7s6t, p7this.p7s6req, p7s6req)
 	return p7this.p7s6resp, p7this.err
 }
 
 type s6MockI9RPCService struct {
-	i9RPCService I9RPCService
+	i9RPCService ServiceI9
 	f8SendRPC    func() (any, error)
 }
 
@@ -48,13 +48,13 @@ func TestF8CoverWithRPC(p7s6t *testing.T) {
 			p7s6MockClient: &s6MockI9RPCClient{
 				p7s6t:       p7s6t,
 				i9serialize: serialize.F8NewS6Json(),
-				p7s6req: &protocol.S6RPCRequest{
-					ServiceName:             "user-rpc-service",
-					FunctionName:            "F8GetUserById",
-					FunctionInputDataEncode: []byte(`{"userId":11}`),
+				p7s6req: &protocol.Request{
+					ServiceName: "user-rpc-service",
+					FuncName:    "F8GetUserById",
+					FuncInput:   []byte(`{"userId":11}`),
 				},
-				p7s6resp: &protocol.S6RPCResponse{
-					FunctionOutputDataEncode: []byte(`{"userId":11,"userName":"aa"}`),
+				p7s6resp: &protocol.Response{
+					FuncOutput: []byte(`{"userId":11,"userName":"aa"}`),
 				},
 			},
 			p7s6MockService: func() *s6MockI9RPCService {
@@ -75,7 +75,7 @@ func TestF8CoverWithRPC(p7s6t *testing.T) {
 
 	for _, s6case := range s5s6case {
 		p7s6t.Run(s6case.name, func(p7s6t2 *testing.T) {
-			F8CoverWithRPC(s6case.p7s6MockClient, s6case.p7s6MockService.i9RPCService)
+			CoverWithRPC(s6case.p7s6MockClient, s6case.p7s6MockService.i9RPCService)
 			resp, err := s6case.p7s6MockService.f8SendRPC()
 			assert.Equal(p7s6t2, s6case.wantErr, err)
 			if err != nil {

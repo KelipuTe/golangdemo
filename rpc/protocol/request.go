@@ -1,23 +1,17 @@
 package protocol
 
-// RPC 的请求数据
-type S6RPCRequest struct {
-	ServiceName  string
-	FunctionName string
-	// 元数据
-	M3MetaData map[string]string
-	// 方法入参的序列化方式
-	SerializeCode uint8
-	// 方法入参
-	FunctionInputDataEncode []byte
+// Request 请求数据结构
+type Request struct {
+	ServiceName   string
+	FuncName      string
+	MetaData      map[string]string // 元数据
+	SerializeCode uint8             // 方法入参的序列化方式
+	FuncInput     []byte            // 方法入参
 }
 
-// RPC 的响应数据
-type S6RPCResponse struct {
-	// 返回的异常
-	Error error
-	// 方法出参的序列化方式
-	SerializeCode uint8
-	// 方法出参
-	FunctionOutputDataEncode []byte
+// Response 响应数据结构
+type Response struct {
+	Error         error  // 异常
+	SerializeCode uint8  // 方法出参的序列化方式
+	FuncOutput    []byte // 方法出参
 }

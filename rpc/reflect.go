@@ -6,15 +6,15 @@ import (
 	"reflect"
 )
 
-// 本地服务的反射
-type S6ReflectService struct {
-	i9RPCService               I9RPCService
-	s6i9RPCServiceReflectValue reflect.Value
+// ServiceReflect 本地服务的反射
+type ServiceReflect struct {
+	service ServiceI9
+	reflect reflect.Value
 }
 
-func (p7this *S6ReflectService) f8HandleRPC(i9ctx context.Context, functionName string, i9serialize serialize.I9Serialize, functionInputEncodeData []byte) ([]byte, error) {
+func (p7this *ServiceReflect) f8HandleRPC(i9ctx context.Context, functionName string, i9serialize serialize.SerializeI9, functionInputEncodeData []byte) ([]byte, error) {
 	// 通过方法名，从结构体的反射中找到方法
-	s6MethodValue := p7this.s6i9RPCServiceReflectValue.MethodByName(functionName)
+	s6MethodValue := p7this.reflect.MethodByName(functionName)
 	// 拿到方法的第二个入参的类型，第一个是 context
 	inputType := s6MethodValue.Type().In(1)
 	// 构造方法的第二个入参参

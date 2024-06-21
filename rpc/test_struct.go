@@ -23,7 +23,7 @@ type S6UserRPCService struct {
 	F8GetUserById func(i9ctx context.Context, p7req *S6F8GetUserByIdRequest) (*S6F8GetUserByIdResponse, error)
 }
 
-func (p7this *S6UserRPCService) F8GetServiceName() string {
+func (p7this *S6UserRPCService) GetServiceName() string {
 	return "user-rpc-service"
 }
 
@@ -32,7 +32,7 @@ func (p7this *S6UserRPCService) F8GetServiceName() string {
 type S6UserService struct {
 }
 
-func (p7this *S6UserService) F8GetServiceName() string {
+func (p7this *S6UserService) GetServiceName() string {
 	return "user-rpc-service"
 }
 

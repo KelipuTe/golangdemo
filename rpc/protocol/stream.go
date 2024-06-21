@@ -10,71 +10,75 @@ import (
 	"net"
 )
 
-// 消息长度的长度
-const c5LenOfJsonMsgLen int = 8
-
-type S6Json struct {
+// Stream stream 格式的 RPC 协议
+// 报文 = 报文长度(8字节) + json编码的报文内容
+type Stream struct {
+	msgLen int //报文长度
 }
 
-func F8NewS6Json() *S6Json { return &S6Json{} }
+func NewStream() *Stream {
+	return &Stream{
+		msgLen: 8,
+	}
+}
 
-func (this S6Json) F8EncodeReq(p7s6req *S6RPCRequest) ([]byte, error) {
-	s5MsgBody, err := json.Marshal(p7s6req)
+func (t Stream) EncodeReq(req *Request) ([]byte, error) {
+	s5MsgBody, err := json.Marshal(req)
 	if nil != err {
 		return nil, err
 	}
-	log.Printf("F8EncodeReq:%s,%+v", string(s5MsgBody), p7s6req)
-	s5ReqMsg := make([]byte, c5LenOfJsonMsgLen+len(s5MsgBody))
-	binary.BigEndian.PutUint64(s5ReqMsg[:c5LenOfJsonMsgLen], uint64(len(s5MsgBody)))
+	log.Printf("EncodeReq:%s,%+v", string(s5MsgBody), req)
+	s5ReqMsg := make([]byte, t.msgLen+len(s5MsgBody))
+	binary.BigEndian.PutUint64(s5ReqMsg[:t.msgLen], uint64(len(s5MsgBody)))
 	copy(s5ReqMsg[8:], s5MsgBody)
 	return s5ReqMsg, nil
 }
 
-func (this S6Json) F8DecodeReq(s5ReqMsg []byte) (*S6RPCRequest, error) {
-	p7s6req := &S6RPCRequest{}
+func (t Stream) DecodeReq(s5ReqMsg []byte) (*Request, error) {
+	p7s6req := &Request{}
 	err := json.Unmarshal(s5ReqMsg, p7s6req)
 	if nil != err {
 		return nil, err
 	}
-	log.Printf("F8DecodeReq:%s,%+v", string(s5ReqMsg), p7s6req)
+	log.Printf("DecodeReq:%s,%+v", string(s5ReqMsg), p7s6req)
 	return p7s6req, nil
 }
 
-func (this S6Json) F8EncodeResp(p7s6resp *S6RPCResponse) ([]byte, error) {
+func (t Stream) EncodeResp(p7s6resp *Response) ([]byte, error) {
 	s5MsgBody, err := json.Marshal(p7s6resp)
 	if nil != err {
 		return nil, err
 	}
-	log.Printf("F8EncodeReq:%s,%+v", string(s5MsgBody), p7s6resp)
-	s5RespMsg := make([]byte, c5LenOfJsonMsgLen+len(s5MsgBody))
-	binary.BigEndian.PutUint64(s5RespMsg[:c5LenOfJsonMsgLen], uint64(len(s5MsgBody)))
+	log.Printf("EncodeReq:%s,%+v", string(s5MsgBody), p7s6resp)
+	s5RespMsg := make([]byte, t.msgLen+len(s5MsgBody))
+	binary.BigEndian.PutUint64(s5RespMsg[:t.msgLen], uint64(len(s5MsgBody)))
 	copy(s5RespMsg[8:], s5MsgBody)
 	return s5RespMsg, nil
 }
 
-func (this S6Json) F8DecodeResp(s5RespMsg []byte) (*S6RPCResponse, error) {
-	p7s6resp := &S6RPCResponse{}
+func (t Stream) DecodeResp(s5RespMsg []byte) (*Response, error) {
+	p7s6resp := &Response{}
 	err := json.Unmarshal(s5RespMsg, p7s6resp)
 	if nil != err {
 		return nil, err
 	}
-	log.Printf("F8DecodeResp:%s,%+v", string(s5RespMsg), p7s6resp)
+	log.Printf("DecodeResp:%s,%+v", string(s5RespMsg), p7s6resp)
 	return p7s6resp, nil
 }
 
-func (this S6Json) F8ReadReqMsgFromTCP(i9conn net.Conn) (s5ReqMsg []byte, err error) {
+func (t Stream) ReadReqMsg(i9conn net.Conn) (s5ReqMsg []byte, err error) {
 	defer func() {
 		if err2 := recover(); nil != err2 {
 			err = errors.New(fmt.Sprintf("tcp connection panic with : %v", err2))
 		}
 	}()
 
-	s5ReqMsgLen := make([]byte, c5LenOfJsonMsgLen)
+	s5ReqMsgLen := make([]byte, t.msgLen)
 	readByteNum, err := i9conn.Read(s5ReqMsgLen)
 	if nil != err {
 		return nil, err
 	}
-	if c5LenOfJsonMsgLen != readByteNum {
+	if t.msgLen != readByteNum {
 		return nil, errors.New("could not read msg length")
 	}
 	reqMsgLen := binary.BigEndian.Uint64(s5ReqMsgLen)
@@ -83,7 +87,7 @@ func (this S6Json) F8ReadReqMsgFromTCP(i9conn net.Conn) (s5ReqMsg []byte, err er
 	return s5ReqMsg, err
 }
 
-func (this S6Json) F8ReadRespMsgFromTCP(i9conn net.Conn) (s5RespMsg []byte, err error) {
+func (t Stream) ReadRespMsg(i9conn net.Conn) (s5RespMsg []byte, err error) {
 	defer func() {
 		if err2 := recover(); nil != err2 {
 			// 因为这个地方要返回异常，所以返回值要用命名的
@@ -91,12 +95,12 @@ func (this S6Json) F8ReadRespMsgFromTCP(i9conn net.Conn) (s5RespMsg []byte, err 
 		}
 	}()
 
-	s5RespMsgLen := make([]byte, c5LenOfJsonMsgLen)
+	s5RespMsgLen := make([]byte, t.msgLen)
 	readByteNum, err := i9conn.Read(s5RespMsgLen)
 	if nil != err {
 		return nil, err
 	}
-	if c5LenOfJsonMsgLen != readByteNum {
+	if t.msgLen != readByteNum {
 		return nil, errors.New("could not read msg length")
 	}
 	respMsgLen := binary.BigEndian.Uint64(s5RespMsgLen)

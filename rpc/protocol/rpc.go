@@ -31,15 +31,15 @@ func F8NewS6CustomRPC() S6CustomRPC {
 	}
 }
 
-func (this S6CustomRPC) F8EncodeReq(p7s6req *S6RPCRequest) ([]byte, error) {
+func (this S6CustomRPC) EncodeReq(p7s6req *Request) ([]byte, error) {
 	// 先计算最终生成的协议报文的总长度
 	headerLen := 11
 	headerLen += len(p7s6req.ServiceName) + 2
-	headerLen += len(p7s6req.FunctionName) + 2
-	for t4key, t4value := range p7s6req.M3MetaData {
+	headerLen += len(p7s6req.FuncName) + 2
+	for t4key, t4value := range p7s6req.MetaData {
 		headerLen += len(t4key) + len(t4value) + 3
 	}
-	bodyLen := len(p7s6req.FunctionInputDataEncode)
+	bodyLen := len(p7s6req.FuncInput)
 
 	// 最终生成的协议报文
 	s5MsgBody := make([]byte, headerLen+bodyLen)
@@ -69,13 +69,13 @@ func (this S6CustomRPC) F8EncodeReq(p7s6req *S6RPCRequest) ([]byte, error) {
 	p7current[1] = c5ASCII10
 	p7current = p7current[2:]
 	// 方法名
-	copy(p7current, p7s6req.FunctionName)
-	p7current = p7current[len(p7s6req.FunctionName):]
+	copy(p7current, p7s6req.FuncName)
+	p7current = p7current[len(p7s6req.FuncName):]
 	p7current[0] = c5ASCII13
 	p7current[1] = c5ASCII10
 	p7current = p7current[2:]
 	// 元数据
-	for t4key, t4value := range p7s6req.M3MetaData {
+	for t4key, t4value := range p7s6req.MetaData {
 		copy(p7current, t4key)
 		p7current = p7current[len(t4key):]
 		p7current[0] = ':'
@@ -87,13 +87,13 @@ func (this S6CustomRPC) F8EncodeReq(p7s6req *S6RPCRequest) ([]byte, error) {
 		p7current = p7current[2:]
 	}
 	// 请求参数
-	copy(p7current, p7s6req.FunctionInputDataEncode)
+	copy(p7current, p7s6req.FuncInput)
 
 	return s5MsgBody, nil
 }
 
-func (this S6CustomRPC) F8DecodeReq(s5ReqMsg []byte) (*S6RPCRequest, error) {
-	p7s6req := &S6RPCRequest{}
+func (this S6CustomRPC) DecodeReq(s5ReqMsg []byte) (*Request, error) {
+	p7s6req := &Request{}
 	// 作用相当于指针
 	currentIndex := 0
 
@@ -120,10 +120,10 @@ func (this S6CustomRPC) F8DecodeReq(s5ReqMsg []byte) (*S6RPCRequest, error) {
 	// 方法名
 	s5HeaderPart = s5HeaderPart[currentIndex:]
 	t4index = bytes.Index(s5HeaderPart, []byte{c5ASCII13, c5ASCII10})
-	p7s6req.FunctionName = string(s5HeaderPart[:t4index])
+	p7s6req.FuncName = string(s5HeaderPart[:t4index])
 	currentIndex = t4index + 2
 	// 元数据
-	p7s6req.M3MetaData = make(map[string]string, 2)
+	p7s6req.MetaData = make(map[string]string, 2)
 	for {
 		s5HeaderPart = s5HeaderPart[currentIndex:]
 		t4index = bytes.Index(s5HeaderPart, []byte{c5ASCII13, c5ASCII10})
@@ -133,22 +133,22 @@ func (this S6CustomRPC) F8DecodeReq(s5ReqMsg []byte) (*S6RPCRequest, error) {
 		t4index2 := bytes.IndexByte(s5HeaderPart, ':')
 		t4key := string(s5HeaderPart[:t4index2])
 		t4value := string(s5HeaderPart[t4index2+1 : t4index])
-		p7s6req.M3MetaData[t4key] = t4value
+		p7s6req.MetaData[t4key] = t4value
 		currentIndex = t4index + 2
 	}
 
 	// 请求参数
-	p7s6req.FunctionInputDataEncode = s5ReqMsg[headerLen:]
+	p7s6req.FuncInput = s5ReqMsg[headerLen:]
 
 	return p7s6req, nil
 }
 
-func (this S6CustomRPC) F8EncodeResp(p7s6resp *S6RPCResponse) ([]byte, error) {
+func (this S6CustomRPC) EncodeResp(p7s6resp *Response) ([]byte, error) {
 	// 先计算最终生成的协议报文的总长度
 	headerLen := 11
 	errStr := p7s6resp.Error.Error()
 	headerLen += len(errStr) + 2
-	bodyLen := len(p7s6resp.FunctionOutputDataEncode)
+	bodyLen := len(p7s6resp.FuncOutput)
 
 	// 最终生成的协议报文
 	s5MsgBody := make([]byte, headerLen+bodyLen)
@@ -179,13 +179,13 @@ func (this S6CustomRPC) F8EncodeResp(p7s6resp *S6RPCResponse) ([]byte, error) {
 	p7current = p7current[2:]
 
 	// 请求参数
-	copy(p7current, p7s6resp.FunctionOutputDataEncode)
+	copy(p7current, p7s6resp.FuncOutput)
 
 	return s5MsgBody, nil
 }
 
-func (this S6CustomRPC) F8DecodeResp(s5RespMsg []byte) (*S6RPCResponse, error) {
-	p7s6resp := &S6RPCResponse{}
+func (this S6CustomRPC) DecodeResp(s5RespMsg []byte) (*Response, error) {
+	p7s6resp := &Response{}
 	// 作用相当于指针
 	currentIndex := 0
 
@@ -214,12 +214,12 @@ func (this S6CustomRPC) F8DecodeResp(s5RespMsg []byte) (*S6RPCResponse, error) {
 	currentIndex = t4index + 2
 
 	// 请求参数
-	p7s6resp.FunctionOutputDataEncode = s5RespMsg[headerLen:]
+	p7s6resp.FuncOutput = s5RespMsg[headerLen:]
 
 	return p7s6resp, nil
 }
 
-func (this S6CustomRPC) F8ReadReqMsgFromTCP(i9conn net.Conn) (s5ReqMsg []byte, err error) {
+func (this S6CustomRPC) ReadReqMsg(i9conn net.Conn) (s5ReqMsg []byte, err error) {
 	defer func() {
 		if err2 := recover(); nil != err2 {
 			err = errors.New(fmt.Sprintf("tcp connection panic with : %v", err2))
@@ -254,7 +254,7 @@ func (this S6CustomRPC) F8ReadReqMsgFromTCP(i9conn net.Conn) (s5ReqMsg []byte, e
 	return s5ReqMsg, err
 }
 
-func (this S6CustomRPC) F8ReadRespMsgFromTCP(i9conn net.Conn) (s5ReqMsg []byte, err error) {
+func (this S6CustomRPC) ReadRespMsg(i9conn net.Conn) (s5ReqMsg []byte, err error) {
 	defer func() {
 		if err2 := recover(); nil != err2 {
 			err = errors.New(fmt.Sprintf("tcp connection panic with : %v", err2))
