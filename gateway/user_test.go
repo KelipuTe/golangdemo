@@ -9,14 +9,14 @@ import (
 	"testing"
 )
 
-type TestUserHandler struct {
+type CaseUserHandler struct {
 }
 
-func NewTestUserHandler() *TestUserHandler {
-	return &TestUserHandler{}
+func NewCaseUserHandler() *CaseUserHandler {
+	return &CaseUserHandler{}
 }
 
-func (t *TestUserHandler) HandleMsg(req *websocket.Msg, conn *websocket.DialConn) {
+func (t *CaseUserHandler) HandleMsg(req *websocket.Msg, conn *websocket.DialConn) {
 	pkg := &Package{}
 	_ = req.ParseJson(pkg)
 
@@ -41,7 +41,7 @@ func (t *TestUserHandler) HandleMsg(req *websocket.Msg, conn *websocket.DialConn
 }
 
 func TestInnerUser(t *testing.T) {
-	h := NewTestUserHandler()
+	h := NewCaseUserHandler()
 	c := websocket.NewClient("localhost", 9601, h)
 	err := c.Start()
 	if err != nil {

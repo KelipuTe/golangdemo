@@ -6,116 +6,161 @@ import (
 	"testing"
 )
 
-func Test_f8IterateStructField(p7test *testing.T) {
-	s5s6case := []struct {
-		testName   string
-		input      any
-		resultWant map[string]any
-		errWant    error
+type CaseUser struct {
+	PublicV1  int
+	privateV1 int
+}
+
+func (t *CaseUser) GetPublicV1() int {
+	return t.PublicV1
+}
+
+func (t *CaseUser) SetPublicV1(in int) int {
+	t.PublicV1 = in
+	return t.PublicV1
+}
+
+func (t *CaseUser) setPrivateV1(in int) {
+	t.privateV1 = in
+}
+
+type CaseUserV2 struct {
+	PublicV1 int `tag1:"tag1" tag2:"tag2"`
+}
+
+func (t CaseUserV2) GetPublicV1() int {
+	return t.PublicV1
+}
+
+func TestVisitStructField(t *testing.T) {
+	caseList := []struct {
+		name    string
+		input   any
+		wantRes map[string]any
+		wantErr error
 	}{
 		{
-			// 非法输入 nil
-			testName:   "nil",
-			input:      nil,
-			resultWant: nil,
-			errWant:    ErrMustStructOrStructPointer,
+			name:    "非法nil",
+			input:   nil,
+			wantRes: nil,
+			wantErr: ErrMustStructOrPointer,
 		},
 		{
-			// 非法输入 int 指针
-			testName: "int pointer",
+			name: "非法int指针",
 			input: func() *int {
 				i := 1
 				return &i
 			}(),
-			resultWant: nil,
-			errWant:    ErrMustStructOrStructPointer,
+			wantRes: nil,
+			wantErr: ErrMustStructOrPointer,
 		},
 		{
-			// 普通结构体
-			testName:   "normal struct",
-			input:      User{Name: "aaa", Sex: 1, age: 18},
-			resultWant: map[string]any{"Name": "aaa", "Sex": 1, "age": 0},
-			errWant:    nil,
+			name:    "普通结构体",
+			input:   CaseUser{PublicV1: 10, privateV1: 20},
+			wantRes: map[string]any{"PublicV1": 10, "privateV1": 0},
+			wantErr: nil,
 		},
 		{
-			// 一级结构体指针
-			testName:   "struct pointer",
-			input:      &User{Name: "aaa", Sex: 1, age: 18},
-			resultWant: map[string]any{"Name": "aaa", "Sex": 1, "age": 0},
-			errWant:    nil,
+			name:    "一级指针",
+			input:   &CaseUser{PublicV1: 10, privateV1: 20},
+			wantRes: map[string]any{"PublicV1": 10, "privateV1": 0},
+			wantErr: nil,
 		},
 		{
-			// 二级结构体指针
-			testName: "struct pointer multiple",
-			input: func() **User {
-				p1u := &User{Name: "aaa", Sex: 1, age: 18}
-				return &p1u
+			name: "二级指针",
+			input: func() **CaseUser {
+				u := &CaseUser{PublicV1: 10, privateV1: 20}
+				return &u
 			}(),
-			resultWant: map[string]any{"Name": "aaa", "Sex": 1, "age": 0},
-			errWant:    nil,
+			wantRes: map[string]any{"PublicV1": 10, "privateV1": 0},
+			wantErr: nil,
 		},
 	}
-	for _, t4case := range s5s6case {
-		p7test.Run(t4case.testName, func(p7test *testing.T) {
-			res, err := f8IterateStructField(t4case.input)
-			assert.Equal(p7test, t4case.errWant, err)
+
+	for _, v := range caseList {
+		t.Run(v.name, func(t *testing.T) {
+			res, err := visitStructField(v.input)
+			assert.Equal(t, v.wantErr, err)
 			if err != nil {
 				return
 			}
-			assert.Equal(p7test, t4case.resultWant, res)
+			assert.Equal(t, v.wantRes, res)
 		})
 	}
 }
 
-func Test_f8SetStructField(p7test *testing.T) {
-	s5s6case := []struct {
-		testName  string
+func TestVisitStructTag(t *testing.T) {
+	caseList := []struct {
+		name    string
+		input   any
+		wantRes map[string]string
+		wantErr error
+	}{
+		{
+			name:    "普通结构体",
+			input:   CaseUserV2{PublicV1: 10},
+			wantRes: map[string]string{"PublicV1": `tag1:"tag1" tag2:"tag2"`},
+			wantErr: nil,
+		},
+	}
+
+	for _, v := range caseList {
+		t.Run(v.name, func(t *testing.T) {
+			res, err := visitStructTag(v.input)
+			assert.Equal(t, v.wantErr, err)
+			if err != nil {
+				return
+			}
+			assert.Equal(t, v.wantRes, res)
+		})
+	}
+}
+
+func TestEditStructField(t *testing.T) {
+	caseList := []struct {
+		name      string
 		input     any
-		fieldWant string
-		valueWant any
-		errWant   error
+		wantField string
+		wantValue any
+		wantErr   error
 	}{
 		{
-			// 非法输入 nil
-			testName:  "nil",
+			name:      "非法nil",
 			input:     nil,
-			fieldWant: "Name",
-			valueWant: "bbb",
-			errWant:   ErrMustStructPointer,
+			wantField: "PublicV1",
+			wantValue: 11,
+			wantErr:   ErrMustStructPointer,
 		},
 		{
-			// 非法输入 普通结构体
-			testName:  "struct",
-			input:     User{Name: "aaa", Sex: 1, age: 18},
-			fieldWant: "Name",
-			valueWant: "bbb",
-			errWant:   ErrMustStructPointer,
+			name:      "非法普通结构体",
+			input:     CaseUser{PublicV1: 10, privateV1: 20},
+			wantField: "PublicV1",
+			wantValue: 11,
+			wantErr:   ErrMustStructPointer,
 		},
 		{
-			// 非法输入 二级结构体指针
-			testName: "struct_pointer_multiple",
-			input: func() **User {
-				p1u := &User{Name: "aaa", Sex: 1, age: 18}
-				return &p1u
+			name: "非法二级指针",
+			input: func() **CaseUser {
+				u := &CaseUser{PublicV1: 10, privateV1: 20}
+				return &u
 			}(),
-			fieldWant: "Name",
-			valueWant: "bbb",
-			errWant:   ErrMustStructPointer,
+			wantField: "PublicV1",
+			wantValue: 11,
+			wantErr:   ErrMustStructPointer,
 		},
 		{
-			// 一级结构体指针
-			testName:  "struct_pointer",
-			input:     &User{Name: "aaa", Sex: 1, age: 18},
-			fieldWant: "Name",
-			valueWant: "bbb",
-			errWant:   nil,
+			name:      "一级指针",
+			input:     &CaseUser{PublicV1: 10, privateV1: 20},
+			wantField: "PublicV1",
+			wantValue: 11,
+			wantErr:   nil,
 		},
 	}
 
-	for _, t4case := range s5s6case {
-		p7test.Run(t4case.testName, func(p7test *testing.T) {
-			err := f8SetStructField(t4case.input, t4case.fieldWant, t4case.valueWant)
-			assert.Equal(p7test, t4case.errWant, err)
+	for _, v := range caseList {
+		t.Run(v.name, func(t *testing.T) {
+			err := editStructField(v.input, v.wantField, v.wantValue)
+			assert.Equal(t, v.wantErr, err)
 			if err != nil {
 				return
 			}
@@ -123,64 +168,120 @@ func Test_f8SetStructField(p7test *testing.T) {
 	}
 }
 
-func Test_f8IterateStructFunc(p7test *testing.T) {
-	s5s6case := []struct {
-		testName   string
-		input      any
-		resultWant map[string]*S6FuncInfo
-		errWant    error
+func TestVisitStructFunc(t *testing.T) {
+	caseList := []struct {
+		name    string
+		input   any
+		wantRes map[string]*FuncInfo
+		wantErr error
 	}{
 		{
-			// 非法输入，nil
-			testName:   "nil",
-			input:      nil,
-			resultWant: nil,
-			errWant:    ErrMustStructOrStructPointer,
+			name:    "非法nil",
+			input:   nil,
+			wantRes: nil,
+			wantErr: ErrMustStructOrPointer,
 		},
 		{
-			// 普通结构体
-			testName: "normal struct",
-			input:    User{Name: "aaa", Sex: 1, age: 18},
-			resultWant: map[string]*S6FuncInfo{
-				"GetName": {
-					Name:          "GetName",
-					S5InputType:   []reflect.Type{reflect.TypeOf(User{})},
-					S5OutputType:  []reflect.Type{reflect.TypeOf("aaa")},
-					S5OutputValue: []any{"aaa"},
-				},
-			},
-			errWant: nil,
+			name:    "普通结构体",
+			input:   CaseUser{},
+			wantRes: map[string]*FuncInfo{},
+			wantErr: nil,
 		},
 		{
-			// 一级结构体指针
-			testName: "struct pointer",
-			input:    &User{Name: "aaa", Sex: 1, age: 18},
-			resultWant: map[string]*S6FuncInfo{
-				"GetName": {
-					Name:          "GetName",
-					S5InputType:   []reflect.Type{reflect.TypeOf(&User{})},
-					S5OutputType:  []reflect.Type{reflect.TypeOf("aaa")},
-					S5OutputValue: []any{"aaa"},
-				},
-				"SetSex": {
-					Name:          "SetSex",
-					S5InputType:   []reflect.Type{reflect.TypeOf(&User{}), reflect.TypeOf(1)},
-					S5OutputType:  []reflect.Type{reflect.TypeOf(0)},
-					S5OutputValue: []any{0},
+			name:  "普通结构体V2",
+			input: CaseUserV2{},
+			wantRes: map[string]*FuncInfo{
+				"GetPublicV1": {
+					Name:         "GetPublicV1",
+					InTypeList:   []reflect.Type{reflect.TypeOf(CaseUserV2{})},
+					OutTypeList:  []reflect.Type{reflect.TypeOf(10)},
+					OutValueList: nil,
 				},
 			},
-			errWant: nil,
+			wantErr: nil,
+		},
+		{
+			name:  "一级指针",
+			input: &CaseUser{PublicV1: 10, privateV1: 20},
+			wantRes: map[string]*FuncInfo{
+				"GetPublicV1": {
+					Name:         "GetPublicV1",
+					InTypeList:   []reflect.Type{reflect.TypeOf(&CaseUser{})},
+					OutTypeList:  []reflect.Type{reflect.TypeOf(10)},
+					OutValueList: nil,
+				},
+				"SetPublicV2": {
+					Name:         "SetPublicV1",
+					InTypeList:   []reflect.Type{reflect.TypeOf(&CaseUser{}), reflect.TypeOf(10)},
+					OutTypeList:  []reflect.Type{reflect.TypeOf(10)},
+					OutValueList: nil,
+				},
+			},
+			wantErr: nil,
 		},
 	}
 
-	for _, t4case := range s5s6case {
-		p7test.Run(t4case.testName, func(p7test *testing.T) {
-			res, err := f8IterateStructFunc(t4case.input)
-			assert.Equal(p7test, t4case.errWant, err)
+	for _, v := range caseList {
+		t.Run(v.name, func(t *testing.T) {
+			res, err := visitStructFunc(v.input)
+			assert.Equal(t, v.wantErr, err)
 			if err != nil {
 				return
 			}
-			assert.Equal(p7test, t4case.resultWant, res)
+			assert.Equal(t, v.wantRes, res)
+		})
+	}
+}
+
+func TestCallStructFunc(t *testing.T) {
+	caseList := []struct {
+		name    string
+		input   any
+		wantRes map[string]*FuncInfo
+		wantErr error
+	}{
+		{
+			name:  "普通结构体V2",
+			input: CaseUserV2{PublicV1: 10},
+			wantRes: map[string]*FuncInfo{
+				"GetPublicV1": {
+					Name:         "GetPublicV1",
+					InTypeList:   []reflect.Type{reflect.TypeOf(CaseUserV2{})},
+					OutTypeList:  []reflect.Type{reflect.TypeOf(10)},
+					OutValueList: []any{10},
+				},
+			},
+			wantErr: nil,
+		},
+		{
+			name:  "一级指针",
+			input: &CaseUser{PublicV1: 10, privateV1: 20},
+			wantRes: map[string]*FuncInfo{
+				"GetPublicV1": {
+					Name:         "GetPublicV1",
+					InTypeList:   []reflect.Type{reflect.TypeOf(&CaseUser{})},
+					OutTypeList:  []reflect.Type{reflect.TypeOf(10)},
+					OutValueList: []any{10},
+				},
+				"SetPublicV1": {
+					Name:         "SetPublicV1",
+					InTypeList:   []reflect.Type{reflect.TypeOf(&CaseUser{}), reflect.TypeOf(10)},
+					OutTypeList:  []reflect.Type{reflect.TypeOf(10)},
+					OutValueList: []any{0},
+				},
+			},
+			wantErr: nil,
+		},
+	}
+
+	for _, v := range caseList {
+		t.Run(v.name, func(t *testing.T) {
+			res, err := callStructFunc(v.input)
+			assert.Equal(t, v.wantErr, err)
+			if err != nil {
+				return
+			}
+			assert.Equal(t, v.wantRes, res)
 		})
 	}
 }

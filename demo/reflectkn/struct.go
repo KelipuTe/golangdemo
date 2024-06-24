@@ -4,150 +4,201 @@ import (
 	"reflect"
 )
 
-// f8IterateStructField 通过反射遍历结构体的字段
-func f8IterateStructField(input any) (map[string]any, error) {
-	if nil == input {
-		return nil, ErrMustStructOrStructPointer
+//通过反射访问结构体的属性和方法
+//获取属性信息，修改属性值，获取属性的tag，获取方法信息，访问方法
+
+// 获取属性信息
+func visitStructField(in any) (map[string]any, error) {
+	if in == nil {
+		return nil, ErrMustStructOrPointer
 	}
 
-	i9InputType := reflect.TypeOf(input)
-	s6InputValue := reflect.ValueOf(input)
+	irt := reflect.TypeOf(in)
+	irv := reflect.ValueOf(in)
 
 	// 处理结构体指针（一级或多级指针）
-	for reflect.Pointer == i9InputType.Kind() {
-		i9InputType = i9InputType.Elem()
-		s6InputValue = s6InputValue.Elem()
+	for irt.Kind() == reflect.Pointer {
+		irt = irt.Elem()
+		irv = irv.Elem()
 	}
-	if reflect.Struct != i9InputType.Kind() {
-		return nil, ErrMustStructOrStructPointer
+	if irt.Kind() != reflect.Struct {
+		return nil, ErrMustStructOrPointer
 	}
 
-	// 结构体字段数量
-	fieldNum := i9InputType.NumField()
-	m3result := make(map[string]any, fieldNum)
-	// 解析结构体的每个字段
+	// 有几个属性，按下标遍历然后解析
+	fieldNum := irt.NumField()
+	fieldList := make(map[string]any, fieldNum)
 	for i := 0; i < fieldNum; i++ {
-		s6FieldType := i9InputType.Field(i)
-		s6FieldValue := s6InputValue.Field(i)
-		// 私有字段这里是拿不到值的，默认赋零值
-		if s6FieldType.IsExported() {
-			m3result[s6FieldType.Name] = s6FieldValue.Interface()
+		// 类型反射和值反射分别获取属性信息
+		vrt := irt.Field(i)
+		vrv := irv.Field(i)
+
+		// 判断是不是公开属性
+		if vrt.IsExported() {
+			fieldList[vrt.Name] = vrv.Interface()
 		} else {
-			m3result[s6FieldType.Name] = reflect.Zero(s6FieldType.Type).Interface()
+			// 私有属性是拿不到值的，默认赋零值
+			fieldList[vrt.Name] = reflect.Zero(vrt.Type).Interface()
 		}
 	}
 
-	return m3result, nil
+	return fieldList, nil
 }
 
-// f8SetStructField 通过反射修改结构体的字段
-func f8SetStructField(input any, field string, value any) error {
-	// 因为需要修改结构体，所以必须是一级结构体指针
-	if nil == input {
+func visitStructTag(in any) (map[string]string, error) {
+	if in == nil {
+		return nil, ErrMustStructOrPointer
+	}
+
+	irt := reflect.TypeOf(in)
+	irv := reflect.ValueOf(in)
+
+	for irt.Kind() == reflect.Pointer {
+		irt = irt.Elem()
+		irv = irv.Elem()
+	}
+	if irt.Kind() != reflect.Struct {
+		return nil, ErrMustStructOrPointer
+	}
+
+	fieldNum := irt.NumField()
+	fieldList := make(map[string]string, fieldNum)
+	for i := 0; i < fieldNum; i++ {
+		vrt := irt.Field(i)
+		fieldList[vrt.Name] = string(vrt.Tag)
+	}
+
+	return fieldList, nil
+}
+
+// 修改属性值
+func editStructField(in any, field string, value any) error {
+	// 因为需要修改结构体，所以必须是一级指针
+	if in == nil {
 		return ErrMustStructPointer
 	}
 
-	i9InputType := reflect.TypeOf(input)
-	s6InputValue := reflect.ValueOf(input)
+	irt := reflect.TypeOf(in)
+	irv := reflect.ValueOf(in)
 
 	// 处理结构体指针
-	if reflect.Pointer == i9InputType.Kind() {
-		i9InputType = i9InputType.Elem()
-		s6InputValue = s6InputValue.Elem()
+	if irt.Kind() != reflect.Pointer {
+		return ErrMustStructPointer
 	}
-	if reflect.Struct != i9InputType.Kind() {
+	irt = irt.Elem()
+	irv = irv.Elem()
+	if irt.Kind() != reflect.Struct {
 		return ErrMustStructPointer
 	}
 
-	// 判断字段存不存在
-	if _, ok := i9InputType.FieldByName(field); !ok {
+	// 判断属性存不存在
+	if _, ok := irt.FieldByName(field); !ok {
 		return ErrStructFieldNotFound
 	}
-	s6FieldValue := s6InputValue.FieldByName(field)
-	// 判断字段能不能赋值
-	if !s6FieldValue.CanSet() {
+	vrv := irv.FieldByName(field)
+
+	// 判断属性能不能赋值
+	if !vrv.CanSet() {
 		return ErrStructFieldCannotSet
 	}
-	s6FieldValue.Set(reflect.ValueOf(value))
+	vrv.Set(reflect.ValueOf(value))
 
 	return nil
 }
 
-type S6FuncInfo struct {
-	// 方法名
-	Name string
-	// 方法的入参的类型
-	S5InputType []reflect.Type
-	// 方法的出参的类型
-	S5OutputType []reflect.Type
-	// 方法的出参的值
-	S5OutputValue []any
+type FuncInfo struct {
+	Name         string         // 方法名
+	InTypeList   []reflect.Type // 入参类型
+	OutTypeList  []reflect.Type // 出参类型
+	OutValueList []any          // 出参值
 }
 
-// f8IterateStructFunc 通过反射遍历结构体的方法
-func f8IterateStructFunc(input any) (map[string]*S6FuncInfo, error) {
-	if nil == input {
-		return nil, ErrMustStructOrStructPointer
+// 获取方法信息
+func visitStructFunc(in any) (map[string]*FuncInfo, error) {
+	if in == nil {
+		return nil, ErrMustStructOrPointer
 	}
 
-	i9InputType := reflect.TypeOf(input)
+	irt := reflect.TypeOf(in)
 
-	// 处理结构体指针
-	if reflect.Pointer == i9InputType.Kind() && reflect.Struct != i9InputType.Elem().Kind() {
-		return nil, ErrMustStructOrStructPointer
+	if irt.Kind() != reflect.Struct && irt.Kind() != reflect.Pointer {
+		return nil, ErrMustStructOrPointer
 	}
-	if reflect.Struct != i9InputType.Kind() {
-		return nil, ErrMustStructOrStructPointer
+	if irt.Kind() == reflect.Pointer && irt.Elem().Kind() != reflect.Struct {
+		return nil, ErrMustStructOrPointer
 	}
 
-	// 结构体方法数量
-	funcNum := i9InputType.NumMethod()
-	m3result := make(map[string]*S6FuncInfo, funcNum)
-	// 解析结构体的每个方法
+	// 有几个方法，按下标解析每个方法
+	funcNum := irt.NumMethod()
+	funcList := make(map[string]*FuncInfo, funcNum)
 	for i := 0; i < funcNum; i++ {
-		t4func := i9InputType.Method(i)
-		// 方法的入参的数量
-		funcInputNum := t4func.Type.NumIn()
-		s5FuncInput := make([]reflect.Type, 0, funcInputNum)
-		// 方法的出参的数量
-		funcOutputNum := t4func.Type.NumOut()
-		s5FuncOutput := make([]reflect.Type, 0, funcOutputNum)
-		s5res := make([]any, 0, funcOutputNum)
+		vrt := irt.Method(i)
 
-		// 构造调用方法需要的入参
-		s5FuncCallInput := make([]reflect.Value, 0, funcInputNum)
-		// 注意，第一个参数永远都是接收器
-		s5FuncCallInput = append(s5FuncCallInput, reflect.ValueOf(input))
-		// 按下标遍历入参
-		for j := 0; j < funcInputNum; j++ {
-			// 反射得到入参的类型
-			funcInputType := t4func.Type.In(j)
-			s5FuncInput = append(s5FuncInput, funcInputType)
-			// 用入参的类型的 0 值构造请求参数
-			if j > 0 {
-				s5FuncCallInput = append(s5FuncCallInput, reflect.Zero(funcInputType))
+		// 入参数量，按下标遍历
+		inNum := vrt.Type.NumIn()
+		inTypeList := make([]reflect.Type, 0, inNum)
+		for j := 0; j < inNum; j++ {
+			// 反射得到参数类型
+			v2 := vrt.Type.In(j)
+			inTypeList = append(inTypeList, v2)
+		}
+
+		// 出参数量，按下标遍历
+		outNum := vrt.Type.NumOut()
+		outTypeList := make([]reflect.Type, 0, outNum)
+		for j := 0; j < outNum; j++ {
+			// 反射得到参数类型
+			v2 := vrt.Type.Out(j)
+			outTypeList = append(outTypeList, v2)
+		}
+
+		funcList[vrt.Name] = &FuncInfo{
+			Name:        vrt.Name,
+			InTypeList:  inTypeList,
+			OutTypeList: outTypeList,
+		}
+	}
+
+	return funcList, nil
+}
+
+// 调用方法
+func callStructFunc(in any) (map[string]*FuncInfo, error) {
+	funcList, err := visitStructFunc(in)
+	if err != nil {
+		return nil, err
+	}
+
+	irt := reflect.TypeOf(in)
+	funcNum := irt.NumMethod()
+	for i := 0; i < funcNum; i++ {
+		vrt := irt.Method(i)
+		v := funcList[vrt.Name]
+
+		//构造调用方法需要的入参。注意，第一个参数永远都是接收器。
+		inNum := len(v.InTypeList)
+		inValueList := make([]reflect.Value, 0, inNum)
+		inValueList = append(inValueList, reflect.ValueOf(in))
+		for j := 0; j < inNum; j++ {
+			if j < 1 {
+				continue
 			}
+			// 这里意思一下，用入参类型的 0 值构造请求参数
+			inValueList = append(inValueList, reflect.Zero(v.InTypeList[j]))
 		}
 
 		// 用上面构造的请求参数调用方法
-		s5FuncCallOutput := t4func.Func.Call(s5FuncCallInput)
+		resValueList := vrt.Func.Call(inValueList)
 
-		// 按下标遍历出参
-		for j := 0; j < funcOutputNum; j++ {
-			// 反射得到出参的类型
-			funcOutputType := t4func.Type.Out(j)
-			s5FuncOutput = append(s5FuncOutput, funcOutputType)
-			// 记录调用方法后得到的出参的值
-			s5res = append(s5res, s5FuncCallOutput[j].Interface())
+		// 记录调用方法后得到的出参的值
+		outNum := len(v.OutTypeList)
+		outValueList := make([]any, 0, outNum)
+		for j := 0; j < outNum; j++ {
+			outValueList = append(outValueList, resValueList[j].Interface())
 		}
 
-		m3result[t4func.Name] = &S6FuncInfo{
-			Name:          t4func.Name,
-			S5InputType:   s5FuncInput,
-			S5OutputType:  s5FuncOutput,
-			S5OutputValue: s5res,
-		}
+		funcList[vrt.Name].OutValueList = outValueList
 	}
 
-	return m3result, nil
+	return funcList, nil
 }

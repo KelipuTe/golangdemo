@@ -6,69 +6,66 @@ import (
 	"testing"
 )
 
-func Test_f8IterateString(p7test *testing.T) {
-	s5s6case := []struct {
-		testName   string
-		input      any
-		resultWant []any
-		errWant    error
+// 通过反射访问 string
+
+func visitString(in any) ([]any, error) {
+	if in == nil {
+		return nil, ErrMustString
+	}
+
+	irt := reflect.TypeOf(in)
+	irv := reflect.ValueOf(in)
+
+	if irt.Kind() != reflect.String {
+		return nil, ErrMustString
+	}
+
+	// 有几个字符，按下标遍历
+	length := irv.Len()
+	charList := make([]any, 0, length)
+	for i := 0; i < length; i++ {
+		v := irv.Index(i)
+		charList = append(charList, v.Interface())
+	}
+
+	return charList, nil
+}
+
+func TestVisitString(t *testing.T) {
+	caseList := []struct {
+		name    string
+		input   any
+		wantRes []any
+		wantErr error
 	}{
 		{
-			// 非法输入 nil
-			testName:   "nil",
-			input:      nil,
-			resultWant: nil,
-			errWant:    ErrMustString,
+			name:    "非法nil",
+			input:   nil,
+			wantRes: nil,
+			wantErr: ErrMustString,
 		},
 		{
-			// 非法输入 int
-			testName:   "int",
-			input:      2,
-			resultWant: nil,
-			errWant:    ErrMustString,
+			name:    "非法int",
+			input:   2,
+			wantRes: nil,
+			wantErr: ErrMustString,
 		},
 		{
-			// 字符串
-			testName:   "string",
-			input:      "abc",
-			resultWant: []any{uint8('a'), uint8('b'), uint8('c')},
-			errWant:    nil,
+			name:    "string",
+			input:   "abc",
+			wantRes: []any{uint8('a'), uint8('b'), uint8('v')},
+			wantErr: nil,
 		},
 	}
 
-	for _, t4case := range s5s6case {
-		p7test.Run(t4case.testName, func(p7test *testing.T) {
-			res, err := f8IterateString(t4case.input)
-			assert.Equal(p7test, t4case.errWant, err)
+	for _, v := range caseList {
+		t.Run(v.name, func(test *testing.T) {
+			res, err := visitString(v.input)
+			assert.Equal(test, v.wantErr, err)
 			if err != nil {
 				return
 			}
-			assert.Equal(p7test, t4case.resultWant, res)
+			assert.Equal(test, v.wantRes, res)
 		})
 	}
-}
-
-// f8IterateString 通过反射遍历 string
-func f8IterateString(input any) ([]any, error) {
-	if nil == input {
-		return nil, ErrMustString
-	}
-
-	i9InputType := reflect.TypeOf(input)
-	s6InputValue := reflect.ValueOf(input)
-
-	if reflect.String != i9InputType.Kind() {
-		return nil, ErrMustString
-	}
-
-	// 字符串有几个字符
-	stringLen := s6InputValue.Len()
-	s5EachChar := make([]any, 0, stringLen)
-	// 按下标遍历字符
-	for i := 0; i < stringLen; i++ {
-		t4item := s6InputValue.Index(i)
-		s5EachChar = append(s5EachChar, t4item.Interface())
-	}
-
-	return s5EachChar, nil
 }

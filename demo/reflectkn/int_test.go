@@ -6,144 +6,139 @@ import (
 	"testing"
 )
 
-func Test_f8IterateInt(p7test *testing.T) {
-	s5s6case := []struct {
-		testName   string
-		input      any
-		resultWant int
-		errWant    error
-	}{
-		{
-			// 非法输入 nil
-			testName:   "nil",
-			input:      nil,
-			resultWant: 0,
-			errWant:    ErrMustInt,
-		},
-		{
-			// 非法输入 字符串
-			testName:   "string",
-			input:      "abc",
-			resultWant: 0,
-			errWant:    ErrMustInt,
-		},
-		{
-			// int
-			testName:   "int",
-			input:      2,
-			resultWant: 2,
-			errWant:    nil,
-		},
-	}
+//通过反射访问 int 和 int 指针
 
-	for _, t4case := range s5s6case {
-		p7test.Run(t4case.testName, func(p7test *testing.T) {
-			res, err := f8IterateInt(t4case.input)
-			assert.Equal(p7test, t4case.errWant, err)
-			if err != nil {
-				return
-			}
-			assert.Equal(p7test, t4case.resultWant, res)
-		})
-	}
-}
-
-// f8IterateInt 通过反射遍历 int
-func f8IterateInt(input any) (int, error) {
-	if nil == input {
+func visitInt(in any) (int, error) {
+	if in == nil {
 		return 0, ErrMustInt
 	}
 
-	i9InputType := reflect.TypeOf(input)
-	s6InputValue := reflect.ValueOf(input)
+	irt := reflect.TypeOf(in)
+	irv := reflect.ValueOf(in)
 
-	if reflect.Int != i9InputType.Kind() {
+	if irt.Kind() != reflect.Int {
 		return 0, ErrMustInt
 	}
 
-	anyValue := s6InputValue.Interface()
-	intValue, ok := anyValue.(int)
+	anyv := irv.Interface()
+	intv, ok := anyv.(int)
 	if !ok {
 		return 0, ErrMustInt
 	}
 
-	return intValue, nil
+	return intv, nil
 }
 
-func Test_f8IterateIntPointer(p7test *testing.T) {
-	s5s6case := []struct {
-		testName   string
-		input      any
-		resultWant int
-		errWant    error
+func TestVisitInt(t *testing.T) {
+	caseList := []struct {
+		name    string
+		input   any
+		wantRes int
+		wantErr error
 	}{
 		{
-			// 非法输入 nil
-			testName:   "nil",
-			input:      nil,
-			resultWant: 0,
-			errWant:    ErrMustIntPointer,
+			name:    "非法nil",
+			input:   nil,
+			wantRes: 0,
+			wantErr: ErrMustInt,
 		},
 		{
-			// 非法输入 字符串
-			testName:   "string",
-			input:      "abc",
-			resultWant: 0,
-			errWant:    ErrMustIntPointer,
+			name:    "非法string",
+			input:   "abc",
+			wantRes: 0,
+			wantErr: ErrMustInt,
 		},
 		{
-			// int
-			testName:   "int",
-			input:      2,
-			resultWant: 2,
-			errWant:    nil,
+			name:    "合法int",
+			input:   2,
+			wantRes: 2,
+			wantErr: nil,
+		},
+	}
+
+	for _, v := range caseList {
+		t.Run(v.name, func(t *testing.T) {
+			res, err := visitInt(v.input)
+			assert.Equal(t, v.wantErr, err)
+			if err != nil {
+				return
+			}
+			assert.Equal(t, v.wantRes, res)
+		})
+	}
+}
+
+func visitIntPointer(in any) (int, error) {
+	if in == nil {
+		return 0, ErrMustIntPointer
+	}
+
+	irt := reflect.TypeOf(in)
+	irv := reflect.ValueOf(in)
+
+	// 处理结构体指针（一级或多级指针）
+	for irt.Kind() == reflect.Pointer {
+		irt = irt.Elem()
+		irv = irv.Elem()
+	}
+
+	if irt.Kind() != reflect.Int {
+		return 0, ErrMustIntPointer
+	}
+
+	anyv := irv.Interface()
+	intv, ok := anyv.(int)
+	if !ok {
+		return 0, ErrMustInt
+	}
+
+	return intv, nil
+}
+
+func TestVisitIntPointer(t *testing.T) {
+	caseList := []struct {
+		name    string
+		input   any
+		wantRes int
+		wantErr error
+	}{
+		{
+			name:    "非法nil",
+			input:   nil,
+			wantRes: 0,
+			wantErr: ErrMustIntPointer,
 		},
 		{
-			// int*
-			testName: "*int",
+			name:    "非法string",
+			input:   "abc",
+			wantRes: 0,
+			wantErr: ErrMustIntPointer,
+		},
+		{
+			name:    "合法int",
+			input:   2,
+			wantRes: 2,
+			wantErr: nil,
+		},
+		{
+			name: "合法*int",
 			input: func() *int {
 				input := 2
 				return &input
 			}(),
-			resultWant: 2,
-			errWant:    nil,
+			wantRes: 2,
+			wantErr: nil,
 		},
 	}
 
-	for _, t4case := range s5s6case {
-		p7test.Run(t4case.testName, func(p7test *testing.T) {
-			res, err := f8IterateIntPointer(t4case.input)
-			assert.Equal(p7test, t4case.errWant, err)
+	for _, v := range caseList {
+		t.Run(v.name, func(t *testing.T) {
+			res, err := visitIntPointer(v.input)
+			assert.Equal(t, v.wantErr, err)
 			if err != nil {
 				return
 			}
-			assert.Equal(p7test, t4case.resultWant, res)
+			assert.Equal(t, v.wantRes, res)
 		})
 	}
-}
-
-func f8IterateIntPointer(input any) (int, error) {
-	if nil == input {
-		return 0, ErrMustIntPointer
-	}
-
-	i9InputType := reflect.TypeOf(input)
-	s6InputValue := reflect.ValueOf(input)
-
-	// 处理结构体指针（一级或多级指针）
-	for reflect.Pointer == i9InputType.Kind() {
-		i9InputType = i9InputType.Elem()
-		s6InputValue = s6InputValue.Elem()
-	}
-	if reflect.Int != i9InputType.Kind() {
-		return 0, ErrMustIntPointer
-	}
-
-	anyValue := s6InputValue.Interface()
-	intValue, ok := anyValue.(int)
-	if !ok {
-		return 0, ErrMustInt
-	}
-
-	return intValue, nil
 }
