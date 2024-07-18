@@ -81,7 +81,7 @@ func (p7this *Server) F8HandleRPC(i9ctx context.Context, p7s6req *protocol.Reque
 	if !ok {
 		return nil, fmt.Errorf("serialize code [%d] not found", p7s6req.SerializeCode)
 	}
-	functionOutputDataEncode, err := p7s6service.f8HandleRPC(i9ctx, p7s6req.FuncName, i9Serialize, p7s6req.FuncInput)
+	functionOutputDataEncode, err := p7s6service.handleRPC(i9ctx, p7s6req.FuncName, p7s6req.FuncInput, i9Serialize)
 	if nil != err {
 		return nil, err
 	}

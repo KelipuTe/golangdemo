@@ -8,47 +8,40 @@ import (
 
 // 两边都要
 
-type S6F8GetUserByIdRequest struct {
+type GetUserByIDReq struct {
 	UserId int `json:"userId"`
 }
 
-type S6F8GetUserByIdResponse struct {
-	UserId   int    `json:"userId"`
-	UserName string `json:"userName"`
+type GetUserByIDResp struct {
+	UserID   int    `json:"userID"`
+	Username string `json:"username"`
 }
 
 // client
 
-type S6UserRPCService struct {
-	F8GetUserById func(i9ctx context.Context, p7req *S6F8GetUserByIdRequest) (*S6F8GetUserByIdResponse, error)
+type CaseUserRPCService struct {
+	GetUserByID func(context.Context, *GetUserByIDReq) (*GetUserByIDResp, error)
 }
 
-func (p7this *S6UserRPCService) GetServiceName() string {
+func (t *CaseUserRPCService) GetServiceName() string {
 	return "user-rpc-service"
 }
 
 // server
 
-type S6UserService struct {
-}
+type CaseUserService struct{}
 
-func (p7this *S6UserService) GetServiceName() string {
+func (t *CaseUserService) GetServiceName() string {
 	return "user-rpc-service"
 }
 
-func (p7this *S6UserService) F8GetUserById(i9ctx context.Context, p7s6req *S6F8GetUserByIdRequest) (*S6F8GetUserByIdResponse, error) {
-	log.Printf("flowId: %s", i9ctx.Value("flowId").(string))
-	if 11 == p7s6req.UserId {
-		return &S6F8GetUserByIdResponse{
-			UserId:   11,
-			UserName: "aa",
-		}, nil
-	} else if 22 == p7s6req.UserId {
-		return &S6F8GetUserByIdResponse{
-			UserId:   22,
-			UserName: "bb",
-		}, nil
+func (t *CaseUserService) GetUserByID(ctx context.Context, req *GetUserByIDReq) (*GetUserByIDResp, error) {
+	log.Printf("flowId: %s", ctx.Value("flowId").(string))
+	if req.UserId == 11 {
+		return &GetUserByIDResp{UserID: 11, Username: "aa"}, nil
+	} else if req.UserId == 22 {
+		return &GetUserByIDResp{UserID: 22, Username: "bb"}, nil
 	} else {
-		return nil, fmt.Errorf("user id [%d] not found", p7s6req.UserId)
+		return nil, fmt.Errorf("user id [%d] not found", req.UserId)
 	}
 }

@@ -14,7 +14,7 @@ type ClientI9 interface {
 	// GetSerialize 获取请求参数的序列化方式
 	GetSerialize() serialize.SerializeI9
 	// SendRPC 发起 RPC 调用
-	SendRPC(i9ctx context.Context, p7s6req *protocol.Request) (*protocol.Response, error)
+	SendRPC(context.Context, *protocol.Request) (*protocol.Response, error)
 }
 
 type Client struct {

@@ -8,14 +8,14 @@ import (
 )
 
 func Test_Client(p7s6t *testing.T) {
-	p7s6client := NewClient()
-	p7s6client.SetProtocol(protocol.F8NewS6CustomRPC())
+	c := NewClient()
+	c.SetProtocol(protocol.F8NewS6CustomRPC())
 
-	p7s6RPCService := &S6UserRPCService{}
-	CoverWithRPC(p7s6client, p7s6RPCService)
+	svc := &CaseUserRPCService{}
+	CoverWithRPC(c, svc)
 
-	i9ctx := context.Background()
-	i9ctx = context.WithValue(i9ctx, "flowId", "flowId12345678")
-	resp, err := p7s6RPCService.F8GetUserById(i9ctx, &S6F8GetUserByIdRequest{UserId: 33})
+	ctx := context.Background()
+	ctx = context.WithValue(ctx, "traceID", "1234567890")
+	resp, err := svc.GetUserByID(ctx, &GetUserByIDReq{UserId: 33})
 	fmt.Println(resp, err)
 }

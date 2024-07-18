@@ -40,7 +40,7 @@ func TestF8CoverWithRPC(p7s6t *testing.T) {
 		name            string
 		p7s6MockClient  *s6MockI9RPCClient
 		p7s6MockService *s6MockI9RPCService
-		wantResp        *S6F8GetUserByIdResponse
+		wantResp        *GetUserByIDResp
 		wantErr         error
 	}{
 		{
@@ -50,7 +50,7 @@ func TestF8CoverWithRPC(p7s6t *testing.T) {
 				i9serialize: serialize.F8NewS6Json(),
 				p7s6req: &protocol.Request{
 					ServiceName: "user-rpc-service",
-					FuncName:    "F8GetUserById",
+					FuncName:    "GetUserByID",
 					FuncInput:   []byte(`{"userId":11}`),
 				},
 				p7s6resp: &protocol.Response{
@@ -58,17 +58,17 @@ func TestF8CoverWithRPC(p7s6t *testing.T) {
 				},
 			},
 			p7s6MockService: func() *s6MockI9RPCService {
-				p7s6RPCService := &S6UserRPCService{}
+				p7s6RPCService := &CaseUserRPCService{}
 				return &s6MockI9RPCService{
 					i9RPCService: p7s6RPCService,
 					f8SendRPC: func() (any, error) {
-						return p7s6RPCService.F8GetUserById(context.Background(), &S6F8GetUserByIdRequest{UserId: 11})
+						return p7s6RPCService.GetUserByID(context.Background(), &GetUserByIDReq{UserId: 11})
 					},
 				}
 			}(),
-			wantResp: &S6F8GetUserByIdResponse{
-				UserId:   11,
-				UserName: "aa",
+			wantResp: &GetUserByIDResp{
+				UserID:   11,
+				Username: "aa",
 			},
 		},
 	}

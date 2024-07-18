@@ -679,7 +679,7 @@ func TestSelectJoin(p7s6t *testing.T) {
 				t1 := F8NewS6Table(&S6APPUserModel{})
 				t2 := F8NewS6Table(&S6APPUserInfoModel{})
 				return F8NewS6SelectBuilder[S6APPUserModel](p7s6DB).
-					F8From(t1.F8Join(t2).F8On(t1.F8Column("Id").F8Equal(t2.F8Column("UserId"))))
+					F8From(t1.F8Join(t2).F8On(t1.F8Column("Id").F8Equal(t2.F8Column("UserID"))))
 			}(),
 			wantQuery: &S6Query{
 				SQLString: "SELECT * FROM (`app_user` JOIN `app_user_info` ON `id` = `user_id`);",
@@ -692,7 +692,7 @@ func TestSelectJoin(p7s6t *testing.T) {
 				t1 := F8NewS6Table(&S6APPUserOrder{})
 				t2 := F8NewS6Table(&S6APPUserInfoModel{})
 				return F8NewS6SelectBuilder[S6APPUserOrder](p7s6DB).
-					F8From(t1.F8Join(t2).F8Using(F8NewS6Column("UserId")))
+					F8From(t1.F8Join(t2).F8Using(F8NewS6Column("UserID")))
 			}(),
 			wantQuery: &S6Query{
 				SQLString: "SELECT * FROM (`app_user_order` JOIN `app_user_info` USING (`user_id`));",
@@ -705,7 +705,7 @@ func TestSelectJoin(p7s6t *testing.T) {
 				t1 := F8NewS6Table(&S6APPUserModel{}).F8As("t1")
 				t2 := F8NewS6Table(&S6APPUserInfoModel{})
 				return F8NewS6SelectBuilder[S6APPUserModel](p7s6DB).
-					F8From(t1.F8Join(t2).F8On(t1.F8Column("Id").F8Equal(t2.F8Column("UserId"))))
+					F8From(t1.F8Join(t2).F8On(t1.F8Column("Id").F8Equal(t2.F8Column("UserID"))))
 			}(),
 			wantQuery: &S6Query{
 				SQLString: "SELECT * FROM (`app_user` AS `t1` JOIN `app_user_info` ON `t1`.`id` = `user_id`);",
@@ -718,7 +718,7 @@ func TestSelectJoin(p7s6t *testing.T) {
 				t1 := F8NewS6Table(&S6APPUserModel{}).F8As("t1")
 				t2 := F8NewS6Table(&S6APPUserInfoModel{}).F8As("t2")
 				return F8NewS6SelectBuilder[S6APPUserModel](p7s6DB).
-					F8From(t1.F8Join(t2).F8On(t1.F8Column("Id").F8Equal(t2.F8Column("UserId"))))
+					F8From(t1.F8Join(t2).F8On(t1.F8Column("Id").F8Equal(t2.F8Column("UserID"))))
 			}(),
 			wantQuery: &S6Query{
 				SQLString: "SELECT * FROM (`app_user` AS `t1` JOIN `app_user_info` AS `t2` ON `t1`.`id` = `t2`.`user_id`);",
@@ -732,8 +732,8 @@ func TestSelectJoin(p7s6t *testing.T) {
 				t2 := F8NewS6Table(&S6APPUserInfoModel{}).F8As("t2")
 				t3 := F8NewS6Table(&S6APPUserOrder{}).F8As("t3")
 				return F8NewS6SelectBuilder[S6APPUserModel](p7s6DB).
-					F8From(t1.F8Join(t2).F8On(t1.F8Column("Id").F8Equal(t2.F8Column("UserId"))).
-						F8Join(t3).F8On(t1.F8Column("Id").F8Equal(t3.F8Column("UserId"))))
+					F8From(t1.F8Join(t2).F8On(t1.F8Column("Id").F8Equal(t2.F8Column("UserID"))).
+						F8Join(t3).F8On(t1.F8Column("Id").F8Equal(t3.F8Column("UserID"))))
 			}(),
 			wantQuery: &S6Query{
 				SQLString: "SELECT * FROM ((`app_user` AS `t1` JOIN `app_user_info` AS `t2` ON `t1`.`id` = `t2`.`user_id`) JOIN `app_user_order` AS `t3` ON `t1`.`id` = `t3`.`user_id`);",
@@ -746,7 +746,7 @@ func TestSelectJoin(p7s6t *testing.T) {
 				t1 := F8NewS6Table(&S6APPUserModel{}).F8As("t1")
 				t2 := F8NewS6Table(&S6APPUserInfoModel{})
 				return F8NewS6SelectBuilder[S6APPUserModel](p7s6DB).
-					F8From(t1.F8LeftJoin(t2).F8On(t1.F8Column("Id").F8Equal(t2.F8Column("UserId"))))
+					F8From(t1.F8LeftJoin(t2).F8On(t1.F8Column("Id").F8Equal(t2.F8Column("UserID"))))
 			}(),
 			wantQuery: &S6Query{
 				SQLString: "SELECT * FROM (`app_user` AS `t1` LEFT JOIN `app_user_info` ON `t1`.`id` = `user_id`);",
@@ -760,8 +760,8 @@ func TestSelectJoin(p7s6t *testing.T) {
 				t2 := F8NewS6Table(&S6APPUserInfoModel{}).F8As("t2")
 				t3 := F8NewS6Table(&S6APPUserOrder{}).F8As("t3")
 				return F8NewS6SelectBuilder[S6APPUserModel](p7s6DB).F8From(
-					t1.F8LeftJoin(t2).F8On(t1.F8Column("Id").F8Equal(t2.F8Column("UserId"))).
-						F8Join(t3).F8On(t1.F8Column("Id").F8Equal(t3.F8Column("UserId"))))
+					t1.F8LeftJoin(t2).F8On(t1.F8Column("Id").F8Equal(t2.F8Column("UserID"))).
+						F8Join(t3).F8On(t1.F8Column("Id").F8Equal(t3.F8Column("UserID"))))
 			}(),
 			wantQuery: &S6Query{
 				SQLString: "SELECT * FROM ((`app_user` AS `t1` LEFT JOIN `app_user_info` AS `t2` ON `t1`.`id` = `t2`.`user_id`) JOIN `app_user_order` AS `t3` ON `t1`.`id` = `t3`.`user_id`);",
@@ -806,7 +806,7 @@ func TestSelectSubQuery(p7s6t *testing.T) {
 			name: "table_a_in_sub_b",
 			queryBuilder: func() I9QueryBuilder {
 				sub := F8NewS6SelectBuilder[S6APPUserInfoModel](p7s6DB).
-					F8Select(F8NewS6Column("UserId")).F8AsSubQuery("sub")
+					F8Select(F8NewS6Column("UserID")).F8AsSubQuery("sub")
 				return F8NewS6SelectBuilder[S6APPUserModel](p7s6DB).
 					F8Where(F8NewS6Column("Id").F8InQuery(sub))
 			}(),
@@ -844,7 +844,7 @@ func TestSelectJoinAndSubQuery(p7s6t *testing.T) {
 				t1 := F8NewS6Table(&S6APPUserModel{}).F8As("t1")
 				subb := F8NewS6SelectBuilder[S6APPUserInfoModel](p7s6DB).F8AsSubQuery("subb")
 				return F8NewS6SelectBuilder[S6APPUserModel](p7s6DB).F8From(
-					t1.F8Join(subb).F8On(t1.F8Column("Id").F8Equal(subb.F8Column("UserId"))))
+					t1.F8Join(subb).F8On(t1.F8Column("Id").F8Equal(subb.F8Column("UserID"))))
 			}(),
 			wantQuery: &S6Query{
 				SQLString: "SELECT * FROM (`app_user` AS `t1` JOIN (SELECT * FROM `app_user_info`) AS `subb` ON `t1`.`id` = `subb`.`user_id`);",
@@ -857,7 +857,7 @@ func TestSelectJoinAndSubQuery(p7s6t *testing.T) {
 				suba := F8NewS6SelectBuilder[S6APPUserModel](p7s6DB).F8AsSubQuery("suba")
 				subb := F8NewS6SelectBuilder[S6APPUserInfoModel](p7s6DB).F8AsSubQuery("subb")
 				return F8NewS6SelectBuilder[S6APPUserModel](p7s6DB).F8From(
-					suba.F8Join(subb).F8On(suba.F8Column("Id").F8Equal(subb.F8Column("UserId"))))
+					suba.F8Join(subb).F8On(suba.F8Column("Id").F8Equal(subb.F8Column("UserID"))))
 			}(),
 			wantQuery: &S6Query{
 				SQLString: "SELECT * FROM ((SELECT * FROM `app_user`) AS `suba` JOIN (SELECT * FROM `app_user_info`) AS `subb` ON `suba`.`id` = `subb`.`user_id`);",
