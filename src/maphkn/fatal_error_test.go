@@ -6,6 +6,9 @@ import (
 	"time"
 )
 
+// 不正确的使用 map 会导致 fatal error。
+// fatal error 会让主进程挂掉，无法被 recover 恢复。
+
 // 并发写 map 会导致 fatal error: concurrent map writes
 func TestCW(t *testing.T) {
 	m := map[int]int{1: 1, 2: 2}

@@ -21,7 +21,7 @@ func TestFuncWithRecover(t *testing.T) {
 }
 
 func funcWithRecover() bool {
-	//这个结构可以防止函数内部的panic导致函数外部挂掉
+	//这个结构可以防止函数内部的panic导致函数调用者挂掉
 	defer func() { recover() }()
 
 	unix := time.Now().Unix()
