@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  #Deployment的名字
+  name: golangdemomicroserviceuser
+spec:
+  #开几个POD
+  replicas: 3
+  #筛选资源
+  selector:
+    matchLabels:
+      #用的是哪个模板（对应下面模板的名字）
+      app: golangdemomicroserviceuser
+  template:
+    metadata:
+      labels:
+        #模板的名字
+        app: golangdemomicroserviceuser
+    #POD详细信息
+    spec:
+      #POD里面运行的容器
+      containers:
+        #容器的名字
+        - name: golangdemomicroserviceuser
+          #容器用的是哪个docker镜像
+          image: golangdemomicroserviceuser:v0.0.1
+          ports:
+            #user服务开的是8080端口
+            - containerPort: 8080
+

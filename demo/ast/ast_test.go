@@ -9,7 +9,7 @@ import (
 
 func TestAst(t *testing.T) {
 	fset := token.NewFileSet()
-	f, err := parser.ParseFile(fset, "src.go",
+	f, err := parser.ParseFile(fset, "srclearning.go",
 		`
 package ast
 

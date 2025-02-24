@@ -216,7 +216,7 @@ type (
 	}
 	for _, tc := range testCases {
 		fset := token.NewFileSet()
-		f, err := parser.ParseFile(fset, "src.go", tc.src, parser.ParseComments)
+		f, err := parser.ParseFile(fset, "srclearning.go", tc.src, parser.ParseComments)
 		if err != nil {
 			t.Fatal(err)
 		}

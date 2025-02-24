@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: golangdemomicroserviceusermysql
+  labels:
+    app: golangdemomicroserviceusermysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: golangdemomicroserviceusermysql
+  template:
+    metadata:
+      name: golangdemomicroserviceusermysql
+      labels:
+        app: golangdemomicroserviceusermysql
+    spec:
+      containers:
+        - name: golangdemomicroserviceusermysql
+          image: mysql:8.0
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: "root"
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: mysql-storage
+      restartPolicy: Always
+      volumes:
+        - name: mysql-storage
+          persistentVolumeClaim:
+            claimName: gdms-mysql-claim
+      

@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: golangdemomicroserviceredis
+  labels:
+    app: golangdemomicroserviceredis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: golangdemomicroserviceredis
+  template:
+    metadata:
+      name: golangdemomicroserviceredis
+      labels:
+        app: golangdemomicroserviceredis
+    spec:
+      containers:
+        - name: golangdemomicroserviceredis
+          image: redis:7
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 6379
+      restartPolicy: Always
