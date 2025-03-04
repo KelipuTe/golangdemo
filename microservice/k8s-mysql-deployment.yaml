@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: golangdemomicroserviceusermysql
+  name: gd-ms-mysql
   labels:
-    app: golangdemomicroserviceusermysql
+    app: gd-ms-mysql
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: golangdemomicroserviceusermysql
+      app: gd-ms-mysql
   template:
     metadata:
-      name: golangdemomicroserviceusermysql
+      name: gd-ms-mysql
       labels:
-        app: golangdemomicroserviceusermysql
+        app: gd-ms-mysql
     spec:
       containers:
-        - name: golangdemomicroserviceusermysql
+        - name: gd-ms-mysql
           image: mysql:8.0
           imagePullPolicy: IfNotPresent
           env:
@@ -26,10 +26,10 @@ spec:
             - containerPort: 3306
           volumeMounts:
             - mountPath: /var/lib/mysql
-              name: mysql-storage
+              name: gd-ms-mysql-storage
       restartPolicy: Always
       volumes:
-        - name: mysql-storage
+        - name: gd-ms-mysql-storage
           persistentVolumeClaim:
-            claimName: gdms-mysql-claim
+            claimName: gd-ms-mysql-claim
       

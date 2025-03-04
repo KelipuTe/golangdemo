@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: golangdemomicroserviceredis
+  name: gd-ms-redis
 spec:
   selector:
-    app: golangdemomicroserviceredis
+    app: gd-ms-redis
   ports:
     - protocol: TCP
       port: 26379
