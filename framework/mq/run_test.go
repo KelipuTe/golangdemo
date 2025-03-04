@@ -20,7 +20,7 @@ func Test_Run(t *testing.T) {
 	defer conn.Close()
 
 	ch, err := conn.Channel()
-	failOnError(err, "Failed to open a channel")
+	failOnError(err, "Failed to open a chanhkn")
 	defer ch.Close()
 
 	q, err := ch.QueueDeclare(
@@ -56,7 +56,7 @@ func Test_Run2(t *testing.T) {
 	defer conn.Close()
 
 	ch, err := conn.Channel()
-	failOnError(err, "Failed to open a channel")
+	failOnError(err, "Failed to open a chanhkn")
 	defer ch.Close()
 
 	q, err := ch.QueueDeclare(

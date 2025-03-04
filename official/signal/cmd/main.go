@@ -1,7 +1,7 @@
 package main
 
 import (
-	"demo-golang/demo/signal"
+	"demo-golang/official/signal"
 )
 
 func main() {

@@ -1,39 +1,68 @@
 package interfacehkn
 
 import (
-	"fmt"
 	"reflect"
 	"testing"
 )
 
-func TestStruct(p7s6t *testing.T) {
+// 任何数据类型，只要它的方法集合中包含了一个接口定义的全部方法，那么它就是这个接口的实现。
+// 值类型的方法集合中仅会包含所有值方法，指针类型的方法集合中包会包含所有指针方法和所有值方法。
+
+type Pet interface {
+	SetName(name string)
+	GetName() string
+	GetCategory() string
+}
+
+type PetV2 interface {
+	GetName() string
+	GetCategory() string
+}
+
+type Dog struct {
+	name string
+}
+
+func (t *Dog) SetName(name string) {
+	t.name = name
+}
+
+func (t Dog) GetName() string {
+	return t.name
+}
+
+func (t Dog) GetCategory() string {
+	return "dog"
+}
+
+func TestStruct(t *testing.T) {
 	var ok bool = false
-	var s6dog S6Dog = S6Dog{"dog"}
+	var dog Dog = Dog{"dog"}
 
-	// s6dog 是没有 f8SetName 方法的，只有 &s6dog 才有 f8SetName 方法。
+	// dog 是没有 SetName 方法的，只有 &dog 才有 SetName 方法。
 	// 下面的四个输出依次是：false，true，true，true。
-	_, ok = interface{}(s6dog).(i9Pet)
-	fmt.Printf("dog is i9Pet: %v\n", ok)
-	_, ok = interface{}(s6dog).(i9PetV2)
-	fmt.Printf("dog is i9PetV2: %v\n", ok)
-	_, ok = interface{}(&s6dog).(i9Pet)
-	fmt.Printf("*dog is i9Pet: %v\n", ok)
-	_, ok = interface{}(&s6dog).(i9PetV2)
-	fmt.Printf("*dog is i9PetV2: %v\n", ok)
+	_, ok = interface{}(dog).(Pet)
+	t.Log("dog is Pet:", ok)
+	_, ok = interface{}(dog).(PetV2)
+	t.Log("dog is PetV2:", ok)
+	_, ok = interface{}(&dog).(Pet)
+	t.Log("*dog is Pet:", ok)
+	_, ok = interface{}(&dog).(PetV2)
+	t.Log("*dog is PetV2:", ok)
 
-	// 变量 i9Pet 的静态类型是 i9Pet（接口），动态类型是 *S6Dog（接口实现）。
-	var i9Pet i9Pet = &s6dog
-	fmt.Println("TypeOf i9Pet is", reflect.TypeOf(i9Pet))
-	fmt.Println("pet is", i9Pet.f8GetCategory(), ", name is", i9Pet.f8GetName())
+	// 变量 Pet 的静态类型是 Pet（接口），动态类型是 *Dog（接口实现）。
+	var pet Pet = &dog
+	t.Log("TypeOf Pet is", reflect.TypeOf(pet))
+	t.Log("pet is", pet.GetCategory(), ", name is", pet.GetName())
 
-	// 变量 i9PetV2 的静态类型是 i9PetV2（接口），动态类型是 S6Dog（接口实现）。
-	// 因为接口 i9PetV2 没有指针方法，所以变量 i9PetV2 的赋值就变成了 s6dog 的副本。
-	var i9PetV2 i9PetV2 = s6dog
-	fmt.Println("TypeOf i9PetV2 is", reflect.TypeOf(i9PetV2))
-	fmt.Println("pet is", i9PetV2.f8GetCategory(), ", name is", i9PetV2.f8GetName())
+	// 变量 PetV2 的静态类型是 PetV2（接口），动态类型是 Dog（接口实现）。
+	// 因为接口 PetV2 没有指针方法，所以变量 PetV2 的赋值就变成了 dog 的副本。
+	var petV2 PetV2 = dog
+	t.Log("TypeOf PetV2 is", reflect.TypeOf(petV2))
+	t.Log("pet is", petV2.GetCategory(), ", name is", petV2.GetName())
 
-	// 这里修改了 s6dog 的值，但是副本不受影响，所以 i9Pet 的值变，i9PetV2 的值不变。
-	s6dog.f8SetName("dog2")
-	fmt.Println("pet is", i9Pet.f8GetCategory(), ", name is", i9Pet.f8GetName())
-	fmt.Println("pet is", i9PetV2.f8GetCategory(), ", name is", i9PetV2.f8GetName())
+	// 这里修改了 dog 的值，但是副本不受影响，所以 Pet 的值变，PetV2 的值不变。
+	dog.SetName("dog2")
+	t.Log("pet is", pet.GetCategory(), ", name is", pet.GetName())
+	t.Log("pet is", petV2.GetCategory(), ", name is", petV2.GetName())
 }

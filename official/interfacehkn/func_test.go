@@ -5,25 +5,25 @@ import (
 	"testing"
 )
 
-// 在 Golang 里面，可以给方法类型添加方法，所以方法类型也可成为接口的实现。
-// 所以如果有一个参数的类型是接口，那么传进去的东西可以是结构体类型也可以是一个方法类型。
+// 可以给方法类型添加方法，所以方法类型也可成为接口的实现。
+// 如果有一个参数的类型是接口，那么传进去的东西可以是结构体类型也可以是一个方法。
 
-type i9Call interface {
-	f8Call(interface{})
+type outerFunc interface {
+	outerFunc(string)
 }
 
-type f8Demo func(interface{})
+type innerFunc func(string)
 
-func (f8this f8Demo) f8Call(input interface{}) {
-	fmt.Println("before f8Call f8Demo")
-	f8this(input)
-	fmt.Println("after f8Call f8Demo")
+func (t innerFunc) outerFunc(input string) {
+	fmt.Println("before innerFunc")
+	t(input)
+	fmt.Println("after innerFunc")
 }
 
-func TestFunction(p7s6t *testing.T) {
-	var f8Demo f8Demo = func(input interface{}) { fmt.Println(input) }
-	// 将 f8Demo 类型的变量赋值 i9Call 接口类型的变量
-	var i9Call i9Call = f8Demo
+func TestFunc(t *testing.T) {
+	var inner innerFunc = func(input string) { fmt.Println(input) }
+	// 将 innerFunc 类型的变量赋值 outerFunc 接口类型的变量
+	var outer outerFunc = inner
 	// 调用接口上的方法
-	i9Call.f8Call("hello")
+	outer.outerFunc("hello")
 }

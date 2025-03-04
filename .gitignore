@@ -1,8 +1,9 @@
 # Jet Brains 全家桶的配置
-.idea/
 
 # Visual Studio Code 的配置
 .vscode/
+# npm 的依赖
+node_modules/
 
 # windows 的可执行文件
 *.exe

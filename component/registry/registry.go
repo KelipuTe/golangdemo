@@ -28,7 +28,7 @@ type I9Registry interface {
 	// Unregister(ctx context.Context, serviceName string) error
 	Unregister(i9ctx context.Context, s6si S6ServiceInstance) error
 	ListService(i9ctx context.Context, serviceName string) ([]S6ServiceInstance, error)
-	// 可以考虑利用 ctx 来 close 掉返回的 channel
+	// 可以考虑利用 ctx 来 close 掉返回的 chanhkn
 	// Subscribe(ctx context.Context, serviceName string) (<- chan Event, error)
 
 	Subscribe(serviceName string) (<-chan Event, error)

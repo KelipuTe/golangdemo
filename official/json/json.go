@@ -6,12 +6,12 @@ import (
 )
 
 func main() {
-	fmt.Println("demo run")
+	fmt.Println("official run")
 	StractEncodeToJson()
 	JsonDecodeIntoStruct()
 	MapEncodeToJson()
 	JsonDecodeIntoMap()
-	fmt.Println("demo finish")
+	fmt.Println("official finish")
 }
 
 //struct的标签可以定义json解析时的一些操作

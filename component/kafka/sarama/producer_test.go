@@ -3,6 +3,7 @@ package sarama
 import (
 	"github.com/IBM/sarama"
 	"github.com/stretchr/testify/require"
+	"log"
 	"testing"
 )
 
@@ -17,26 +18,28 @@ var addrs = []string{"localhost:9094"}
 // 同步发消息
 func TestSyncProducer(t *testing.T) {
 	cfg := sarama.NewConfig()
-	//c.Producer.Partitioner 默认是NewHashPartitioner（哈希），想要达到业务有序非常简单
+	//c.Producer.Partitioner 可以设置Partition逻辑，默认是NewHashPartitioner（哈希）
 	cfg.Producer.Return.Successes = true
 	producer, err := sarama.NewSyncProducer(addrs, cfg)
 	require.NoError(t, err)
 
+	//Topic，topic
+	//Value，消息本体
+	//Headers，在生产者和消费者之间传递数据，类似http的header
 	msg := &sarama.ProducerMessage{
-		//topic
 		Topic: "test_topic",
-		//消息本体
-		Value: sarama.StringEncoder("hello world"),
-		//在生产者和消费者之间传递数据，类似http的header
+		Value: sarama.StringEncoder("TestSyncProducer"),
 		Headers: []sarama.RecordHeader{
 			{
 				Key:   []byte("traceId"),
-				Value: []byte("traceId123456"),
+				Value: []byte("TestSyncProducer"),
 			},
 		},
 	}
 	_, _, err = producer.SendMessage(msg)
 	require.NoError(t, err)
+
+	log.Println("发送成功")
 }
 
 // 异步发消息
@@ -48,27 +51,33 @@ func TestAsyncProducer(t *testing.T) {
 	require.NoError(t, err)
 
 	go func() {
-		msgChan := producer.Input()
+		msgCh := producer.Input()
 		msg := &sarama.ProducerMessage{
 			Topic: "test_topic",
-			Value: sarama.StringEncoder("hello world"),
+			Value: sarama.StringEncoder("TestAsyncProducer"),
 			Headers: []sarama.RecordHeader{
 				{
 					Key:   []byte("traceId"),
-					Value: []byte("traceId123456"),
+					Value: []byte("TestAsyncProducer"),
 				},
 			},
 		}
-		msgChan <- msg
+		//如果Kafka那边出现性能瓶颈了，msgCh<-msg 是有可能阻塞的
+		select {
+		case msgCh <- msg:
+			t.Log("生产者不阻塞")
+		default:
+			t.Log("生产者阻塞")
+		}
 	}()
 
-	succChan := producer.Successes()
-	errChan := producer.Errors()
+	succCh := producer.Successes()
+	errCh := producer.Errors()
 
 	select {
-	case <-succChan:
+	case <-succCh:
 		t.Log("发送成功")
-	case err := <-errChan:
+	case err := <-errCh:
 		t.Log("发送失败", err.Error())
 	}
 }

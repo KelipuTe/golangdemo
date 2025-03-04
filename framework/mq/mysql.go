@@ -172,7 +172,7 @@ func NewMySQLClient(config Config) *gorm.DB {
 	filePath := filepath.Join(config.GetString("GORM_LOG_FILE"))
 	logFile, err := os.OpenFile(filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if nil != err {
-		log.Printf("new gorm log with err: %s\n", err)
+		log.Printf("new gorm logger with err: %s\n", err)
 		return nil
 	}
 	newLogger := logger.New(

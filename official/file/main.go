@@ -8,13 +8,13 @@ import (
 )
 
 func main() {
-	fmt.Println("demo run")
-	filePath := "./demo/file/demo.txt"
+	fmt.Println("official run")
+	filePath := "./official/file/official.txt"
 	writeTxtToFile(filePath, "写入文本", false)
 	readTxtFromFile(filePath)
 	writeTxtToFile(filePath, "追加文本", false)
 	readTxtFromFile(filePath)
-	fmt.Println("demo finish")
+	fmt.Println("official finish")
 }
 
 // 写入文件

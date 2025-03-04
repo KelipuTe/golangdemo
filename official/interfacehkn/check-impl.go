@@ -1,17 +1,17 @@
 package interfacehkn
 
-type interface1 interface {
-	func1()
+type checkInterface interface {
+	checkFunc()
 }
 
-type struct1 struct {
+type checkStruct struct {
 }
 
-func (t struct1) func1() {
+func (t checkStruct) checkFunc() {
 }
 
 //这两种写法可以检查 struct1 是否实现了 interface1
 
-var _ interface1 = &struct1{}
+var _ checkInterface = &checkStruct{}
 
-var _ interface1 = (*struct1)(nil)
+var _ checkInterface = (*checkStruct)(nil)

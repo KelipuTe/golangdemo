@@ -1,7 +1,7 @@
 package gateway
 
 import (
-	"demo-golang/demo/signal"
+	"demo-golang/official/signal"
 	"testing"
 )
 
