@@ -13,7 +13,7 @@ func TestSlideWindowLimiter(t *testing.T) {
 		for {
 			time.Sleep(time.Second)
 			ctx := context.Background()
-			isLimit, err := limiter.IsLimit(ctx, "test")
+			isLimit, err := limiter.IsLimited(ctx, "test")
 			t.Log("test", isLimit, err)
 		}
 	}()
@@ -23,7 +23,7 @@ func TestSlideWindowLimiter(t *testing.T) {
 			time.Sleep(500 * time.Millisecond)
 			time.Sleep(time.Second)
 			ctx := context.Background()
-			isLimit, err := limiter.IsLimit(ctx, "test")
+			isLimit, err := limiter.IsLimited(ctx, "test")
 			t.Log("test", isLimit, err)
 		}
 	}()
@@ -32,7 +32,7 @@ func TestSlideWindowLimiter(t *testing.T) {
 		for {
 			time.Sleep(time.Second)
 			ctx := context.Background()
-			isLimit, err := limiter.IsLimit(ctx, "test2")
+			isLimit, err := limiter.IsLimited(ctx, "test2")
 			t.Log("test2", isLimit, err)
 		}
 	}()

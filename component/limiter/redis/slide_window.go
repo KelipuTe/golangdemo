@@ -17,15 +17,15 @@ type SlideWindowLimiter struct {
 	maxReqNum  int           // 最大请求数
 }
 
-func NewSlideWindowLimiter(cmd redis.Cmdable, w time.Duration, num int) *SlideWindowLimiter {
+func NewSlideWindowLimiter(r redis.Cmdable, w time.Duration, num int) *SlideWindowLimiter {
 	return &SlideWindowLimiter{
-		redis:      cmd,
+		redis:      r,
 		windowSize: w,
 		maxReqNum:  num,
 	}
 }
 
-func (t *SlideWindowLimiter) IsLimit(ctx context.Context, key string) (bool, error) {
+func (t *SlideWindowLimiter) IsLimited(ctx context.Context, key string) (bool, error) {
 	return t.redis.Eval(
 		ctx, luaScript, []string{key},
 		t.windowSize.Milliseconds(), t.maxReqNum, time.Now().UnixMilli(),

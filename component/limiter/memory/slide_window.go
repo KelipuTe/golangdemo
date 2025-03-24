@@ -38,7 +38,7 @@ func NewSlideWindowLimiter(w, s time.Duration, num int) *SlideWindowLimiter {
 	}
 }
 
-func (t *SlideWindowLimiter) IsLimit(ctx context.Context, key string) (bool, error) {
+func (t *SlideWindowLimiter) IsLimited(ctx context.Context, key string) (bool, error) {
 	now := time.Now().UnixNano()
 
 	// 运行起来之后，读肯定远多于写，所以用读写锁
