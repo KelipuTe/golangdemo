@@ -15,8 +15,8 @@ func TestGinPrometheus(t *testing.T) {
 	prometheusBuilder := &prometheus.Builder{
 		Help:      "监控gin的http接口",
 		Namespace: "golangdemo",
-		Subsystem: "ginprometheus",
-		Name:      "ginhttp",
+		Subsystem: "gin",
+		Name:      "http",
 	}
 
 	server.Use(
@@ -26,17 +26,7 @@ func TestGinPrometheus(t *testing.T) {
 	)
 
 	server.GET("/", func(ctx *gin.Context) {
-		var num int
-
-		minute := time.Now().Second()
-		if minute > 40 {
-			num = rand.Intn(500)
-		} else if minute > 20 {
-			num = rand.Intn(300)
-		} else {
-			num = rand.Intn(100)
-		}
-
+		num := rand.Intn(500)
 		time.Sleep(time.Duration(num) * time.Millisecond)
 
 		ctx.JSON(http.StatusOK, "TestGinPrometheus")

@@ -1,0 +1,6 @@
+services:
+  zipkin:
+    container_name: zipkin-dev
+    image: bitnami/zipkin:3.5.0
+    ports:
+      - '9411:9411'

@@ -9,7 +9,7 @@ import (
 
 // Builder gin普罗米修斯监控中间件
 // 监控，请求总数，正在处理的请求数，请求时间
-// Namespace+Subsystem+Name，是唯一的即可，要不然会panic
+// \Namespace+Subsystem+Name，是唯一的即可，要不然会panic
 // 比如，可以是，公司部门-部门管理的服务-从服务采集的什么数据
 type Builder struct {
 	// 这客户端是干什么的
@@ -74,7 +74,6 @@ func (t *Builder) ResponseTimeSummary() gin.HandlerFunc {
 			ConstLabels: map[string]string{
 				"instance_id": t.InstanceId,
 			},
-			//key是百分比，val是误差。key=0.5 val=0.01。那0.49-0.51都算。
 			Objectives: map[float64]float64{
 				0.5:   0.01,
 				0.7:   0.01,

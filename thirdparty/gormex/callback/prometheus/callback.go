@@ -6,8 +6,8 @@ import (
 	"time"
 )
 
-// Callback gorm普罗米修斯监控中间件
-// 监控，查询时间
+// Callback gorm的普罗米修斯监控插件
+// 监控，查询语句执行时间
 type Callback struct {
 	vector *prometheus.SummaryVec
 }
